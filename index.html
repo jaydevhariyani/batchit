@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BatchIt - Professional Web Utilities & Calculators</title>
+  <title>BatchIt - Free Online Utility Tools & Calculators</title>
   <style>
     * {
       margin: 0;
@@ -12,13 +12,13 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     body {
-      background-color: #f4f7f6;
+      background-color: #f8f9fa;
       color: #333;
       line-height: 1.6;
     }
     header {
       background: #ffffff;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
       position: sticky;
       top: 0;
       z-index: 1000;
@@ -32,66 +32,89 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      height: 70px;
+      height: 75px;
     }
     .logo {
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 700;
-      color: #007bff;
+      color: #0066cc;
     }
     .search-bar input {
-      padding: 8px 15px;
-      width: 250px;
-      border: 1px solid #ccc;
+      padding: 8px 18px;
+      width: 280px;
+      border: 1px solid #ddd;
       border-radius: 20px;
       outline: none;
+      font-size: 14px;
     }
     .hero {
       text-align: center;
       padding: 50px 20px;
-      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      background: linear-gradient(135deg, #0066cc 0%, #004080 100%);
       color: white;
+      margin-bottom: 30px;
     }
     .hero h1 {
-      font-size: 36px;
-      margin-bottom: 10px;
+      font-size: 38px;
+      margin-bottom: 12px;
+    }
+    .hero p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    .category-title {
+      font-size: 22px;
+      color: #222;
+      margin: 40px 0 20px 0;
+      border-left: 5px solid #0066cc;
+      padding-left: 10px;
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 20px;
-      padding: 40px 0;
+      margin-bottom: 30px;
     }
     .card {
       background: #fff;
-      padding: 25px;
+      padding: 22px;
       border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
       transition: 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
     }
     .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      border-top: 3px solid #0066cc;
     }
     .card h3 {
-      color: #007bff;
-      margin-bottom: 10px;
+      color: #0066cc;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+    .card p {
+      color: #666;
+      font-size: 14px;
     }
     .ads-space {
       background: #e9ecef;
       text-align: center;
       padding: 20px;
-      margin: 20px 0;
+      margin: 30px 0;
       border-radius: 8px;
       color: #6c757d;
       font-size: 14px;
     }
     footer {
       text-align: center;
-      padding: 20px;
+      padding: 25px;
       background: #fff;
       color: #666;
-      border-top: 1px solid #ddd;
+      border-top: 1px solid #eaeaea;
+      margin-top: 50px;
     }
   </style>
 </head>
@@ -101,35 +124,62 @@
     <div class="container nav">
       <div class="logo">BatchIt</div>
       <div class="search-bar">
-        <input type="text" placeholder="Search tools...">
+        <input type="text" placeholder="Search 20+ tools...">
       </div>
     </div>
   </header>
 
   <section class="hero">
     <div class="container">
-      <h1>Smart Web Utilities & Calculators</h1>
-      <p>Fast, reliable, and India-focused online tools for everyday needs.</p>
+      <h1>All-in-One Web Utilities & Calculators</h1>
+      <p>Fast, reliable, and SEO-optimized free online tools for your everyday tasks.</p>
     </div>
   </section>
 
   <main class="container">
-    <div class="ads-space">AdSense Banner Space (Responsive Ad Unit)</div>
+    <div class="ads-space">Google AdSense Header Banner Space</div>
 
+    <!-- Finance Category -->
+    <h2 class="category-title">Finance Tools</h2>
     <div class="grid">
-      <div class="card">
-        <h3>SIP Calculator</h3>
-        <p>Calculate your mutual fund returns and investment growth easily with accurate estimations.</p>
-      </div>
-      <div class="card">
-        <h3>Loan Calculator</h3>
-        <p>Plan your monthly EMIs and loan amortizations seamlessly with real-time math.</p>
-      </div>
-      <div class="card">
-        <h3>PDF & File Tools</h3>
-        <p>Fast browser-based utilities to manage, modify, and handle your documents securely.</p>
-      </div>
+      <a href="sip-calculator.html" class="card"><h3>SIP Calculator</h3><p>Calculate mutual fund returns and investment growth easily.</p></a>
+      <a href="emi-calculator.html" class="card"><h3>EMI Calculator</h3><p>Plan your monthly loan payments accurately.</p></a>
+      <a href="loan-calculator.html" class="card"><h3>Loan Calculator</h3><p>Compute total interest and amortization schedules.</p></a>
+      <a href="salary-calculator.html" class="card"><h3>Salary Calculator</h3><p>Calculate in-hand salary, tax, and deductions.</p></a>
+      <a href="gst-calculator.html" class="card"><h3>GST Calculator</h3><p>Add or remove GST amounts instantly.</p></a>
+      <a href="discount-calculator.html" class="card"><h3>Discount Calculator</h3><p>Find out final sale prices and saved amounts.</p></a>
+      <a href="profit-loss-calculator.html" class="card"><h3>Profit/Loss Calculator</h3><p>Calculate margins, profits, and losses seamlessly.</p></a>
+      <a href="currency-converter.html" class="card"><h3>Currency Converter</h3><p>Convert global currencies with live rates.</p></a>
     </div>
+
+    <!-- Calculators Category -->
+    <h2 class="category-title">Calculators & Math</h2>
+    <div class="grid">
+      <a href="percentage-calculator.html" class="card"><h3>Percentage Calculator</h3><p>Calculate percentage increases, decreases, and ratios.</p></a>
+      <a href="bmi-calculator.html" class="card"><h3>BMI Calculator</h3><p>Check your Body Mass Index and health status.</p></a>
+      <a href="cgpa-calculator.html" class="card"><h3>CGPA/Percentage</h3><p>Convert CGPA scores into equivalent percentages.</p></a>
+      <a href="date-difference.html" class="card"><h3>Date Difference</h3><p>Find exact days, months, and years between dates.</p></a>
+      <a href="time-calculator.html" class="card"><h3>Time Calculator</h3><p>Add or subtract hours, minutes, and seconds.</p></a>
+      <a href="unit-converter.html" class="card"><h3>Unit Converter</h3><p>Convert length, weight, temperature, and volume.</p></a>
+    </div>
+
+    <!-- PDF & Image Category -->
+    <h2 class="category-title">PDF & Image Tools</h2>
+    <div class="grid">
+      <a href="image-compressor.html" class="card"><h3>Image Compressor</h3><p>Reduce image file size without losing quality.</p></a>
+      <a href="pdf-compressor.html" class="card"><h3>PDF Compressor</h3><p>Shrink large PDF documents securely.</p></a>
+      <a href="pdf-merger.html" class="card"><h3>PDF Merger</h3><p>Combine multiple PDF files into one document.</p></a>
+      <a href="pdf-image-tools.html" class="card"><h3>PDF/Image Tools</h3><p>Convert formats and manage files in browser.</p></a>
+    </div>
+
+    <!-- Text & Utility Category -->
+    <h2 class="category-title">Text & Utilities</h2>
+    <div class="grid">
+      <a href="word-counter.html" class="card"><h3>Word Counter</h3><p>Count words, characters, and reading time instantly.</p></a>
+      <a href="qr-generator.html" class="card"><h3>QR Code Generator</h3><p>Create custom QR codes for URLs and text.</p></a>
+    </div>
+
+    <div class="ads-space">Google AdSense Footer Banner Space</div>
   </main>
 
   <footer>
