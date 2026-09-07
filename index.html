@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Utility Tools - Free Online Tools</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
     <div class="container">
-      <a href="index.html" class="logo">Utility Tools</a>
+      <a href="index.html" class="logo">
+        <span>?</span> Utility<span>Tools</span>
+      </a>
       <nav>
         <a href="index.html">Home</a>
         <a href="all-tools.html">All Tools</a>
@@ -19,38 +22,40 @@
 
   <section class="hero">
     <div class="container">
-      <h1>Every tool you need. One beautiful workspace.</h1>
-      <p>PDF, image, text, developer, finance utilities — fast, private & free forever.</p>
-      <div class="stats">
-        <div><strong>50+</strong> tools</div>
-        <div><strong>10</strong> categories</div>
-        <div><strong>$0</strong> forever</div>
+      <div class="hero-badge">? 50+ free tools</div>
+      <h1>Every tool you need. <span>One beautiful workspace.</span></h1>
+      <p>PDF, image, developer, finance & daily utilities — fast, private, and built for everyday productivity.</p>
+
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search 50+ tools...">
       </div>
-      <a href="all-tools.html" class="btn">Browse all tools</a>
+
+      <div class="popular-pills">
+        <a href="tools/pdf-merge.html">Merge PDF</a>
+        <a href="tools/image-compress.html">Compress Image</a>
+        <a href="tools/pdf-to-image.html">PDF to Image</a>
+        <a href="tools/emi-calculator.html">EMI Calculator</a>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><strong>50+</strong> tools</div>
+        <div class="stat"><strong>8</strong> categories</div>
+        <div class="stat"><strong>100%</strong> free</div>
+        <div class="stat"><strong>$0</strong> forever</div>
+      </div>
     </div>
   </section>
 
-  <section class="categories container">
-    <h2>Pick your workflow</h2>
-    <div class="cat-grid">
-      <a href="all-tools.html#text" class="cat-card">Text Tools</a>
-      <a href="all-tools.html#developer" class="cat-card">Developer</a>
-      <a href="all-tools.html#security" class="cat-card">Security</a>
-      <a href="all-tools.html#finance" class="cat-card">Finance</a>
-      <a href="all-tools.html#daily" class="cat-card">Daily Life</a>
-    </div>
-  </section>
-
-  <section class="popular container">
-    <h2>Most loved utilities</h2>
-    <div class="tools-grid" id="popular-tools">
-      <!-- JS will fill -->
+  <section class="section">
+    <div class="container">
+      <h2>Popular Tools</h2>
+      <div class="tools-grid" id="popular-tools"></div>
     </div>
   </section>
 
   <footer>
     <div class="container">
-      <p>© 2026 Utility Tools. 100% Free • Privacy First • No Sign-up</p>
+      <p>© 2026 Utility Tools • 100% Free • Privacy First • No Sign-up</p>
     </div>
   </footer>
 
