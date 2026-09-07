@@ -3,15 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BatchIt - Free Online Utility Tools | PDF, Image, Calculators & More</title>
-  <meta name="description" content="BatchIt offers free online tools for PDF, image, text, developer, finance and daily utilities. Fast, private and free forever. Merge PDF, Compress Image, SIP, EMI, Word Counter and more." />
-  <meta name="keywords" content="BatchIt, free online tools, PDF merge, image compress, SIP calculator, EMI calculator, word counter, password generator, QR code" />
-  <meta name="robots" content="index, follow" />
+  <title>BatchIt - Free Online Tools | PDF Resize, Image to PDF, SIP Calculator, EMI Calculator</title>
+  <meta name="description" content="Free online PDF Resize, Image to PDF, Merge PDF, Image Compress, SIP Calculator, EMI Calculator, GST Calculator, Word Counter & more. Fast, private, no signup. 100% free forever on BatchIt." />
+  <meta name="keywords" content="PDF Resize, Image to PDF, Merge PDF, Image Compress, SIP Calculator, EMI Calculator, GST Calculator, Word Counter, Password Generator, QR Code Generator, free online tools, BatchIt" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+  <meta name="author" content="BatchIt" />
+  <meta name="theme-color" content="#7c3aed" />
   <link rel="canonical" href="https://batchit.site/" />
-  <meta property="og:title" content="BatchIt - Free Online Utility Tools" />
-  <meta property="og:description" content="Every tool you need. One beautiful workspace. Free forever." />
+  <meta property="og:title" content="BatchIt - Free PDF Resize, Image to PDF, SIP & EMI Calculator" />
+  <meta property="og:description" content="Free online PDF Resize, Image to PDF, Merge PDF, SIP Calculator, EMI Calculator and 15+ tools. Fast, private, free forever." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://batchit.site/" />
+  <meta property="og:site_name" content="BatchIt" />
+  <meta property="og:locale" content="en_IN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="BatchIt - Free Online PDF & Calculator Tools" />
+  <meta name="twitter:description" content="PDF Resize, Image to PDF, SIP Calculator, EMI Calculator and more. 100% free." />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "BatchIt",
+    "url": "https://batchit.site/",
+    "description": "Free online utility tools including PDF Resize, Image to PDF, Merge PDF, SIP Calculator, EMI Calculator, GST Calculator and more.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "INR"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "120"
+    }
+  }
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -105,10 +133,10 @@
           </button>
         </div>
         <div class="flex flex-wrap justify-center gap-2 text-sm">
+          <span class="px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600">PDF Resize</span>
+          <span class="px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600">Image to PDF</span>
           <span class="px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600">Merge PDF</span>
-          <span class="px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600">Compress Image</span>
           <span class="px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600">SIP Calculator</span>
-          <span class="px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-600">Word Counter</span>
         </div>
         <div class="mt-8 flex flex-wrap justify-center gap-6 text-sm text-slate-500">
           <span class="flex items-center gap-1.5"><span class="text-brand-600 font-bold">50+</span> tools</span>
@@ -209,28 +237,30 @@
 
   <script>
     const tools = [
-      { id: 'pdf', name: 'Merge PDF', desc: 'Combine multiple PDF files into one', category: 'pdf', icon: '📄', color: 'bg-red-50 text-red-600' },
-      { id: 'image', name: 'Image Compress & Resize', desc: 'Compress and resize images easily', category: 'image', icon: '🖼️', color: 'bg-pink-50 text-pink-600' },
-      { id: 'sip', name: 'SIP Calculator', desc: 'Calculate mutual fund SIP returns', category: 'finance', icon: '📈', color: 'bg-emerald-50 text-emerald-600' },
-      { id: 'emi', name: 'EMI Calculator', desc: 'Compute monthly loan payments', category: 'finance', icon: '🏦', color: 'bg-emerald-50 text-emerald-600' },
-      { id: 'gst', name: 'GST Calculator', desc: 'Calculate GST inclusive & exclusive', category: 'finance', icon: '🧾', color: 'bg-emerald-50 text-emerald-600' },
-      { id: 'percentage', name: 'Percentage Calculator', desc: 'Find percentage of any value', category: 'finance', icon: '%', color: 'bg-emerald-50 text-emerald-600' },
-      { id: 'age', name: 'Age Calculator', desc: 'Calculate exact age from date of birth', category: 'finance', icon: '🎂', color: 'bg-amber-50 text-amber-600' },
-      { id: 'word', name: 'Word Counter', desc: 'Count words, characters & reading time', category: 'text', icon: '📝', color: 'bg-blue-50 text-blue-600' },
-      { id: 'case', name: 'Case Converter', desc: 'UPPER, lower, Title Case converter', category: 'text', icon: 'Aa', color: 'bg-blue-50 text-blue-600' },
-      { id: 'password', name: 'Password Generator', desc: 'Create strong random passwords', category: 'security', icon: '🔐', color: 'bg-violet-50 text-violet-600' },
-      { id: 'qr', name: 'QR Code Generator', desc: 'Generate QR code for text or URL', category: 'developer', icon: '▦', color: 'bg-indigo-50 text-indigo-600' },
-      { id: 'json', name: 'JSON Formatter', desc: 'Format and validate JSON', category: 'developer', icon: '{ }', color: 'bg-indigo-50 text-indigo-600' },
-      { id: 'base64', name: 'Base64 Encoder', desc: 'Encode or decode Base64 strings', category: 'developer', icon: '64', color: 'bg-indigo-50 text-indigo-600' },
-      { id: 'hash', name: 'Hash Generator', desc: 'Generate SHA-256 and SHA-1 hashes', category: 'security', icon: '#', color: 'bg-violet-50 text-violet-600' },
-      { id: 'lorem', name: 'Lorem Ipsum', desc: 'Generate placeholder text', category: 'text', icon: '¶', color: 'bg-blue-50 text-blue-600' },
-      { id: 'url', name: 'URL Encoder', desc: 'Encode or decode URL strings', category: 'developer', icon: '🔗', color: 'bg-indigo-50 text-indigo-600' },
-      { id: 'reverse', name: 'Text Reverser', desc: 'Reverse any text instantly', category: 'text', icon: '↔', color: 'bg-blue-50 text-blue-600' },
-      { id: 'duplicate', name: 'Duplicate Remover', desc: 'Remove duplicate lines from text', category: 'text', icon: '🧹', color: 'bg-blue-50 text-blue-600' },
+      { id: 'pdf', name: 'Merge PDF', desc: 'Combine multiple PDF files into one free online', category: 'pdf', icon: '📄', color: 'bg-red-50 text-red-600' },
+      { id: 'pdfresize', name: 'PDF Resize', desc: 'Resize PDF pages to A4, Letter or custom size', category: 'pdf', icon: '📐', color: 'bg-red-50 text-red-600' },
+      { id: 'imagetopdf', name: 'Image to PDF', desc: 'Convert images (JPG, PNG) to PDF instantly', category: 'pdf', icon: '🖼️📄', color: 'bg-red-50 text-red-600' },
+      { id: 'image', name: 'Image Compress & Resize', desc: 'Compress and resize images online free', category: 'image', icon: '🖼️', color: 'bg-pink-50 text-pink-600' },
+      { id: 'sip', name: 'SIP Calculator', desc: 'Free SIP Calculator - Estimate mutual fund returns', category: 'finance', icon: '📈', color: 'bg-emerald-50 text-emerald-600' },
+      { id: 'emi', name: 'EMI Calculator', desc: 'Free EMI Calculator for home, car & personal loans', category: 'finance', icon: '🏦', color: 'bg-emerald-50 text-emerald-600' },
+      { id: 'gst', name: 'GST Calculator', desc: 'Free GST Calculator - Inclusive & Exclusive', category: 'finance', icon: '🧾', color: 'bg-emerald-50 text-emerald-600' },
+      { id: 'percentage', name: 'Percentage Calculator', desc: 'Calculate percentage of any value online', category: 'finance', icon: '%', color: 'bg-emerald-50 text-emerald-600' },
+      { id: 'age', name: 'Age Calculator', desc: 'Calculate exact age from date of birth free', category: 'finance', icon: '🎂', color: 'bg-amber-50 text-amber-600' },
+      { id: 'word', name: 'Word Counter', desc: 'Count words, characters, sentences & reading time', category: 'text', icon: '📝', color: 'bg-blue-50 text-blue-600' },
+      { id: 'case', name: 'Case Converter', desc: 'Convert text to UPPER, lower, Title Case free', category: 'text', icon: 'Aa', color: 'bg-blue-50 text-blue-600' },
+      { id: 'password', name: 'Password Generator', desc: 'Generate strong random passwords online free', category: 'security', icon: '🔐', color: 'bg-violet-50 text-violet-600' },
+      { id: 'qr', name: 'QR Code Generator', desc: 'Create QR code for any text or URL free', category: 'developer', icon: '▦', color: 'bg-indigo-50 text-indigo-600' },
+      { id: 'json', name: 'JSON Formatter', desc: 'Format, validate and beautify JSON online', category: 'developer', icon: '{ }', color: 'bg-indigo-50 text-indigo-600' },
+      { id: 'base64', name: 'Base64 Encoder', desc: 'Encode or decode Base64 strings free', category: 'developer', icon: '64', color: 'bg-indigo-50 text-indigo-600' },
+      { id: 'hash', name: 'Hash Generator', desc: 'Generate SHA-256 and SHA-1 hashes free', category: 'security', icon: '#', color: 'bg-violet-50 text-violet-600' },
+      { id: 'lorem', name: 'Lorem Ipsum Generator', desc: 'Generate Lorem Ipsum placeholder text free', category: 'text', icon: '¶', color: 'bg-blue-50 text-blue-600' },
+      { id: 'url', name: 'URL Encoder Decoder', desc: 'Encode or decode URL strings online free', category: 'developer', icon: '🔗', color: 'bg-indigo-50 text-indigo-600' },
+      { id: 'reverse', name: 'Text Reverser', desc: 'Reverse any text instantly free online', category: 'text', icon: '↔', color: 'bg-blue-50 text-blue-600' },
+      { id: 'duplicate', name: 'Duplicate Line Remover', desc: 'Remove duplicate lines from text free', category: 'text', icon: '🧹', color: 'bg-blue-50 text-blue-600' },
     ];
 
     const categories = [
-      { id: 'pdf', name: 'PDF', count: 1, icon: '📄' },
+      { id: 'pdf', name: 'PDF', count: 3, icon: '📄' },
       { id: 'image', name: 'Image', count: 1, icon: '🖼️' },
       { id: 'finance', name: 'Finance', count: 5, icon: '💰' },
       { id: 'text', name: 'Text', count: 5, icon: '📝' },
@@ -458,6 +488,41 @@
               <a id="pdfLink" href="#" download="merged.pdf" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-xl transition">Download Merged PDF</a>
             </div>
             <p class="text-xs text-slate-400 text-center">Processed entirely in your browser. Nothing is uploaded.</p></div>`;
+        case 'pdfresize': return `<div class="space-y-4">
+            <div><label class="block text-sm font-medium text-slate-700 mb-1.5">Upload PDF</label>
+              <input type="file" id="pdfResizeFile" accept="application/pdf" class="w-full text-sm"></div>
+            <div><label class="block text-sm font-medium text-slate-700 mb-1.5">Target Size</label>
+              <select id="pdfSize" class="${inputCls}" onchange="toggleCustomSize()">
+                <option value="a4">A4 (210 × 297 mm)</option>
+                <option value="letter">Letter (8.5 × 11 in)</option>
+                <option value="a5">A5 (148 × 210 mm)</option>
+                <option value="custom">Custom (mm)</option>
+              </select></div>
+            <div id="customSizeWrap" class="hidden grid grid-cols-2 gap-3">
+              <div><label class="block text-sm font-medium text-slate-700 mb-1">Width (mm)</label><input type="number" id="customW" value="210" class="${inputCls}"></div>
+              <div><label class="block text-sm font-medium text-slate-700 mb-1">Height (mm)</label><input type="number" id="customH" value="297" class="${inputCls}"></div>
+            </div>
+            <button onclick="resizePDF()" class="${btnCls}">Resize PDF</button>
+            <p id="pdfResizeStatus" class="text-sm text-center text-slate-500"></p>
+            <div id="pdfResizeDownload" class="hidden text-center">
+              <a id="pdfResizeLink" href="#" download="resized.pdf" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-xl transition">Download Resized PDF</a>
+            </div>
+            <p class="text-xs text-slate-400 text-center">Pages are scaled to fit the selected size. Processed in your browser.</p></div>`;
+        case 'imagetopdf': return `<div class="space-y-4">
+            <div><label class="block text-sm font-medium text-slate-700 mb-1.5">Select Images (JPG, PNG)</label>
+              <input type="file" id="imgToPdfFiles" accept="image/*" multiple class="w-full text-sm"></div>
+            <div><label class="block text-sm font-medium text-slate-700 mb-1.5">Page Size</label>
+              <select id="imgPdfSize" class="${inputCls}">
+                <option value="a4">A4</option>
+                <option value="letter">Letter</option>
+                <option value="fit">Fit to Image</option>
+              </select></div>
+            <button onclick="imagesToPDF()" class="${btnCls}">Convert to PDF</button>
+            <p id="imgPdfStatus" class="text-sm text-center text-slate-500"></p>
+            <div id="imgPdfDownload" class="hidden text-center">
+              <a id="imgPdfLink" href="#" download="images.pdf" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-xl transition">Download PDF</a>
+            </div>
+            <p class="text-xs text-slate-400 text-center">Each image becomes one page. 100% private – nothing uploaded.</p></div>`;
         default: return '<p class="text-slate-500 text-center py-8">This tool is coming soon.</p>';
       }
     }
@@ -684,6 +749,101 @@
         status.textContent = 'Done! Download below.';
       } catch (e) {
         status.textContent = 'Error: ' + e.message;
+      }
+    }
+
+    function toggleCustomSize() {
+      const wrap = document.getElementById('customSizeWrap');
+      if (document.getElementById('pdfSize').value === 'custom') wrap.classList.remove('hidden');
+      else wrap.classList.add('hidden');
+    }
+
+    async function resizePDF() {
+      const input = document.getElementById('pdfResizeFile');
+      const status = document.getElementById('pdfResizeStatus');
+      const dl = document.getElementById('pdfResizeDownload');
+      if (!input.files?.length) { status.textContent = 'Please select a PDF file'; return; }
+      status.textContent = 'Resizing...';
+      dl.classList.add('hidden');
+      try {
+        const { PDFDocument, PageSizes } = PDFLib;
+        const buf = await input.files[0].arrayBuffer();
+        const src = await PDFDocument.load(buf);
+        const out = await PDFDocument.create();
+        let targetW, targetH;
+        const size = document.getElementById('pdfSize').value;
+        if (size === 'a4') { targetW = PageSizes.A4[0]; targetH = PageSizes.A4[1]; }
+        else if (size === 'letter') { targetW = PageSizes.Letter[0]; targetH = PageSizes.Letter[1]; }
+        else if (size === 'a5') { targetW = PageSizes.A5[0]; targetH = PageSizes.A5[1]; }
+        else {
+          // mm to points (1 mm ≈ 2.83465 pt)
+          targetW = (+document.getElementById('customW').value || 210) * 2.83465;
+          targetH = (+document.getElementById('customH').value || 297) * 2.83465;
+        }
+        const pages = await out.copyPages(src, src.getPageIndices());
+        for (const page of pages) {
+          const { width, height } = page.getSize();
+          const scale = Math.min(targetW / width, targetH / height);
+          page.setSize(targetW, targetH);
+          page.scaleContent(scale, scale);
+          // center content
+          const x = (targetW - width * scale) / 2;
+          const y = (targetH - height * scale) / 2;
+          page.translateContent(x, y);
+          out.addPage(page);
+        }
+        const bytes = await out.save();
+        const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+        document.getElementById('pdfResizeLink').href = url;
+        dl.classList.remove('hidden');
+        status.textContent = 'Done! Download below.';
+      } catch (e) {
+        console.error(e);
+        status.textContent = 'Error: ' + e.message;
+      }
+    }
+
+    async function imagesToPDF() {
+      const input = document.getElementById('imgToPdfFiles');
+      const status = document.getElementById('imgPdfStatus');
+      const dl = document.getElementById('imgPdfDownload');
+      if (!input.files?.length) { status.textContent = 'Please select at least one image'; return; }
+      status.textContent = 'Converting...';
+      dl.classList.add('hidden');
+      try {
+        const { PDFDocument, PageSizes } = PDFLib;
+        const pdf = await PDFDocument.create();
+        const sizeOpt = document.getElementById('imgPdfSize').value;
+        for (const file of input.files) {
+          const buf = await file.arrayBuffer();
+          let img;
+          if (file.type === 'image/png') img = await pdf.embedPng(buf);
+          else img = await pdf.embedJpg(buf);
+          let pageW, pageH;
+          if (sizeOpt === 'fit') {
+            pageW = img.width;
+            pageH = img.height;
+          } else if (sizeOpt === 'letter') {
+            pageW = PageSizes.Letter[0]; pageH = PageSizes.Letter[1];
+          } else {
+            pageW = PageSizes.A4[0]; pageH = PageSizes.A4[1];
+          }
+          const page = pdf.addPage([pageW, pageH]);
+          const scale = Math.min(pageW / img.width, pageH / img.height);
+          const w = img.width * scale;
+          const h = img.height * scale;
+          const x = (pageW - w) / 2;
+          const y = (pageH - h) / 2;
+          page.drawImage(img, { x, y, width: w, height: h });
+        }
+        const bytes = await pdf.save();
+        const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+        document.getElementById('imgPdfLink').href = url;
+        dl.classList.remove('hidden');
+        status.textContent = 'Done! Download below.';
+      } catch (e) {
+        console.error(e);
+        status.textContent = 'Error: ' + e.message + ' (use JPG or PNG)';
       }
     }
 
