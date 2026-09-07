@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Edit</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="../index.html" class="logo">Utility Tools</a>
+    </div>
+  </header>
+  <div class="tool-page container">
+    <div class="tool-box">
+      <h1>PDF Edit (Delete / Rotate)</h1>
+      <input type="file" id="file" accept=".pdf">
+      <label>Pages to delete (comma separated, e.g. 2,4,5)</label>
+      <input type="text" id="deletePages" placeholder="Leave empty if none">
+      <label>Rotate all pages by</label>
+      <select id="rotate">
+        <option value="0">No rotation</option>
+        <option value="90">90°</option>
+        <option value="180">180°</option>
+        <option value="270">270°</option>
+      </select>
+      <button onclick="editPDF()">Apply & Download</button>
+      <div id="status" class="result"></div>
+    </div>
+  </div>
+  <script>
+    async function editPDF() {
+      const file = document.getElementById('file').files[0];
+      if (!file) return alert('Select a PDF');
+      const { PDFDocument, degrees } = PDFLib;
+      const bytes = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(bytes);
+      const total = pdfDoc.getPageCount();
+
+      // Delete pages
+      const del = document.getElementById('deletePages').value
+        .split(',')
+        .map(x => parseInt(x.trim()) - 1)
+        .filter(x => !isNaN(x) && x >= 0 && x < total)
+        .sort((a,b) => b - a); // delete from end
+
+      del.forEach(i => pdfDoc.removePage(i));
+
+      // Rotate
+      const rot = parseInt(document.getElementById('rotate').value);
+      if (rot !== 0) {
+        pdfDoc.getPages().forEach(page => {
+          page.setRotation(degrees(rot));
+        });
+      }
+
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'edited.pdf';
+      a.click();
+      document.getElementById('status').textContent = 'Edited PDF downloaded!';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Compress</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="../index.html" class="logo">Utility Tools</a>
+    </div>
+  </header>
+  <div class="tool-page container">
+    <div class="tool-box">
+      <h1>Image Compress</h1>
+      <input type="file" id="file" accept="image/*">
+      <label>Quality (0.1 - 1): <span id="qVal">0.7</span></label>
+      <input type="range" id="quality" min="0.1" max="1" step="0.05" value="0.7">
+      <button onclick="compress()">Compress & Download</button>
+      <div id="info" class="result" style="display:none;"></div>
+      <img id="preview" style="max-width:100%; margin-top:20px; display:none;">
+    </div>
+  </div>
+  <script>
+    document.getElementById('quality').oninput = e => document.getElementById('qVal').textContent = e.target.value;
+    async function compress() {
+      const file = document.getElementById('file').files[0];
+      if (!file) return alert('Select an image');
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        initialQuality: parseFloat(document.getElementById('quality').value)
+      };
+      try {
+        const compressed = await imageCompression(file, options);
+        const url = URL.createObjectURL(compressed);
+        document.getElementById('preview').src = url;
+        document.getElementById('preview').style.display = 'block';
+        document.getElementById('info').style.display = 'block';
+        document.getElementById('info').innerHTML = `
+          Original: ${(file.size/1024).toFixed(1)} KB<br>
+          Compressed: ${(compressed.size/1024).toFixed(1)} KB
+        `;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'compressed_' + file.name;
+        a.click();
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+  </script>
+</body>
+</html>

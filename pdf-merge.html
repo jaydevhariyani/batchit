@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Merge</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="../index.html" class="logo">Utility Tools</a>
+    </div>
+  </header>
+  <div class="tool-page container">
+    <div class="tool-box">
+      <h1>PDF Merge</h1>
+      <input type="file" id="files" accept=".pdf" multiple>
+      <button onclick="merge()">Merge PDFs</button>
+      <div id="status" class="result"></div>
+    </div>
+  </div>
+  <script>
+    async function merge() {
+      const files = document.getElementById('files').files;
+      if (files.length < 2) return alert('Select at least 2 PDFs');
+      const { PDFDocument } = PDFLib;
+      const merged = await PDFDocument.create();
+      for (let file of files) {
+        const bytes = await file.arrayBuffer();
+        const pdf = await PDFDocument.load(bytes);
+        const pages = await merged.copyPages(pdf, pdf.getPageIndices());
+        pages.forEach(p => merged.addPage(p));
+      }
+      const pdfBytes = await merged.save();
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'merged.pdf';
+      a.click();
+      document.getElementById('status').textContent = 'Merged PDF downloaded!';
+    }
+  </script>
+</body>
+</html>

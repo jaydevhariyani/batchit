@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Age Calculator</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="../index.html" class="logo">Utility Tools</a>
+    </div>
+  </header>
+  <div class="tool-page container">
+    <div class="tool-box">
+      <h1>Age Calculator</h1>
+      <label>Date of Birth</label>
+      <input type="date" id="dob">
+      <button onclick="calc()">Calculate Age</button>
+      <div id="result" class="result"></div>
+    </div>
+  </div>
+  <script>
+    function calc() {
+      const dob = new Date(document.getElementById('dob').value);
+      if (!dob) return;
+      const today = new Date();
+      let years = today.getFullYear() - dob.getFullYear();
+      let months = today.getMonth() - dob.getMonth();
+      let days = today.getDate() - dob.getDate();
+      if (days < 0) {
+        months--;
+        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+      }
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+      document.getElementById('result').innerHTML = `
+        <b>${years}</b> Years, <b>${months}</b> Months, <b>${days}</b> Days
+      `;
+    }
+  </script>
+</body>
+</html>

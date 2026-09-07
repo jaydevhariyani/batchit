@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salary Calculator</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="../index.html" class="logo">Utility Tools</a>
+    </div>
+  </header>
+  <div class="tool-page container">
+    <div class="tool-box">
+      <h1>Salary Calculator (India)</h1>
+      <label>Gross Monthly Salary (?)</label>
+      <input type="number" id="gross" value="50000">
+      <label>PF Deduction (%)</label>
+      <input type="number" id="pf" value="12">
+      <label>Professional Tax (?)</label>
+      <input type="number" id="pt" value="200">
+      <button onclick="calc()">Calculate In-hand</button>
+      <div id="result" class="result"></div>
+    </div>
+  </div>
+  <script>
+    function calc() {
+      const gross = +document.getElementById('gross').value;
+      const pf = gross * (+document.getElementById('pf').value / 100);
+      const pt = +document.getElementById('pt').value;
+      const inhand = gross - pf - pt;
+      document.getElementById('result').innerHTML = `
+        Gross: <b>?${gross.toLocaleString()}</b><br>
+        PF: <b>?${pf.toFixed(0)}</b><br>
+        Professional Tax: <b>?${pt}</b><br>
+        <hr>
+        In-hand Salary: <b style="color:#22c55e">?${inhand.toFixed(0)}</b>
+      `;
+    }
+  </script>
+</body>
+</html>

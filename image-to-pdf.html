@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image to PDF</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="../index.html" class="logo">Utility Tools</a>
+    </div>
+  </header>
+  <div class="tool-page container">
+    <div class="tool-box">
+      <h1>Image to PDF</h1>
+      <input type="file" id="files" accept="image/*" multiple>
+      <button onclick="convert()">Convert to PDF</button>
+      <div id="status" class="result"></div>
+    </div>
+  </div>
+  <script>
+    async function convert() {
+      const files = document.getElementById('files').files;
+      if (!files.length) return alert('Select images');
+      const { PDFDocument } = PDFLib;
+      const pdfDoc = await PDFDocument.create();
+      for (let file of files) {
+        const bytes = await file.arrayBuffer();
+        let image;
+        if (file.type.includes('png')) image = await pdfDoc.embedPng(bytes);
+        else image = await pdfDoc.embedJpg(bytes);
+        const page = pdfDoc.addPage([image.width, image.height]);
+        page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+      }
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'images.pdf';
+      a.click();
+      document.getElementById('status').textContent = 'PDF downloaded!';
+    }
+  </script>
+</body>
+</html>

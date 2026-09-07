@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Crop</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="../index.html" class="logo">Utility Tools</a>
+    </div>
+  </header>
+  <div class="tool-page container">
+    <div class="tool-box">
+      <h1>PDF Crop</h1>
+      <p style="color:var(--muted); font-size:0.9rem;">Crop all pages equally (in points). 1 inch = 72 points</p>
+      <input type="file" id="file" accept=".pdf">
+      <label>Left</label><input type="number" id="left" value="20">
+      <label>Right</label><input type="number" id="right" value="20">
+      <label>Top</label><input type="number" id="top" value="20">
+      <label>Bottom</label><input type="number" id="bottom" value="20">
+      <button onclick="cropPDF()">Crop & Download</button>
+      <div id="status" class="result"></div>
+    </div>
+  </div>
+  <script>
+    async function cropPDF() {
+      const file = document.getElementById('file').files[0];
+      if (!file) return alert('Select a PDF');
+      const { PDFDocument } = PDFLib;
+      const bytes = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(bytes);
+      const left = +document.getElementById('left').value;
+      const right = +document.getElementById('right').value;
+      const top = +document.getElementById('top').value;
+      const bottom = +document.getElementById('bottom').value;
+
+      pdfDoc.getPages().forEach(page => {
+        const { width, height } = page.getSize();
+        page.setCropBox(left, bottom, width - left - right, height - top - bottom);
+      });
+
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cropped.pdf';
+      a.click();
+      document.getElementById('status').textContent = 'Cropped PDF downloaded!';
+    }
+  </script>
+</body>
+</html>

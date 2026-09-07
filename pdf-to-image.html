@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF to Image</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="../index.html" class="logo">Utility Tools</a>
+    </div>
+  </header>
+  <div class="tool-page container">
+    <div class="tool-box">
+      <h1>PDF to Image</h1>
+      <input type="file" id="file" accept=".pdf">
+      <label>Page number (leave empty for all)</label>
+      <input type="number" id="pageNum" min="1" placeholder="All pages">
+      <button onclick="convert()">Convert to PNG</button>
+      <div id="status" class="result"></div>
+      <div id="preview"></div>
+    </div>
+  </div>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    async function convert() {
+      const file = document.getElementById('file').files[0];
+      if (!file) return alert('Select a PDF');
+      const status = document.getElementById('status');
+      status.textContent = 'Processing...';
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const total = pdf.numPages;
+      let pageToRender = document.getElementById('pageNum').value;
+      const pages = pageToRender ? [parseInt(pageToRender)] : Array.from({length: total}, (_, i) => i + 1);
+
+      document.getElementById('preview').innerHTML = '';
+      for (let num of pages) {
+        if (num < 1 || num > total) continue;
+        const page = await pdf.getPage(num);
+        const viewport = page.getViewport({ scale: 2 });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = `page-${num}.png`;
+        a.click();
+
+        const img = document.createElement('img');
+        img.src = canvas.toDataURL('image/png');
+        img.style.maxWidth = '100%';
+        img.style.marginTop = '15px';
+        img.style.borderRadius = '8px';
+        document.getElementById('preview').appendChild(img);
+      }
+      status.textContent = 'Done! Images downloaded.';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Editor</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    canvas { max-width: 100%; border-radius: 8px; margin-top: 15px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
+    .filters button { width: auto; padding: 8px 14px; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="../index.html" class="logo">Utility Tools</a>
+    </div>
+  </header>
+  <div class="tool-page container">
+    <div class="tool-box">
+      <h1>Photo Editor</h1>
+      <input type="file" id="file" accept="image/*">
+      <div class="filters">
+        <button onclick="applyFilter('none')">Original</button>
+        <button onclick="applyFilter('grayscale(100%)')">Grayscale</button>
+        <button onclick="applyFilter('sepia(80%)')">Sepia</button>
+        <button onclick="applyFilter('contrast(150%)')">High Contrast</button>
+        <button onclick="applyFilter('brightness(130%)')">Bright</button>
+        <button onclick="applyFilter('blur(2px)')">Blur</button>
+        <button onclick="download()">Download</button>
+      </div>
+      <canvas id="canvas"></canvas>
+    </div>
+  </div>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let img = new Image();
+    let currentFilter = 'none';
+
+    document.getElementById('file').onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        img.src = reader.result;
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          applyFilter('none');
+        };
+      };
+      reader.readAsDataURL(file);
+    };
+
+    function applyFilter(filter) {
+      currentFilter = filter;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.filter = filter;
+      ctx.drawImage(img, 0, 0);
+    }
+
+    function download() {
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/jpeg', 0.92);
+      a.download = 'edited-photo.jpg';
+      a.click();
+    }
+  </script>
+</body>
+</html>

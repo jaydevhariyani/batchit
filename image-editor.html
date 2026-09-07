@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Editor</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    canvas { max-width: 100%; border: 1px solid #475569; border-radius: 8px; margin-top: 15px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0; }
+    .controls button { width: auto; padding: 10px 16px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="../index.html" class="logo">Utility Tools</a>
+    </div>
+  </header>
+  <div class="tool-page container">
+    <div class="tool-box">
+      <h1>Image Editor</h1>
+      <input type="file" id="file" accept="image/*">
+      <div class="controls">
+        <button onclick="rotate(-90)">? Rotate Left</button>
+        <button onclick="rotate(90)">? Rotate Right</button>
+        <button onclick="download()">Download</button>
+      </div>
+      <label>Brightness: <span id="bVal">100</span>%</label>
+      <input type="range" id="brightness" min="50" max="150" value="100">
+      <label>Contrast: <span id="cVal">100</span>%</label>
+      <input type="range" id="contrast" min="50" max="150" value="100">
+      <canvas id="canvas"></canvas>
+    </div>
+  </div>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let img = new Image();
+    let angle = 0;
+
+    document.getElementById('file').onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        img.src = reader.result;
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          draw();
+        };
+      };
+      reader.readAsDataURL(file);
+    };
+
+    document.getElementById('brightness').oninput = e => {
+      document.getElementById('bVal').textContent = e.target.value;
+      draw();
+    };
+    document.getElementById('contrast').oninput = e => {
+      document.getElementById('cVal').textContent = e.target.value;
+      draw();
+    };
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(canvas.width/2, canvas.height/2);
+      ctx.rotate(angle * Math.PI / 180);
+      ctx.filter = `brightness(${document.getElementById('brightness').value}%) contrast(${document.getElementById('contrast').value}%)`;
+      ctx.drawImage(img, -img.width/2, -img.height/2);
+      ctx.restore();
+    }
+
+    function rotate(deg) {
+      angle = (angle + deg) % 360;
+      // Swap width/height when rotating 90/270
+      if (Math.abs(deg) === 90) {
+        [canvas.width, canvas.height] = [canvas.height, canvas.width];
+      }
+      draw();
+    }
+
+    function download() {
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'edited-image.png';
+      a.click();
+    }
+  </script>
+</body>
+</html>
