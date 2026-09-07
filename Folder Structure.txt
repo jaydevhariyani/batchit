@@ -1,0 +1,17 @@
+utility-tools/
++-- index.html
++-- all-tools.html
++-- style.css
++-- script.js
++-- tools/
+¦   +-- word-counter.html
+¦   +-- password-generator.html
+¦   +-- qr-code.html
+¦   +-- json-formatter.html
+¦   +-- base64.html
+¦   +-- hash-generator.html
+¦   +-- age-calculator.html
+¦   +-- gst-calculator.html
+¦   +-- emi-calculator.html
+¦   +-- text-case.html
++-- README.md

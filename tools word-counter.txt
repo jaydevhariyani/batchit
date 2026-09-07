@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Counter</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="../index.html" class="logo">Utility Tools</a>
+    </div>
+  </header>
+  <div class="tool-page container">
+    <div class="tool-box">
+      <h1>Word Counter</h1>
+      <textarea id="text" rows="8" placeholder="Type or paste your text here..."></textarea>
+      <div class="result" id="result">
+        Words: 0 | Characters: 0 | Sentences: 0 | Reading time: 0 min
+      </div>
+    </div>
+  </div>
+  <script>
+    const text = document.getElementById('text');
+    const result = document.getElementById('result');
+    text.addEventListener('input', () => {
+      const val = text.value;
+      const words = val.trim() === '' ? 0 : val.trim().split(/\s+/).length;
+      const chars = val.length;
+      const sentences = (val.match(/[.!?]+/g) || []).length;
+      const reading = Math.ceil(words / 200);
+      result.innerHTML = `Words: <b>${words}</b> | Characters: <b>${chars}</b> | Sentences: <b>${sentences}</b> | Reading time: <b>${reading}</b> min`;
+    });
+  </script>
+</body>
+</html>
