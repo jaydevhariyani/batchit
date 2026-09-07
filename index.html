@@ -1,885 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BatchIt - Free Online Utility, Calculation & PDF Tools</title>
-    
-    <!-- Google Search Console Verification Tag -->
-    <meta name="google-site-verification" content="fsSoaO_blLN67QAeQK9XIw5qLydXIVKg4vugVZKn0V8" />
-
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="BatchIt is your ultimate destination for free, fast, and secure online utility tools, age calculator, BMI calculator, unit converter, password generator, QR code generator, and PDF & image tools.">
-    <meta name="keywords" content="free online tools, age calculator, bmi calculator, unit converter, password generator, word counter, qr code generator, percentage calculator, gst calculator, pdf tools, image editor, batchit">
-    <meta name="author" content="Jaydev Hariyani">
-    <meta name="robots" content="index, follow">
-    
-    <!-- Open Graph / Social Media Meta Tags -->
-    <meta property="og:title" content="BatchIt - Free Online Utility & Calculation Tools">
-    <meta property="og:description" content="Quick, secure, and free online utility tools, calculations, and PDF converters designed to simplify your everyday digital tasks.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://batchit.site">
-
-    <!-- QRCode.js Library for generating QR codes -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <style>
-        :root {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --primary: #4f46e5;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            scroll-behavior: smooth;
-        }
-        body {
-            background-color: var(--bg-color);
-            min-height: 100vh;
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* Navigation & Dropdown Menu */
-        nav {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            text-decoration: none;
-        }
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-        }
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropbtn {
-            background: #f1f5f9;
-            color: var(--text-main);
-            padding: 8px 16px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-        .dropbtn:hover {
-            background: #e2e8f0;
-            color: var(--primary);
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: white;
-            min-width: 220px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            z-index: 1;
-            padding: 8px 0;
-            animation: fadeIn 0.2s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .dropdown-content a {
-            color: var(--text-main);
-            padding: 10px 16px;
-            text-decoration: none;
-            display: block;
-            font-size: 0.9rem;
-            transition: background 0.2s;
-        }
-        .dropdown-content a:hover {
-            background-color: #f1f5f9;
-            color: var(--primary);
-            padding-left: 20px;
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        /* Layout Structure */
-        .layout {
-            display: flex;
-            flex: 1;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-            padding: 20px;
-            gap: 25px;
-        }
-        sidebar {
-            width: 260px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            position: sticky;
-            top: 90px;
-            height: calc(100vh - 110px);
-            overflow-y: auto;
-            display: none;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
-        }
-        @media(min-width: 1024px) {
-            sidebar {
-                display: block;
-            }
-        }
-        sidebar h3 {
-            font-size: 1rem;
-            color: var(--text-main);
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--border-color);
-        }
-        sidebar ul {
-            list-style: none;
-        }
-        sidebar ul li {
-            margin-bottom: 8px;
-        }
-        sidebar ul li a {
-            display: block;
-            padding: 9px 12px;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: transform 0.2s, opacity 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-        }
-        sidebar ul li a:hover {
-            transform: translateX(4px);
-            opacity: 0.9;
-        }
-
-        /* Unique Sidebar Colors */
-        .sb-age { background: linear-gradient(135deg, #2563eb, #3b82f6); }
-        .sb-bmi { background: linear-gradient(135deg, #16a34a, #22c55e); }
-        .sb-unit { background: linear-gradient(135deg, #d97706, #f59e0b); }
-        .sb-pwd { background: linear-gradient(135deg, #dc2626, #ef4444); }
-        .sb-word { background: linear-gradient(135deg, #9333ea, #a855f7); }
-        .sb-qr { background: linear-gradient(135deg, #0891b2, #06b6d4); }
-        .sb-per { background: linear-gradient(135deg, #db2777, #ec4899); }
-        .sb-gst { background: linear-gradient(135deg, #ca8a04, #eab308); }
-        .sb-color { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
-        .sb-img { background: linear-gradient(135deg, #0284c7, #38bdf8); }
-        .sb-pdf { background: linear-gradient(135deg, #ea580c, #f97316); }
-
-        .main-content {
-            flex: 1;
-        }
-
-        /* Designer Header Look */
-        header {
-            text-align: center;
-            padding: 50px 20px;
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4f46e5 100%);
-            color: white;
-            border-radius: 16px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        header h1 {
-            font-size: 2.3rem;
-            margin-bottom: 10px;
-            letter-spacing: -0.5px;
-            font-weight: 800;
-            background: linear-gradient(to right, #ffffff, #c7d2fe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        header p {
-            font-size: 1.05rem;
-            opacity: 0.85;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        @media(min-width: 768px) {
-            .container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        .card {
-            background: var(--card-bg);
-            padding: 22px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.08);
-        }
-        .card.full-width {
-            grid-column: 1 / -1;
-        }
-        .card h2 {
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-
-        /* Unique Card Themes */
-        .card-age h2 { color: #2563eb; }
-        .card-age button { background-color: #2563eb; }
-        .card-bmi h2 { color: #16a34a; }
-        .card-bmi button { background-color: #16a34a; }
-        .card-unit h2 { color: #d97706; }
-        .card-unit button { background-color: #d97706; }
-        .card-pwd h2 { color: #dc2626; }
-        .card-pwd button { background-color: #dc2626; }
-        .card-word h2 { color: #9333ea; }
-        .card-word button { background-color: #9333ea; }
-        .card-qr h2 { color: #0891b2; }
-        .card-qr button { background-color: #0891b2; }
-        .card-per h2 { color: #db2777; }
-        .card-per button { background-color: #db2777; }
-        .card-gst h2 { color: #ca8a04; }
-        .card-gst button { background-color: #ca8a04; }
-        .card-color h2 { color: #7c3aed; }
-        .card-color button { background-color: #7c3aed; }
-        .card-img h2 { color: #0284c7; }
-        .card-img button { background-color: #0284c7; }
-        .card-pdf h2 { color: #ea580c; }
-        .card-pdf button { background-color: #ea580c; }
-
-        .input-group {
-            margin-bottom: 12px;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-        }
-        .input-group input, .input-group select, .input-group textarea {
-            width: 100%;
-            padding: 9px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            outline: none;
-        }
-        .input-group textarea {
-            resize: vertical;
-            height: 80px;
-        }
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-        .result {
-            margin-top: 12px;
-            text-align: center;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-main);
-            word-break: break-all;
-            background: #f1f5f9;
-            padding: 10px;
-            border-radius: 6px;
-        }
-        #qrcode {
-            display: flex;
-            justify-content: center;
-            margin-top: 15px;
-        }
-        footer {
-            background: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-            padding: 40px 20px 20px;
-            color: var(--text-muted);
-            margin-top: 60px;
-        }
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
-        @media(min-width: 768px) {
-            .footer-content {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        .footer-section h3 {
-            margin-bottom: 12px;
-            font-size: 1.1rem;
-            color: var(--text-main);
-        }
-        .footer-section p {
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-        .footer-section a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-        .copyright {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.85rem;
-        }
-    </style>
-</head>
-<body>
-
-    <nav>
-        <a href="#" class="logo">? BatchIt Tools</a>
-        <div class="nav-right">
-            <div class="dropdown">
-                <button class="dropbtn">Tools ?</button>
-                <div class="dropdown-content">
-                    <a href="#age-tool">?? Age Calculator</a>
-                    <a href="#bmi-tool">?? BMI Calculator</a>
-                    <a href="#unit-tool">?? Unit Converter</a>
-                    <a href="#pwd-tool">?? Password Generator</a>
-                    <a href="#word-tool">?? Word Counter</a>
-                    <a href="#qr-tool">?? QR Code Generator</a>
-                    <a href="#per-tool">?? Percentage Calc</a>
-                    <a href="#gst-tool">?? GST / Discount Calc</a>
-                    <a href="#color-tool">?? Color Picker</a>
-                    <a href="#img-tool">??? Image Editor</a>
-                    <a href="#pdf-tool">?? PDF & Image Hub</a>
-                </div>
-            </div>
-            <span style="font-size: 0.9rem; color: var(--text-muted);">Free Online Utilities</span>
-        </div>
-    </nav>
-
-    <div class="layout">
-        <sidebar>
-            <h3>? Quick Menu</h3>
-            <ul>
-                <li><a href="#age-tool" class="sb-age">?? Age Calculator</a></li>
-                <li><a href="#bmi-tool" class="sb-bmi">?? BMI Calculator</a></li>
-                <li><a href="#unit-tool" class="sb-unit">?? Unit Converter</a></li>
-                <li><a href="#pwd-tool" class="sb-pwd">?? Password Generator</a></li>
-                <li><a href="#word-tool" class="sb-word">?? Word Counter</a></li>
-                <li><a href="#qr-tool" class="sb-qr">?? QR Code Generator</a></li>
-                <li><a href="#per-tool" class="sb-per">?? Percentage Calc</a></li>
-                <li><a href="#gst-tool" class="sb-gst">?? GST / Discount Calc</a></li>
-                <li><a href="#color-tool" class="sb-color">?? Color Picker</a></li>
-                <li><a href="#img-tool" class="sb-img">??? Image Editor</a></li>
-                <li><a href="#pdf-tool" class="sb-pdf">?? PDF & Image Hub</a></li>
-            </ul>
-        </sidebar>
-
-        <div class="main-content">
-            <header>
-                <h1>Smart Online Utilities</h1>
-                <p>Your ultimate destination for quick, secure, and free online utility tools</p>
-            </header>
-
-            <div class="container">
-                <div class="card card-age" id="age-tool">
-                    <h2>Age Calculator</h2>
-                    <div class="input-group">
-                        <label for="dob">Select Your Birth Date:</label>
-                        <input type="date" id="dob">
-                    </div>
-                    <button onclick="calculateAge()">Calculate Age</button>
-                    <div class="result" id="ageResult">Result will appear here</div>
-                </div>
-
-                <div class="card card-bmi" id="bmi-tool">
-                    <h2>BMI Calculator</h2>
-                    <div class="input-group">
-                        <label for="weight">Weight (kg):</label>
-                        <input type="number" id="weight" placeholder="e.g., 65">
-                    </div>
-                    <div class="input-group">
-                        <label for="height">Height (cm):</label>
-                        <input type="number" id="height" placeholder="e.g., 170">
-                    </div>
-                    <button onclick="calculateBMI()">Calculate BMI</button>
-                    <div class="result" id="bmiResult">Result will appear here</div>
-                </div>
-
-                <div class="card card-unit" id="unit-tool">
-                    <h2>Unit Converter</h2>
-                    <div class="input-group">
-                        <label for="valToConvert">Enter Value:</label>
-                        <input type="number" id="valToConvert" placeholder="e.g., 10">
-                    </div>
-                    <div class="input-group">
-                        <label for="conversionType">Select Conversion:</label>
-                        <select id="conversionType">
-                            <option value="cmToInches">Centimeters to Inches</option>
-                            <option value="inchesToCm">Inches to Centimeters</option>
-                            <option value="kgToLbs">Kilograms to Pounds</option>
-                            <option value="lbsToKg">Pounds to Kilograms</option>
-                        </select>
-                    </div>
-                    <button onclick="convertUnit()">Convert</button>
-                    <div class="result" id="convertResult">Result will appear here</div>
-                </div>
-
-                <div class="card card-pwd" id="pwd-tool">
-                    <h2>Password Generator</h2>
-                    <div class="input-group">
-                        <label for="pwdLength">Password Length:</label>
-                        <input type="number" id="pwdLength" value="10" min="6" max="24">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="includeSymbols" checked>
-                        <label for="includeSymbols" style="margin-bottom:0; font-size:0.85rem; color:var(--text-main);">Include Symbols & Numbers</label>
-                    </div>
-                    <button onclick="generatePassword()">Generate Password</button>
-                    <div class="result" id="pwdResult">Result will appear here</div>
-                </div>
-
-                <div class="card card-word" id="word-tool">
-                    <h2>Word & Character Counter</h2>
-                    <div class="input-group">
-                        <label for="textInput">Type or Paste Your Text:</label>
-                        <textarea id="textInput" placeholder="Write something here..." oninput="countWords()"></textarea>
-                    </div>
-                    <div class="result" id="wordResult">Words: 0 | Characters: 0</div>
-                </div>
-
-                <div class="card card-qr" id="qr-tool">
-                    <h2>QR Code Generator</h2>
-                    <div class="input-group">
-                        <label for="qrText">Enter Text or URL:</label>
-                        <input type="text" id="qrText" placeholder="https://example.com">
-                    </div>
-                    <button onclick="generateQR()">Generate QR Code</button>
-                    <div id="qrcode"></div>
-                </div>
-
-                <div class="card card-per" id="per-tool">
-                    <h2>Percentage Calculator</h2>
-                    <div class="input-group">
-                        <label for="perNum">What is Number:</label>
-                        <input type="number" id="perNum" placeholder="e.g., 20">
-                    </div>
-                    <div class="input-group">
-                        <label for="perTotal">% of (Total Value):</label>
-                        <input type="number" id="perTotal" placeholder="e.g., 500">
-                    </div>
-                    <button onclick="calculatePercentage()">Calculate Percentage</button>
-                    <div class="result" id="perResult">Result will appear here</div>
-                </div>
-
-                <div class="card card-gst" id="gst-tool">
-                    <h2>Discount / GST Calculator</h2>
-                    <div class="input-group">
-                        <label for="originalPrice">Original Amount:</label>
-                        <input type="number" id="originalPrice" placeholder="e.g., 1000">
-                    </div>
-                    <div class="input-group">
-                        <label for="taxDiscountRate">Rate (%):</label>
-                        <input type="number" id="taxDiscountRate" placeholder="e.g., 18">
-                    </div>
-                    <div class="input-group">
-                        <label for="calcType">Calculation Type:</label>
-                        <select id="calcType">
-                            <option value="discount">Subtract Discount</option>
-                            <option value="gst">Add GST / Tax</option>
-                        </select>
-                    </div>
-                    <button onclick="calculateDiscountGST()">Calculate</button>
-                    <div class="result" id="gstResult">Result will appear here</div>
-                </div>
-
-                <div class="card card-color" id="color-tool">
-                    <h2>Color Picker & Converter</h2>
-                    <div class="input-group">
-                        <label for="colorPicker">Select Color:</label>
-                        <input type="color" id="colorPicker" value="#7c3aed" style="height: 40px; cursor: pointer;" oninput="updateColorValues(this.value)">
-                    </div>
-                    <div class="result" id="colorResult" style="text-align: left; font-size: 0.9rem;">
-                        HEX: #7C3AED<br>RGB: rgb(124, 58, 237)
-                    </div>
-                </div>
-
-                <div class="card card-img" id="img-tool">
-                    <h2>Image & Photo Editor</h2>
-                    <div class="input-group">
-                        <label for="imgUpload">Upload Image:</label>
-                        <input type="file" id="imgUpload" accept="image/*" onchange="loadEditorImage(event)">
-                    </div>
-                    <div class="input-group">
-                        <label for="filterSelect">Apply Filter:</label>
-                        <select id="filterSelect" onchange="applyImageEffect()">
-                            <option value="none">Normal</option>
-                            <option value="grayscale(100%)">Black & White</option>
-                            <option value="sepia(100%)">Sepia</option>
-                            <option value="invert(100%)">Invert Colors</option>
-                            <option value="blur(2px)">Blur</option>
-                        </select>
-                    </div>
-                    <div style="text-align: center; margin-top: 10px;">
-                        <canvas id="imageCanvas" style="max-width: 100%; max-height: 140px; border-radius: 6px; display: none; margin: 0 auto;"></canvas>
-                    </div>
-                    <button onclick="downloadEditedImage()" style="margin-top: 10px;">Download Edited Image</button>
-                    <div class="result" id="imgEditResult">Upload an image to start editing</div>
-                </div>
-
-                <div class="card card-pdf full-width" id="pdf-tool">
-                    <h2>All-in-One PDF & Image Hub</h2>
-                    <div class="input-group">
-                        <label for="pdfAction">Select PDF / Image Tool:</label>
-                        <select id="pdfAction" onchange="updatePdfInterface()">
-                            <option value="imgToPdf">Image to PDF Converter</option>
-                            <option value="mergePdf">Merge Multiple PDFs</option>
-                            <option value="resizePdf">Resize / Compress PDF</option>
-                            <option value="editPdf">Edit / Delete PDF Pages</option>
-                        </select>
-                    </div>
-                    <div class="input-group" id="pdfInputContainer">
-                        <label for="pdfFileUp">Upload Image / PDF File(s):</label>
-                        <input type="file" id="pdfFileUp" multiple accept="image/*,application/pdf">
-                    </div>
-                    <button onclick="processPdfAction()">Process & Download</button>
-                    <div class="result" id="pdfResult">Select a tool and upload file(s) to proceed.</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>About Us</h3>
-                <p>BatchIt (batchit.site) is your ultimate destination for free, fast, and secure online utility tools, calculations, and PDF converters designed to simplify your everyday digital tasks.</p>
-            </div>
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <p>
-                    <strong>Name:</strong> Jaydev Hariyani<br>
-                    <strong>Email:</strong> <a href="mailto:jaydevhariyani@gmail.com">jaydevhariyani@gmail.com</a><br>
-                    <strong>Phone:</strong> <a href="tel:+919429524109">+91 9429524109</a>
-                </p>
-            </div>
-            <div class="footer-section">
-                <h3>Privacy Policy</h3>
-                <p>We respect your privacy. All utility calculations and tool processes run securely within your browser. We do not store, track, or share any personal data or uploaded files.</p>
-            </div>
-        </div>
-        <div class="copyright">
-            &copy; 2026 BatchIt. All rights reserved. Developed by Jaydev Hariyani.
-        </div>
-    </footer>
-
-    <script>
-        function calculateAge() {
-            const dobInput = document.getElementById('dob').value;
-            const resultDiv = document.getElementById('ageResult');
-            
-            if (!dobInput) {
-                resultDiv.innerHTML = "Please select a valid date!";
-                return;
-            }
-
-            const dob = new Date(dobInput);
-            const today = new Date();
-
-            let years = today.getFullYear() - dob.getFullYear();
-            let months = today.getMonth() - dob.getMonth();
-            let days = today.getDate() - dob.getDate();
-
-            if (days < 0) {
-                months--;
-                days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
-            }
-            if (months < 0) {
-                years--;
-                months += 12;
-            }
-
-            resultDiv.innerHTML = `You are ${years} years, ${months} months, and ${days} days old!`;
-        }
-
-        function calculateBMI() {
-            const weight = parseFloat(document.getElementById('weight').value);
-            const height = parseFloat(document.getElementById('height').value);
-            const resultDiv = document.getElementById('bmiResult');
-
-            if (!weight || !height || weight <= 0 || height <= 0) {
-                resultDiv.innerHTML = "Please enter valid weight and height!";
-                return;
-            }
-
-            const heightInMeters = height / 100;
-            const bmi = (weight / (heightInMeters * heightInMeters)).toFixed(1);
-            
-            let status = "";
-            if (bmi < 18.5) {
-                status = "Underweight";
-            } else if (bmi >= 18.5 && bmi <= 24.9) {
-                status = "Normal weight";
-            } else if (bmi >= 25 && bmi <= 29.9) {
-                status = "Overweight";
-            } else {
-                status = "Obese";
-            }
-
-            resultDiv.innerHTML = `Your BMI is ${bmi} (${status})`;
-        }
-
-        function convertUnit() {
-            const val = parseFloat(document.getElementById('valToConvert').value);
-            const type = document.getElementById('conversionType').value;
-            const resultDiv = document.getElementById('convertResult');
-
-            if (isNaN(val)) {
-                resultDiv.innerHTML = "Please enter a valid number!";
-                return;
-            }
-
-            let res = 0;
-            if (type === 'cmToInches') {
-                res = (val * 0.393701).toFixed(2);
-                resultDiv.innerHTML = `${val} cm = ${res} inches`;
-            } else if (type === 'inchesToCm') {
-                res = (val * 2.54).toFixed(2);
-                resultDiv.innerHTML = `${val} inches = ${res} cm`;
-            } else if (type === 'kgToLbs') {
-                res = (val * 2.20462).toFixed(2);
-                resultDiv.innerHTML = `${val} kg = ${res} lbs`;
-            } else if (type === 'lbsToKg') {
-                res = (val / 2.20462).toFixed(2);
-                resultDiv.innerHTML = `${val} lbs = ${res} kg`;
-            }
-        }
-
-        function generatePassword() {
-            const length = parseInt(document.getElementById('pwdLength').value);
-            const includeSymbols = document.getElementById('includeSymbols').checked;
-            const resultDiv = document.getElementById('pwdResult');
-
-            let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-            if (includeSymbols) {
-                chars += "0123456789@#$%^&*!";
-            }
-
-            if (isNaN(length) || length < 4 || length > 30) {
-                resultDiv.innerHTML = "Length must be between 4 and 30!";
-                return;
-            }
-
-            let password = "";
-            for (let i = 0; i < length; i++) {
-                const randomIndex = Math.floor(Math.random() * chars.length);
-                password += chars[randomIndex];
-            }
-
-            resultDiv.innerHTML = `Generated: <span style="color:#dc2626; user-select:all;">${password}</span>`;
-        }
-
-        function countWords() {
-            const text = document.getElementById('textInput').value.trim();
-            const resultDiv = document.getElementById('wordResult');
-
-            const characters = text.length;
-            const words = text === "" ? 0 : text.split(/\s+/).length;
-
-            resultDiv.innerHTML = `Words: ${words} | Characters: ${characters}`;
-        }
-
-        function generateQR() {
-            const text = document.getElementById('qrText').value;
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = "";
-
-            if (!text.trim()) {
-                alert("Please enter text or URL for QR code!");
-                return;
-            }
-
-            new QRCode(qrContainer, {
-                text: text,
-                width: 130,
-                height: 130,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        }
-
-        function calculatePercentage() {
-            const num = parseFloat(document.getElementById('perNum').value);
-            const total = parseFloat(document.getElementById('perTotal').value);
-            const resultDiv = document.getElementById('perResult');
-
-            if (isNaN(num) || isNaN(total)) {
-                resultDiv.innerHTML = "Please enter valid numbers!";
-                return;
-            }
-
-            const res = (num * total) / 100;
-            resultDiv.innerHTML = `${num}% of ${total} = ${res}`;
-        }
-
-        function calculateDiscountGST() {
-            const price = parseFloat(document.getElementById('originalPrice').value);
-            const rate = parseFloat(document.getElementById('taxDiscountRate').value);
-            const type = document.getElementById('calcType').value;
-            const resultDiv = document.getElementById('gstResult');
-
-            if (isNaN(price) || isNaN(rate)) {
-                resultDiv.innerHTML = "Please enter valid numbers!";
-                return;
-            }
-
-            if (type === 'discount') {
-                const discountAmount = (price * rate) / 100;
-                const finalPrice = price - discountAmount;
-                resultDiv.innerHTML = `Discount: -${discountAmount.toFixed(2)} | Final: ${finalPrice.toFixed(2)}`;
-            } else {
-                const gstAmount = (price * rate) / 100;
-                const finalPrice = price + gstAmount;
-                resultDiv.innerHTML = `Tax/GST: +${gstAmount.toFixed(2)} | Total: ${finalPrice.toFixed(2)}`;
-            }
-        }
-
-        function updateColorValues(hex) {
-            let r = parseInt(hex.slice(1, 3), 16);
-            let g = parseInt(hex.slice(3, 5), 16);
-            let b = parseInt(hex.slice(5, 7), 16);
-            
-            document.getElementById('colorResult').innerHTML = `HEX: ${hex.toUpperCase()}<br>RGB: rgb(${r}, ${g}, ${b})`;
-        }
-
-        let uploadedImage = new Image();
-        function loadEditorImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                uploadedImage.src = e.target.result;
-                uploadedImage.onload = function() {
-                    const canvas = document.getElementById('imageCanvas');
-                    canvas.style.display = 'block';
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = uploadedImage.width;
-                    canvas.height = uploadedImage.height;
-                    ctx.drawImage(uploadedImage, 0, 0);
-                    document.getElementById('imgEditResult').innerHTML = "Image loaded successfully!";
-                }
-            }
-            reader.readAsDataURL(file);
-        }
-
-        function applyImageEffect() {
-            const filter = document.getElementById('filterSelect').value;
-            const canvas = document.getElementById('imageCanvas');
-            if (!uploadedImage.src) return;
-
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.filter = filter;
-            ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
-            document.getElementById('imgEditResult').innerHTML = "Filter applied!";
-        }
-
-        function downloadEditedImage() {
-            const canvas = document.getElementById('imageCanvas');
-            if (!uploadedImage.src) {
-                alert("Please upload an image first!");
-                return;
-            }
-            const link = document.createElement('a');
-            link.download = 'edited-image.png';
-            link.href = canvas.toDataURL();
-            link.click();
-        }
-
-        function updatePdfInterface() {
-            const action = document.getElementById('pdfAction').value;
-            const resultDiv = document.getElementById('pdfResult');
-            if (action === 'imgToPdf') {
-                resultDiv.innerHTML = "Ready to convert Images to PDF. Upload JPG/PNG files.";
-            } else if (action === 'mergePdf') {
-                resultDiv.innerHTML = "Ready to merge PDFs. Upload multiple PDF files.";
-            } else if (action === 'resizePdf') {
-                resultDiv.innerHTML = "Ready to compress/resize PDF file size.";
-            } else if (action === 'editPdf') {
-                resultDiv.innerHTML = "Ready to manage, delete or rearrange PDF pages.";
-            }
-        }
-
-        function processPdfAction() {
-            const action = document.getElementById('pdfAction').value;
-            const fileInput = document.getElementById('pdfFileUp');
-            const resultDiv = document.getElementById('pdfResult');
-
-            if (fileInput.files.length === 0) {
-                resultDiv.innerHTML = "Please select at least one file first!";
-                return;
-            }
-
-            resultDiv.innerHTML = `Processing ${fileInput.files.length} file(s) for ${action}... Done!`;
-        }
-    </script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BatchIt - Modern Web Utilities</title>
+  <title>BatchIt - Professional Web Utilities & Calculators</title>
   <style>
     * {
       margin: 0;
@@ -888,23 +12,23 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     body {
-      background-color: #f8f9fa;
+      background-color: #f4f7f6;
       color: #333;
       line-height: 1.6;
     }
-    .site-header {
+    header {
       background: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
       position: sticky;
       top: 0;
       z-index: 1000;
     }
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 0 20px;
     }
-    .navbar {
+    .nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -913,100 +37,97 @@
     .logo {
       font-size: 24px;
       font-weight: 700;
-      color: #0066cc;
+      color: #007bff;
     }
-    .nav-links a {
-      text-decoration: none;
-      color: #555;
-      margin-left: 25px;
-      font-weight: 600;
-      transition: color 0.3s ease;
+    .search-bar input {
+      padding: 8px 15px;
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      outline: none;
     }
-    .nav-links a:hover {
-      color: #0066cc;
-    }
-    .hero-section {
+    .hero {
       text-align: center;
-      padding: 60px 20px;
-      background: linear-gradient(135deg, #0066cc 0%, #004080 100%);
+      padding: 50px 20px;
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
       color: white;
-      margin-bottom: 40px;
     }
-    .hero-section h1 {
-      font-size: 38px;
-      margin-bottom: 15px;
+    .hero h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
     }
-    .hero-section p {
-      font-size: 18px;
-      opacity: 0.9;
-    }
-    .card-grid {
+    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 25px;
-      padding-bottom: 60px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 40px 0;
     }
     .card {
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: 0.3s;
     }
     .card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     }
     .card h3 {
-      margin-bottom: 12px;
-      color: #222;
+      color: #007bff;
+      margin-bottom: 10px;
     }
-    .card p {
-      color: #666;
-      font-size: 15px;
+    .ads-space {
+      background: #e9ecef;
+      text-align: center;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      color: #6c757d;
+      font-size: 14px;
     }
     footer {
       text-align: center;
       padding: 20px;
-      background: #ffffff;
-      color: #777;
-      border-top: 1px solid #eaeaea;
+      background: #fff;
+      color: #666;
+      border-top: 1px solid #ddd;
     }
   </style>
 </head>
 <body>
 
-  <header class="site-header">
-    <div class="container navbar">
+  <header>
+    <div class="container nav">
       <div class="logo">BatchIt</div>
-      <nav class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="#features">Features</a>
-        <a href="#about">About</a>
-      </nav>
+      <div class="search-bar">
+        <input type="text" placeholder="Search tools...">
+      </div>
     </div>
   </header>
 
-  <section class="hero-section">
+  <section class="hero">
     <div class="container">
-      <h1>Welcome to BatchIt</h1>
-      <p>Fast, lightweight, and modern web utilities designed for high performance.</p>
+      <h1>Smart Web Utilities & Calculators</h1>
+      <p>Fast, reliable, and India-focused online tools for everyday needs.</p>
     </div>
   </section>
 
   <main class="container">
-    <div class="card-grid" id="features">
+    <div class="ads-space">AdSense Banner Space (Responsive Ad Unit)</div>
+
+    <div class="grid">
       <div class="card">
-        <h3>Fast Batch Processing</h3>
-        <p>Manage and process your files securely with modern, high-speed web utilities built right into your browser.</p>
+        <h3>SIP Calculator</h3>
+        <p>Calculate your mutual fund returns and investment growth easily with accurate estimations.</p>
       </div>
       <div class="card">
-        <h3>Secure & Lightweight</h3>
-        <p>Built with pure HTML, CSS, and JavaScript ensuring zero bloat and lightning-fast loading speeds globally.</p>
+        <h3>Loan Calculator</h3>
+        <p>Plan your monthly EMIs and loan amortizations seamlessly with real-time math.</p>
       </div>
       <div class="card">
-        <h3>Responsive Design</h3>
-        <p>Optimized seamlessly for mobile phones, tablets, and desktop computers with a clean professional layout.</p>
+        <h3>PDF & File Tools</h3>
+        <p>Fast browser-based utilities to manage, modify, and handle your documents securely.</p>
       </div>
     </div>
   </main>
