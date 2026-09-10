@@ -1,56 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Crop</title>
-  <link rel="stylesheet" href="../style.css">
-  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7138531128040662"
+     crossorigin="anonymous"></script>
+  <title>Crop PDF Online Free - Crop All Pages | BatchIt</title>
+  <meta name="description" content="Free online Crop PDF tool. Crop all pages of a PDF at once with custom margins. Fast, private, no signup. Files never leave your browser. Use BatchIt Crop PDF free." />
+  <meta name="keywords" content="Crop PDF, Crop PDF online free, PDF crop tool, crop all pages PDF, remove PDF margins, free PDF cropper, BatchIt" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+  <meta name="author" content="BatchIt" />
+  <meta name="theme-color" content="#7c3aed" />
+  <link rel="canonical" href="https://batchit.site/pdf-crop.html" />
+  <meta property="og:title" content="Crop PDF Online Free - Crop All Pages | BatchIt" />
+  <meta property="og:description" content="Crop all pages of a PDF online free. Set margins and download instantly. Private, no signup." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://batchit.site/pdf-crop.html" />
+  <meta property="og:site_name" content="BatchIt" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Crop PDF Online Free | BatchIt" />
+  <meta name="twitter:description" content="Free Crop PDF tool – crop all pages with custom margins. Private & fast." />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Crop PDF - BatchIt",
+    "url": "https://batchit.site/pdf-crop.html",
+    "description": "Free online tool to crop all pages of a PDF file with custom margins. Runs in your browser.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" }
+  }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#f5f3ff',100:'#ede9fe',500:'#8b5cf6',600:'#7c3aed',700:'#6d28d9' }
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <style>body{font-family:'Inter',system-ui,sans-serif}</style>
 </head>
-<body>
-  <header>
-    <div class="container">
-      <a href="../index.html" class="logo">Utility Tools</a>
+<body class="bg-slate-50 text-slate-800 antialiased">
+  <header class="bg-white border-b border-slate-100 sticky top-0 z-50">
+    <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-bold">B</div>
+        <span class="font-bold text-slate-900">Batch<span class="text-brand-600">It</span></span>
+      </a>
+      <nav class="flex gap-4 text-sm font-medium text-slate-600">
+        <a href="/" class="hover:text-brand-600">Home</a>
+        <a href="/about.html" class="hover:text-brand-600">About</a>
+        <a href="/privacy.html" class="hover:text-brand-600">Privacy</a>
+      </nav>
     </div>
   </header>
-  <div class="tool-page container">
-    <div class="tool-box">
-      <h1>PDF Crop</h1>
-      <p style="color:var(--muted); font-size:0.9rem;">Crop all pages equally (in points). 1 inch = 72 points</p>
-      <input type="file" id="file" accept=".pdf">
-      <label>Left</label><input type="number" id="left" value="20">
-      <label>Right</label><input type="number" id="right" value="20">
-      <label>Top</label><input type="number" id="top" value="20">
-      <label>Bottom</label><input type="number" id="bottom" value="20">
-      <button onclick="cropPDF()">Crop & Download</button>
-      <div id="status" class="result"></div>
+
+  <main class="max-w-3xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold text-slate-900 mb-2">Crop PDF Online Free</h1>
+    <p class="text-slate-500 mb-8">Crop all pages of your PDF at once. Set margins in points and download. 100% private — files stay in your browser.</p>
+
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-8">
+      <label class="block text-sm font-semibold text-slate-700 mb-2">Select PDF file</label>
+      <input type="file" id="pdfInput" accept="application/pdf" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-brand-50 file:text-brand-700 file:font-semibold hover:file:bg-brand-100" />
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+        <div>
+          <label class="text-xs font-medium text-slate-500">Top (pt)</label>
+          <input type="number" id="cropTop" value="20" min="0" class="mt-1 w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-slate-500">Bottom (pt)</label>
+          <input type="number" id="cropBottom" value="20" min="0" class="mt-1 w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-slate-500">Left (pt)</label>
+          <input type="number" id="cropLeft" value="20" min="0" class="mt-1 w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-slate-500">Right (pt)</label>
+          <input type="number" id="cropRight" value="20" min="0" class="mt-1 w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-400 mt-3">Tip: 72 points ≈ 1 inch. Increase values to crop more from each edge.</p>
+
+      <button id="cropBtn" onclick="cropPdf()" class="mt-6 w-full sm:w-auto px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl transition disabled:opacity-50" disabled>
+        Crop & Download PDF
+      </button>
+      <p id="status" class="mt-3 text-sm text-slate-500"></p>
     </div>
-  </div>
+
+    <section class="space-y-6 text-slate-700 leading-relaxed">
+      <div>
+        <h2 class="text-xl font-semibold text-slate-900 mb-2">How to Crop a PDF Online</h2>
+        <ol class="list-decimal pl-5 space-y-1">
+          <li>Click “Select PDF file” and choose your document.</li>
+          <li>Set Top, Bottom, Left and Right crop margins (in points).</li>
+          <li>Click <strong>Crop & Download PDF</strong>.</li>
+          <li>Your cropped PDF downloads automatically.</li>
+        </ol>
+      </div>
+      <div>
+        <h2 class="text-xl font-semibold text-slate-900 mb-2">Why use BatchIt Crop PDF?</h2>
+        <ul class="list-disc pl-5 space-y-1">
+          <li><strong>Crop all pages at once</strong> — same margins applied to every page.</li>
+          <li><strong>100% private</strong> — processing happens in your browser. We never upload your file.</li>
+          <li><strong>No signup</strong> — free forever, no account needed.</li>
+          <li>Useful for e-commerce listings, scanned docs, and removing white borders.</li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="text-xl font-semibold text-slate-900 mb-2">Related tools</h2>
+        <div class="flex flex-wrap gap-2">
+          <a href="/" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-sm hover:border-brand-300">All Tools</a>
+          <a href="/" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-sm hover:border-brand-300">Merge PDF</a>
+          <a href="/" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-sm hover:border-brand-300">PDF Resize</a>
+          <a href="/" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-sm hover:border-brand-300">Image to PDF</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-slate-900 text-slate-400 mt-12">
+    <div class="max-w-3xl mx-auto px-4 py-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm">
+      <span class="text-white font-semibold">BatchIt</span>
+      <div class="flex gap-4">
+        <a href="/" class="hover:text-white">Home</a>
+        <a href="/about.html" class="hover:text-white">About</a>
+        <a href="/privacy.html" class="hover:text-white">Privacy</a>
+      </div>
+      <p>© 2026 BatchIt. Free forever.</p>
+    </div>
+  </footer>
+
   <script>
-    async function cropPDF() {
-      const file = document.getElementById('file').files[0];
-      if (!file) return alert('Select a PDF');
-      const { PDFDocument } = PDFLib;
-      const bytes = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(bytes);
-      const left = +document.getElementById('left').value;
-      const right = +document.getElementById('right').value;
-      const top = +document.getElementById('top').value;
-      const bottom = +document.getElementById('bottom').value;
+    let pdfBytes = null;
+    document.getElementById('pdfInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      pdfBytes = await file.arrayBuffer();
+      document.getElementById('cropBtn').disabled = false;
+      document.getElementById('status').textContent = 'File ready: ' + file.name;
+    });
 
-      pdfDoc.getPages().forEach(page => {
-        const { width, height } = page.getSize();
-        page.setCropBox(left, bottom, width - left - right, height - top - bottom);
-      });
+    async function cropPdf() {
+      if (!pdfBytes) return;
+      const btn = document.getElementById('cropBtn');
+      const status = document.getElementById('status');
+      btn.disabled = true;
+      status.textContent = 'Cropping...';
+      try {
+        const { PDFDocument } = PDFLib;
+        const src = await PDFDocument.load(pdfBytes);
+        const out = await PDFDocument.create();
+        const top = Math.max(0, Number(document.getElementById('cropTop').value) || 0);
+        const bottom = Math.max(0, Number(document.getElementById('cropBottom').value) || 0);
+        const left = Math.max(0, Number(document.getElementById('cropLeft').value) || 0);
+        const right = Math.max(0, Number(document.getElementById('cropRight').value) || 0);
 
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'cropped.pdf';
-      a.click();
-      document.getElementById('status').textContent = 'Cropped PDF downloaded!';
+        const pages = src.getPages();
+        for (let i = 0; i < pages.length; i++) {
+          const page = pages[i];
+          const { width, height } = page.getSize();
+          const newW = Math.max(50, width - left - right);
+          const newH = Math.max(50, height - top - bottom);
+          const [embedded] = await out.embedPages([page]);
+          const newPage = out.addPage([newW, newH]);
+          newPage.drawPage(embedded, {
+            x: -left,
+            y: -bottom,
+            width: width,
+            height: height
+          });
+        }
+
+        const bytes = await out.save();
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'cropped.pdf';
+        a.click();
+        URL.revokeObjectURL(url);
+        status.textContent = 'Done! Downloaded cropped.pdf';
+      } catch (err) {
+        console.error(err);
+        status.textContent = 'Error: ' + (err.message || 'Could not crop PDF');
+      }
+      btn.disabled = false;
     }
   </script>
 </body>
