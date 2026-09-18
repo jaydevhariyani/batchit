@@ -256,13 +256,13 @@
   </footer>
 
   <!-- MODAL -->
-  <div id="toolModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-bg">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-      <div class="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+  <div id="toolModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-2 sm:p-4 modal-bg">
+    <div id="modalBox" class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white border-b border-slate-100 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-2xl z-10">
         <h3 id="modalTitle" class="text-lg font-bold text-slate-900"></h3>
         <button onclick="closeModal()" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 text-2xl leading-none">&times;</button>
       </div>
-      <div id="modalBody" class="p-6"></div>
+      <div id="modalBody" class="p-4 sm:p-6"></div>
     </div>
   </div>
 
@@ -358,6 +358,16 @@
       document.getElementById('modalTitle').textContent = tool.name;
       document.getElementById('modalBody').innerHTML = getToolHTML(id);
       const modal = document.getElementById('toolModal');
+      const box = document.getElementById('modalBox');
+      if (box) {
+        if (id === 'pdfcrop') {
+          box.classList.remove('max-w-2xl');
+          box.classList.add('max-w-4xl');
+        } else {
+          box.classList.remove('max-w-4xl');
+          box.classList.add('max-w-2xl');
+        }
+      }
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       document.body.style.overflow = 'hidden';
@@ -368,9 +378,14 @@
 
     function closeModal() {
       const modal = document.getElementById('toolModal');
+      const box = document.getElementById('modalBox');
       modal.classList.add('hidden');
       modal.classList.remove('flex');
       document.body.style.overflow = '';
+      if (box) {
+        box.classList.remove('max-w-4xl');
+        box.classList.add('max-w-2xl');
+      }
     }
 
     document.getElementById('toolModal').addEventListener('click', e => {
@@ -556,74 +571,31 @@
             </div>
             <p class="text-xs text-slate-400 text-center">Each image becomes one page. 100% private â€“ nothing uploaded.</p></div>`;
         case 'pdfcrop': return `<div class="space-y-3">
-            <div class="border-2 border-dashed border-violet-300 rounded-2xl p-5 text-center hover:border-brand-500 transition bg-gradient-to-br from-violet-50 to-white" id="cropDropZone"
+            <div class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center hover:border-brand-500 transition" id="cropDropZone"
                  ondragover="event.preventDefault()" ondrop="handleCropDrop(event)">
-              <input type="file" id="cropFile" accept=".pdf,application/pdf" class="hidden" onchange="loadCropPDF(this)" />
-              <div class="w-12 h-12 mx-auto mb-3 bg-brand-100 rounded-xl flex items-center justify-center text-brand-600 text-xl">ðŸ“„</div>
-              <p class="text-slate-800 font-semibold mb-1">PDF select karo - full page preview</p>
-              <p class="text-xs text-slate-500 mb-3">Mobile, laptop, computer - badha ma same</p>
-              <button onclick="document.getElementById('cropFile').click()" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold shadow-md">Choose PDF</button>
-              <p id="cropFileName" class="text-sm text-brand-600 mt-3 font-medium"></p>
+              <input type="file" id="cropPdfFile" accept=".pdf,application/pdf" class="hidden" onchange="loadCropPDF(this)" />
+              <p class="text-3xl mb-2">ðŸ“„</p>
+              <p class="font-semibold text-slate-800">Choose or drop PDF</p>
+              <p class="text-xs text-slate-400 mt-1 mb-3">Crop applies to all pages</p>
+              <button type="button" onclick="document.getElementById('cropPdfFile').click()"
+                      class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg">Choose PDF</button>
+              <p id="cropFileName" class="text-sm text-brand-600 mt-2"></p>
             </div>
-            <div id="cropControls" class="hidden space-y-3">
-              <!-- TOOLBAR - STICKY -->
-              <div class="bg-white border border-slate-200 rounded-xl p-2.5 flex flex-wrap justify-between items-center gap-2 sticky top-0 z-20 shadow-sm">
-                <div class="flex gap-2">
-                  <button onclick="setCropMode('box')" id="modeBox" class="px-4 py-2 rounded-xl text-sm font-bold bg-brand-600 text-white shadow flex items-center gap-1"><span>âœ‚ï¸</span> Box</button>
-                  <button onclick="setCropMode('freehand')" id="modeFree" class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700">Freehand</button>
-                  <button onclick="setCropMode('auto')" id="modeAuto" class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700">Auto 4%</button>
-                </div>
-                <div class="flex gap-1.5 items-center bg-slate-50 rounded-lg p-1">
-                  <span class="text-[11px] font-bold text-slate-500 px-1">ZOOM</span>
-                  <button onclick="zoomPreview(1.25)" class="w-8 h-8 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg font-bold shadow-sm">+</button>
-                  <button onclick="zoomPreview(0.8)" class="w-8 h-8 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg font-bold shadow-sm">âˆ’</button>
-                  <button onclick="fitFullPage()" class="px-3 h-8 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-sm">Fit Page</button>
-                </div>
+            <div id="cropEditorArea" class="hidden text-center">
+              <p class="text-xs text-slate-500 mb-2">Drag / resize red box â€” applies to all pages</p>
+              <div id="cropPreviewWrap" class="mx-auto bg-slate-700 rounded-lg overflow-hidden relative inline-block" style="line-height:0; max-height:min(65vh,520px);">
+                <img id="pdfPreviewForCrop" alt="PDF preview" class="block max-w-full" style="max-height:min(65vh,520px); width:auto; height:auto;" />
               </div>
-
-              <!-- PREVIEW - FULL PAGE NO COMPRESSION - RESPONSIVE -->
-              <div id="previewWrapper" class="bg-[#f1f5f9] rounded-2xl border-2 border-slate-200 overflow-auto flex justify-center items-start p-2 md:p-6" style="min-height:65vh; max-height:78vh;">
-                <div id="canvasContainer" class="bg-white shadow-[0_8px_40px_rgba(0,0,0,0.12)] rounded-lg overflow-hidden" style="line-height:0;">
-                  <canvas id="cropCanvas" class="block cursor-crosshair select-none touch-none" style="display:block; max-width:85vw; width:auto; height:auto; transform-origin: top center;"></canvas>
-                </div>
-              </div>
-              <div class="flex justify-between items-center px-1">
-                <p class="text-[11px] text-slate-500">ðŸ’¡ <b>Tip:</b> Preview ma drag karo - aakhu page scroll thai, dabatu nathi. Mobile ma finger thi.</p>
-                <p id="zoomLabel" class="text-[11px] font-bold text-brand-600">100%</p>
-              </div>
-
-              <!-- SHAPE - COMPACT -->
-              <div class="bg-white border border-slate-200 rounded-xl p-2.5">
-                <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide">
-                  <span class="text-xs font-bold text-slate-600 whitespace-nowrap">SHAPE:</span>
-                  <button onclick="setAspect(null, this)" class="aspect-btn px-3.5 py-2 rounded-full text-xs whitespace-nowrap bg-brand-600 text-white font-bold shadow-sm">Free</button>
-                  <button onclick="setAspect(1, this)" class="aspect-btn px-3.5 py-2 rounded-full text-xs whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">Square</button>
-                  <button onclick="setAspect(2/3, this)" class="aspect-btn px-3.5 py-2 rounded-full text-xs whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">Long 2:3</button>
-                  <button onclick="setAspect(3/2, this)" class="aspect-btn px-3.5 py-2 rounded-full text-xs whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">Wide 3:2</button>
-                  <button onclick="setAspect(9/16, this)" class="aspect-btn px-3.5 py-2 rounded-full text-xs whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">Thin 9:16</button>
-                  <button onclick="setAspect(16/9, this)" class="aspect-btn px-3.5 py-2 rounded-full text-xs whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">Fat 16:9</button>
-                </div>
-                <div class="mt-2 flex items-center gap-2">
-                  <span id="cropStatus" class="text-xs font-semibold text-brand-600 bg-brand-50 px-3 py-1 rounded-full"></span>
-                  <span class="text-[11px] text-slate-400">Drag karine selection banavo</span>
-                </div>
-              </div>
-
-              <!-- MARGINS - COLLAPSIBLE -->
-              <details class="bg-white border border-slate-200 rounded-xl">
-                <summary class="p-3 text-sm font-semibold text-slate-700 cursor-pointer select-none">ðŸ“ Manual Margins (mm) - optional</summary>
-                <div class="grid grid-cols-4 gap-2 p-3 pt-0">
-                  <div><label class="text-[11px] font-bold text-slate-500 uppercase">Top</label><input id="mTop" type="number" value="0" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm focus:border-brand-500 focus:ring-0 font-medium"></div>
-                  <div><label class="text-[11px] font-bold text-slate-500 uppercase">Right</label><input id="mRight" type="number" value="0" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm focus:border-brand-500"></div>
-                  <div><label class="text-[11px] font-bold text-slate-500 uppercase">Bottom</label><input id="mBottom" type="number" value="0" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm focus:border-brand-500"></div>
-                  <div><label class="text-[11px] font-bold text-slate-500 uppercase">Left</label><input id="mLeft" type="number" value="0" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm focus:border-brand-500"></div>
-                </div>
-              </details>
-
-              <!-- ACTION - STICKY BOTTOM -->
-              <div class="flex gap-3 sticky bottom-0 bg-white/90 backdrop-blur-md p-2 rounded-xl border-2 border-brand-100 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-                <button onclick="applyCrop()" class="flex-1 py-3.5 bg-gradient-to-r from-brand-600 to-violet-600 hover:from-brand-700 hover:to-violet-700 text-white font-bold rounded-xl shadow-lg text-[15px] tracking-wide">âœ‚ï¸ Crop & Download PDF</button>
-                <button onclick="resetCrop()" class="px-7 py-3.5 bg-slate-100 hover:bg-slate-200 font-bold rounded-xl text-slate-700">Reset</button>
+              <p id="cropStatus" class="text-xs text-slate-500 mt-2"></p>
+              <div class="flex gap-2 mt-3">
+                <button type="button" onclick="handleCropAllPages()"
+                        class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-sm">
+                  Crop All Pages & Download
+                </button>
+                <button type="button" onclick="resetCrop()"
+                        class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 font-semibold rounded-xl text-sm text-slate-700">
+                  Reset
+                </button>
               </div>
             </div>
           </div>`;
@@ -952,426 +924,264 @@
     }
 
 
-    // ========== CROP PDF ==========
-    let cropPdfBytes = null, cropPdfDoc = null, cropScale = 1.0;
-    let cropMode = 'box', cropAspect = null, isDrawing = false;
-    let startX = 0, startY = 0, cropRect = null, freehandPoints = [];
-    let pdfPageWidth = 0, pdfPageHeight = 0;
-    let currentZoom = 1;
+    // ========== CROP PDF (img + red box, applies to all pages) ==========
+    let cropPdfDoc = null;
+    let pdfPageWidth = 0;
+    let pdfPageHeight = 0;
+    let cropBoxEl = null;
+    let isDragging = false;
+    let isResizing = false;
+    let resizeHandle = null;
+    let startMX = 0, startMY = 0;
+    let startBox = { left: 0, top: 0, width: 0, height: 0 };
 
-    function handleCropDrop(e) {
-      e.preventDefault();
-      const file = e.dataTransfer.files[0];
-      if (file && file.type === 'application/pdf') {
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        document.getElementById('cropFile').files = dt.files;
-        loadCropPDF(document.getElementById('cropFile'));
+    function ensureCropBoxStyles() {
+      if (document.getElementById('crop-box-styles')) return;
+      const style = document.createElement('style');
+      style.id = 'crop-box-styles';
+      style.textContent = `
+        #cropPreviewWrap { position: relative; display: inline-block; max-width: 100%; line-height: 0; }
+        #pdfPreviewForCrop { max-width: 100%; display: block; user-select: none; -webkit-user-drag: none; }
+        #cropBox {
+          position: absolute; border: 2px solid #ef4444; box-sizing: border-box;
+          cursor: move; background: transparent; z-index: 5;
+        }
+        #cropBox .crop-handle {
+          position: absolute; width: 12px; height: 12px; background: #fff;
+          border: 2px solid #ef4444; box-sizing: border-box; z-index: 6;
+        }
+        #cropBox .h-nw { top: -6px; left: -6px; cursor: nwse-resize; }
+        #cropBox .h-ne { top: -6px; right: -6px; cursor: nesw-resize; }
+        #cropBox .h-sw { bottom: -6px; left: -6px; cursor: nesw-resize; }
+        #cropBox .h-se { bottom: -6px; right: -6px; cursor: nwse-resize; }
+        #cropBox .h-n { top: -6px; left: 50%; margin-left: -6px; cursor: ns-resize; }
+        #cropBox .h-s { bottom: -6px; left: 50%; margin-left: -6px; cursor: ns-resize; }
+        #cropBox .h-w { left: -6px; top: 50%; margin-top: -6px; cursor: ew-resize; }
+        #cropBox .h-e { right: -6px; top: 50%; margin-top: -6px; cursor: ew-resize; }
+      `;
+      document.head.appendChild(style);
+    }
+
+    function setCropStatus(msg) {
+      const el = document.getElementById('cropStatus');
+      if (el) el.textContent = msg || '';
+    }
+
+    function createCropBoxOnImage() {
+      const img = document.getElementById('pdfPreviewForCrop');
+      const wrap = document.getElementById('cropPreviewWrap');
+      if (!img || !wrap) return;
+
+      const old = document.getElementById('cropBox');
+      if (old) old.remove();
+
+      const box = document.createElement('div');
+      box.id = 'cropBox';
+      const iw = img.clientWidth || img.naturalWidth;
+      const ih = img.clientHeight || img.naturalHeight;
+      const m = 0.02;
+      box.style.left = (iw * m) + 'px';
+      box.style.top = (ih * m) + 'px';
+      box.style.width = (iw * (1 - 2 * m)) + 'px';
+      box.style.height = (ih * (1 - 2 * m)) + 'px';
+
+      ['nw','ne','sw','se','n','s','w','e'].forEach(function (h) {
+        const handle = document.createElement('div');
+        handle.className = 'crop-handle h-' + h;
+        handle.dataset.handle = h;
+        box.appendChild(handle);
+      });
+
+      wrap.appendChild(box);
+      cropBoxEl = box;
+      bindCropBoxEvents(box, img);
+    }
+
+    function bindCropBoxEvents(box, img) {
+      box.addEventListener('mousedown', onBoxDown);
+      box.addEventListener('touchstart', onBoxDown, { passive: false });
+
+      function onBoxDown(e) {
+        const handle = e.target.closest && e.target.closest('.crop-handle');
+        if (handle) {
+          isResizing = true;
+          resizeHandle = handle.dataset.handle;
+        } else {
+          isDragging = true;
+          resizeHandle = null;
+        }
+        if (e.cancelable) e.preventDefault();
+        const pt = getPoint(e);
+        startMX = pt.x;
+        startMY = pt.y;
+        startBox = {
+          left: parseFloat(box.style.left) || 0,
+          top: parseFloat(box.style.top) || 0,
+          width: parseFloat(box.style.width) || 0,
+          height: parseFloat(box.style.height) || 0
+        };
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+        window.addEventListener('touchmove', onMove, { passive: false });
+        window.addEventListener('touchend', onUp);
+      }
+
+      function getPoint(e) {
+        if (e.touches && e.touches[0]) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        return { x: e.clientX, y: e.clientY };
+      }
+
+      function onMove(e) {
+        if (!isDragging && !isResizing) return;
+        if (e.cancelable) e.preventDefault();
+        const pt = getPoint(e);
+        const dx = pt.x - startMX;
+        const dy = pt.y - startMY;
+        const maxW = img.clientWidth;
+        const maxH = img.clientHeight;
+        let L = startBox.left, T = startBox.top, W = startBox.width, H = startBox.height;
+
+        if (isDragging) {
+          L = startBox.left + dx;
+          T = startBox.top + dy;
+          L = Math.max(0, Math.min(L, maxW - W));
+          T = Math.max(0, Math.min(T, maxH - H));
+        } else if (isResizing && resizeHandle) {
+          const h = resizeHandle;
+          if (h.indexOf('e') >= 0) W = startBox.width + dx;
+          if (h.indexOf('s') >= 0) H = startBox.height + dy;
+          if (h.indexOf('w') >= 0) { W = startBox.width - dx; L = startBox.left + dx; }
+          if (h.indexOf('n') >= 0) { H = startBox.height - dy; T = startBox.top + dy; }
+          if (W < 20) { if (h.indexOf('w') >= 0) L = startBox.left + startBox.width - 20; W = 20; }
+          if (H < 20) { if (h.indexOf('n') >= 0) T = startBox.top + startBox.height - 20; H = 20; }
+          if (L < 0) { W += L; L = 0; }
+          if (T < 0) { H += T; T = 0; }
+          if (L + W > maxW) W = maxW - L;
+          if (T + H > maxH) H = maxH - T;
+        }
+
+        box.style.left = L + 'px';
+        box.style.top = T + 'px';
+        box.style.width = W + 'px';
+        box.style.height = H + 'px';
+      }
+
+      function onUp() {
+        isDragging = false;
+        isResizing = false;
+        resizeHandle = null;
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+        window.removeEventListener('touchmove', onMove);
+        window.removeEventListener('touchend', onUp);
       }
     }
 
     async function loadCropPDF(input) {
-      const file = input.files[0];
+      const file = input && input.files ? input.files[0] : null;
       if (!file) return;
+
+      cropPdfDoc = null;
       const nameEl = document.getElementById('cropFileName');
-      const statusEl = document.getElementById('cropStatus');
-      if(nameEl) nameEl.textContent = file.name + ' (' + (file.size/1024).toFixed(0) + ' KB)';
       const dropZone = document.getElementById('cropDropZone');
+      const editor = document.getElementById('cropEditorArea');
+      if (nameEl) nameEl.textContent = file.name + ' (' + (file.size / 1024).toFixed(0) + ' KB)';
       if (dropZone) dropZone.style.display = 'none';
-      const controls = document.getElementById('cropControls');
-      if(controls) { controls.classList.remove('hidden'); controls.style.display='flex'; controls.style.flexDirection='column'; }
-      if(statusEl) statusEl.textContent = 'Loading preview...';
+      if (editor) editor.classList.add('hidden');
+      setCropStatus('Loading PDF...');
+
       try {
         const buf = await file.arrayBuffer();
-        cropPdfBytes = buf.slice(0);
-        // pdf-lib for cropping
         const { PDFDocument } = PDFLib;
         cropPdfDoc = await PDFDocument.load(buf);
         const page = cropPdfDoc.getPages()[0];
-        const { width, height } = page.getSize();
-        pdfPageWidth = width;
-        pdfPageHeight = height;
-        // pdf.js for REAL preview
-        try {
-          if (window.pdfjsLib) {
-            const loadingTask = pdfjsLib.getDocument({data: buf.slice(0)});
-            _pdfJsDocForPreview = await loadingTask.promise;
+        const size = page.getSize();
+        pdfPageWidth = size.width;
+        pdfPageHeight = size.height;
+
+        if (!window.pdfjsLib) throw new Error('pdf.js not loaded');
+        const data = new Uint8Array(buf.slice(0));
+        const pdf = await pdfjsLib.getDocument({ data: data }).promise;
+        const pdfPage = await pdf.getPage(1);
+        const scale = 1.5;
+        const viewport = pdfPage.getViewport({ scale: scale });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        await pdfPage.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+        ensureCropBoxStyles();
+        const img = document.getElementById('pdfPreviewForCrop');
+        img.onload = function () {
+          createCropBoxOnImage();
+          if (editor) {
+            editor.classList.remove('hidden');
+            editor.style.display = 'block';
           }
-        } catch(e){ console.warn('pdf.js preview failed', e); _pdfJsDocForPreview = null; }
-        const controls = document.getElementById('cropControls');
-        if(controls) controls.classList.remove('hidden');
-        if(statusEl) statusEl.textContent = 'Page: ' + Math.round(width) + ' Ã— ' + Math.round(height) + ' pts â€¢ Drag on preview to select';
-        initCropCanvas();
+          setCropStatus('Adjust red box, then Crop All Pages & Download');
+        };
+        img.src = canvas.toDataURL('image/png');
       } catch (err) {
         console.error(err);
-        const statusEl = document.getElementById('cropStatus');
-        if(statusEl) statusEl.textContent = 'Error: ' + err.message;
+        setCropStatus('Error: ' + err.message);
       }
     }
 
-    function handleCropDrop(e){
+    function handleCropDrop(e) {
       e.preventDefault();
-      const file = e.dataTransfer.files[0];
-      if(!file) return;
-      const dt = {files: [file]};
-      loadCropPDF(dt);
+      e.stopPropagation();
+      const file = e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files[0] : null;
+      if (!file || file.type !== 'application/pdf') return;
+      loadCropPDF({ files: [file] });
     }
 
-
-    function initCropCanvas() {
-      const canvas = document.getElementById('cropCanvas');
-      const wrapper = document.getElementById('previewWrapper');
-      if (!canvas) return;
-      // Responsive render scale: high-res for clarity
-      const isMobile = window.innerWidth < 768;
-      const renderScale = isMobile ? 1.6 : 2.0;
-      window._currentRenderScale = renderScale;
-      currentZoom = 1;
-      canvas.style.transform = 'scale(1)';
-      canvas.style.transformOrigin = 'top center';
-      const zoomLabel = document.getElementById('zoomLabel');
-      if (zoomLabel) zoomLabel.textContent = '100%';
-      
-      if (_pdfJsDocForPreview) {
-        _pdfJsDocForPreview.getPage(1).then(page => {
-          const viewport = page.getViewport({scale: renderScale});
-          cropScale = viewport.width / pdfPageWidth;
-          // Set canvas buffer size (high-res)
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          // Display size: fit width, keep aspect, NO compression
-          canvas.style.width = isMobile ? '92vw' : 'auto';
-          canvas.style.maxWidth = isMobile ? '92vw' : '65vw';
-          canvas.style.height = 'auto';
-          canvas.style.maxHeight = 'none';
-          
-          const ctx = canvas.getContext('2d');
-          // Clear white
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0,0,canvas.width, canvas.height);
-          
-          page.render({canvasContext: ctx, viewport}).promise.then(()=>{
-            // Show full page - scroll to top
-            if (wrapper) wrapper.scrollTop = 0;
-            if (cropRect) drawSelectionFixed(ctx);
-            const status = document.getElementById('cropStatus');
-            if (status) status.textContent = `Full page: ${Math.round(pdfPageWidth)}Ã—${Math.round(pdfPageHeight)} pts - drag to select`;
-          });
-        });
-      } else {
-        // fallback
-        const maxW = isMobile ? 360 : 700;
-        cropScale = Math.min(maxW / pdfPageWidth, 1.6);
-        canvas.width = Math.round(pdfPageWidth * cropScale);
-        canvas.height = Math.round(pdfPageHeight * cropScale);
-        canvas.style.width = '100%';
-        canvas.style.maxWidth = '100%';
-        canvas.style.height = 'auto';
-        drawCropBase();
-      }
-    }
-
-    function fitFullPage(){
-      currentZoom = 1;
-      const canvas = document.getElementById('cropCanvas');
-      if (canvas) {
-        canvas.style.transform = 'scale(1)';
-      }
-      const zoomLabel = document.getElementById('zoomLabel');
-      if (zoomLabel) zoomLabel.textContent = '100%';
-      initCropCanvas();
-    }
-
-    function zoomPreview(factor) {
-      const canvas = document.getElementById('cropCanvas');
-      const zoomLabel = document.getElementById('zoomLabel');
-      if (!canvas) return;
-
-      currentZoom = Math.max(0.4, Math.min(3, (currentZoom || 1) * factor));
-
-      canvas.style.transform = 'scale(' + currentZoom + ')';
-      canvas.style.transformOrigin = 'top center';
-
-      if (zoomLabel) {
-        zoomLabel.textContent = Math.round(currentZoom * 100) + '%';
-      }
-
-      // Keep selection visible after zoom
-      if (cropRect) {
-        const ctx = canvas.getContext('2d');
-        if (ctx) drawSelectionFixed(ctx);
-      }
-    }
-
-    // === FIXED PREVIEW & CROP LOGIC ===
-    let _pdfJsDocForPreview = null;
-    function drawCropBase() {
-      const canvas = document.getElementById('cropCanvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      // If pdf.js preview available, re-render page 1
-      if (_pdfJsDocForPreview) {
-        _pdfJsDocForPreview.getPage(1).then(page => {
-          const viewport = page.getViewport({scale: 1.5});
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          cropScale = viewport.width / pdfPageWidth;
-          page.render({canvasContext: ctx, viewport}).promise.then(()=>{
-            if (cropRect) drawSelectionFixed(ctx);
-          });
-        });
+    async function handleCropAllPages() {
+      if (!cropPdfDoc) {
+        setCropStatus('Please select a PDF first');
         return;
       }
-      // fallback placeholder
-      canvas.width = 800;
-      canvas.height = Math.round(800 * (pdfPageHeight / (pdfPageWidth || 1)));
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0,0,canvas.width, canvas.height);
-      ctx.strokeStyle = '#e2e8f0';
-      ctx.setLineDash([8,6]);
-      ctx.strokeRect(1,1,canvas.width-2, canvas.height-2);
-      ctx.setLineDash([]);
-      ctx.fillStyle = '#64748b';
-      ctx.font = '13px Inter, system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(Math.round(pdfPageWidth) + ' Ã— ' + Math.round(pdfPageHeight) + ' pts', canvas.width/2, canvas.height/2 - 8);
-      ctx.fillText('Draw selection here', canvas.width/2, canvas.height/2 + 14);
-      if (cropRect) drawSelectionFixed(ctx);
-    }
-
-    function normalizeRect(r){
-      let x=r.x, y=r.y, w=r.w, h=r.h;
-      if (w<0){ x+=w; w=-w; }
-      if (h<0){ y+=h; h=-h; }
-      return {x,y,w,h};
-    }
-
-    function drawSelectionFixed(ctxArg){
-      const canvas = document.getElementById('cropCanvas');
-      const ctx = ctxArg || canvas.getContext('2d');
-      if (!cropRect) return;
-      const nr = normalizeRect(cropRect);
-      const {x,y,w,h} = nr;
-      if (w < 5 || h < 5) return;
-      ctx.save();
-      // VERY LIGHT overlay outside - keep page readable
-      ctx.fillStyle = 'rgba(255,255,255,0.62)';
-      // Top
-      ctx.fillRect(0,0,canvas.width, y);
-      // Left
-      ctx.fillRect(0,y,x,h);
-      // Right
-      ctx.fillRect(x+w,y,canvas.width-(x+w),h);
-      // Bottom
-      ctx.fillRect(0,y+h,canvas.width, canvas.height-(y+h));
-      
-      // Selection border - bright purple dashed
-      ctx.strokeStyle = '#7c3aed';
-      ctx.lineWidth = 3;
-      ctx.setLineDash([10,6]);
-      ctx.strokeRect(x+1.5,y+1.5,w-3,h-3);
-      ctx.setLineDash([]);
-      
-      // Inner subtle tint inside selection to indicate crop area
-      ctx.fillStyle = 'rgba(124, 58, 237, 0.06)';
-      ctx.fillRect(x,y,w,h);
-      
-      // Corner handles - white with purple border, bigger for mobile
-      const handleSize = window.innerWidth < 768 ? 14 : 10;
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = '#7c3aed';
-      ctx.lineWidth = 2.5;
-      [[x,y],[x+w,y],[x,y+h],[x+w,y+h]].forEach(([hx,hy])=>{
-        ctx.beginPath();
-        ctx.rect(hx-handleSize/2, hy-handleSize/2, handleSize, handleSize);
-        ctx.fill();
-        ctx.stroke();
-      });
-      // Center handles for resizing hint
-      // Size label with background
-      const label = `${Math.round(w/cropScale)} Ã— ${Math.round(h/cropScale)} pts`;
-      ctx.font = 'bold 13px Inter, sans-serif';
-      const textWidth = ctx.measureText(label).width;
-      // Background pill
-      ctx.fillStyle = '#7c3aed';
-      ctx.beginPath();
-      ctx.roundRect ? ctx.roundRect(x+6, y-28, textWidth+16, 22, 6) : ctx.fillRect(x+6, y-28, textWidth+16, 22);
-      if (!ctx.roundRect) {
-        ctx.fillRect(x+6, y-28, textWidth+16, 22);
-      } else {
-        ctx.fill();
+      const img = document.getElementById('pdfPreviewForCrop');
+      const box = document.getElementById('cropBox');
+      if (!img || !box) {
+        setCropStatus('Preview not ready');
+        return;
       }
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'left';
-      ctx.fillText(label, x+14, y-13);
-      
-      ctx.restore();
-    }
+      setCropStatus('Cropping all pages...');
 
-    // keep old name for compatibility
-    function drawSelection(ctx){ drawSelectionFixed(ctx); }
-
-    function getCanvasPos(e, target){
-      const canvas = target || document.getElementById('cropCanvas');
-      const rect = canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      // Account for CSS scaling and high-DPI
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      // If transform scale applied, rect already includes it, so scaleX/Y still correct
-      return { x: (clientX - rect.left)*scaleX, y: (clientY - rect.top)*scaleY };
-    }
-
-
-    function onCropDown(e) {
-      if (cropMode === 'auto') return;
-      if (e.cancelable) e.preventDefault();
-      isDrawing = true;
-      const p = getCanvasPos(e, e.target);
-      startX = p.x; startY = p.y;
-      if (cropMode === 'freehand') freehandPoints = [p];
-    }
-
-    function onCropMove(e) {
-      if (!isDrawing) return;
-      if (e.cancelable) e.preventDefault();
-      const p = getCanvasPos(e);
-      const canvas = document.getElementById('cropCanvas');
-      const ctx = canvas.getContext('2d');
-      // re-draw base only if needed - for performance we use cached preview logic
-      if (_pdfJsDocForPreview){
-        // we will draw selection on top of existing canvas, but to avoid trails, re-render is done via drawCropBase? use quick clear + selection will be overwritten next frame
-        // simple: do not call drawCropBase here, just redraw from stored image? Instead we keep preview as is and just overlay
-      } else {
-        drawCropBase();
-      }
-      if (cropMode === 'box') {
-        let w = p.x - startX, h = p.y - startY;
-        if (cropAspect && Math.abs(w) > 2) h = Math.abs(w) / cropAspect * Math.sign(h || 1 || 1);
-        cropRect = { x: startX, y: startY, w, h };
-        // redraw full preview then selection
-        if (_pdfJsDocForPreview){
-          _pdfJsDocForPreview.getPage(1).then(page=>{
-            const viewport = page.getViewport({scale:1.5});
-            page.render({canvasContext: ctx, viewport}).promise.then(()=>{ drawSelectionFixed(ctx); });
-          });
-        } else {
-          drawSelectionFixed(ctx);
-        }
-      } else if (cropMode === 'freehand') {
-        freehandPoints.push(p);
-        ctx.beginPath();
-        if (freehandPoints.length>1){
-          ctx.moveTo(freehandPoints[freehandPoints.length-2].x, freehandPoints[freehandPoints.length-2].y);
-          ctx.lineTo(p.x, p.y);
-          ctx.strokeStyle = '#7c3aed';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        }
-      }
-    }
-
-    function onCropUp() {
-      if (!isDrawing) return;
-      isDrawing = false;
-      if (cropMode === 'freehand' && freehandPoints.length > 3) {
-        const xs = freehandPoints.map(p => p.x);
-        const ys = freehandPoints.map(p => p.y);
-        cropRect = {
-          x: Math.min(...xs), y: Math.min(...ys),
-          w: Math.max(...xs) - Math.min(...xs),
-          h: Math.max(...ys) - Math.min(...ys)
-        };
-        drawCropBase();
-        setTimeout(()=>{ const c=document.getElementById('cropCanvas'); if(c) drawSelectionFixed(c.getContext('2d')); }, 80);
-      }
-      if (cropRect){
-        const nr = normalizeRect(cropRect);
-        document.getElementById('cropStatus').textContent = 'Selected: ' + Math.round(nr.w/cropScale) + ' Ã— ' + Math.round(nr.h/cropScale) + ' pts';
-      }
-    }
-
-    function setCropMode(mode) {
-      cropMode = mode;
-      ['modeBox','modeFree','modeAuto'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const active = (id === 'modeBox' && mode==='box') || (id === 'modeFree' && mode==='freehand') || (id === 'modeAuto' && mode==='auto');
-        el.className = active ? 'px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-600 text-white' : 'px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 text-slate-600';
-      });
-      if (mode === 'auto') { cropRect = null; drawCropBase(); document.getElementById('cropStatus').textContent='Auto: 4% margin crop'; }
-      else { document.getElementById('cropStatus').textContent='Draw selection on preview'; }
-    }
-
-    function setAspect(ratio, btnEl) {
-      cropAspect = ratio;
-      const btn = btnEl || (typeof event !== 'undefined' ? event.target : null);
-      document.querySelectorAll('.aspect-btn').forEach(b => {
-        b.classList.remove('bg-brand-600','text-white');
-        b.classList.add('bg-slate-100','text-slate-600');
-      });
-      if (btn && btn.classList) {
-        btn.classList.remove('bg-slate-100','text-slate-600');
-        btn.classList.add('bg-brand-600','text-white');
-      }
-    }
-
-    function resetCrop() {
-      const dz = document.getElementById('cropDropZone'); if(dz) dz.style.display='flex';
-      const cc = document.getElementById('cropControls'); if(cc) { cc.classList.add('hidden'); cc.style.display=''; }
-      cropRect = null;
-      freehandPoints = [];
-      const ids=['mTop','mRight','mBottom','mLeft'];
-      ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=0; });
-      drawCropBase();
-      const st=document.getElementById('cropStatus'); if(st) st.textContent = 'Selection reset';
-    }
-
-
-    
-    async function applyCrop() {
-      if (!cropPdfDoc) return alert('Please load a PDF first');
-      const status = document.getElementById('cropStatus');
-      status.textContent = 'Cropping...';
       try {
+        const dispW = img.clientWidth;
+        const dispH = img.clientHeight;
+        const L = parseFloat(box.style.left) || 0;
+        const T = parseFloat(box.style.top) || 0;
+        const W = parseFloat(box.style.width) || 0;
+        const H = parseFloat(box.style.height) || 0;
+
+        const scaleX = pdfPageWidth / dispW;
+        const scaleY = pdfPageHeight / dispH;
+        let x = L * scaleX;
+        let w = W * scaleX;
+        let h = H * scaleY;
+        let y = pdfPageHeight - (T * scaleY) - h;
+
+        x = Math.max(0, x);
+        y = Math.max(0, y);
+        w = Math.min(w, pdfPageWidth - x);
+        h = Math.min(h, pdfPageHeight - y);
+        if (w < 5 || h < 5) {
+          setCropStatus('Crop area too small');
+          return;
+        }
+
         const { PDFDocument } = PDFLib;
         const out = await PDFDocument.create();
         const pages = cropPdfDoc.getPages();
-        let cropBox;
-
-        if (cropMode === 'auto') {
-          const m = 0.04;
-          cropBox = { x: pdfPageWidth*m, y: pdfPageHeight*m, w: pdfPageWidth*(1-2*m), h: pdfPageHeight*(1-2*m) };
-        } else if (cropRect && Math.abs(cropRect.w) > 5 && Math.abs(cropRect.h) > 5) {
-          const s = 1 / cropScale;
-          const nr = normalizeRect(cropRect);
-          let x = nr.x * s;
-          let yCanvas = nr.y;
-          let w = nr.w * s;
-          let h = nr.h * s;
-          // PDF origin is bottom-left, canvas top-left
-          cropBox = { x, y: pdfPageHeight - (yCanvas * s) - h, w, h };
-        } else {
-          const mm = 2.834645669;
-          const top = (+document.getElementById('mTop').value || 0) * mm;
-          const right = (+document.getElementById('mRight').value || 0) * mm;
-          const bottom = (+document.getElementById('mBottom').value || 0) * mm;
-          const left = (+document.getElementById('mLeft').value || 0) * mm;
-          cropBox = { x: left, y: bottom, w: pdfPageWidth - left - right, h: pdfPageHeight - top - bottom };
-        }
-
-        // clamp
-        cropBox.x = Math.max(0, cropBox.x);
-        cropBox.y = Math.max(0, cropBox.y);
-        cropBox.w = Math.min(cropBox.w, pdfPageWidth - cropBox.x);
-        cropBox.h = Math.min(cropBox.h, pdfPageHeight - cropBox.y);
-        if (cropBox.w < 10 || cropBox.h < 10) throw new Error('Selection too small');
-
         for (let i = 0; i < pages.length; i++) {
           const [copied] = await out.copyPages(cropPdfDoc, [i]);
-          copied.setCropBox(cropBox.x, cropBox.y, cropBox.w, cropBox.h);
-          copied.setMediaBox(cropBox.x, cropBox.y, cropBox.w, cropBox.h);
+          copied.setCropBox(x, y, w, h);
+          copied.setMediaBox(x, y, w, h);
           out.addPage(copied);
         }
 
@@ -1381,40 +1191,34 @@
         a.href = url;
         a.download = 'cropped.pdf';
         a.click();
-        setTimeout(()=>URL.revokeObjectURL(url), 5000);
-        status.textContent = 'Done! Download started.';
+        setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+        setCropStatus('Done! Download started.');
       } catch (err) {
         console.error(err);
-        status.textContent = 'Error: ' + err.message;
+        setCropStatus('Error: ' + err.message);
       }
     }
 
+    function resetCrop() {
+      const dz = document.getElementById('cropDropZone');
+      const ed = document.getElementById('cropEditorArea');
+      if (dz) dz.style.display = '';
+      if (ed) {
+        ed.classList.add('hidden');
+        ed.style.display = 'none';
+      }
+      cropPdfDoc = null;
+      const nameEl = document.getElementById('cropFileName');
+      if (nameEl) nameEl.textContent = '';
+      const input = document.getElementById('cropPdfFile');
+      if (input) input.value = '';
+      const old = document.getElementById('cropBox');
+      if (old) old.remove();
+      const img = document.getElementById('pdfPreviewForCrop');
+      if (img) img.removeAttribute('src');
+      setCropStatus('');
+    }
 
-
-    
-    // FIX: Add touch support and proper event binding for crop canvas
-    (function setupCropCanvasListeners(){
-      const setup = () => {
-        const canvas = document.getElementById('cropCanvas');
-        if (!canvas) return;
-        if (canvas.dataset.fixed) return;
-        canvas.addEventListener('mousedown', onCropDown);
-        canvas.addEventListener('touchstart', onCropDown, {passive:false});
-        canvas.addEventListener('mousemove', (e)=>{ if(isDrawing) onCropMove(e); });
-        canvas.addEventListener('touchmove', onCropMove, {passive:false});
-        window.addEventListener('mouseup', onCropUp);
-        window.addEventListener('touchend', onCropUp);
-        canvas.dataset.fixed = '1';
-      };
-      setTimeout(setup, 1000);
-      // re-setup when tool opens
-      const originalOpenTool = window.openTool;
-      window.openTool = function(...args){
-        const res = originalOpenTool ? originalOpenTool.apply(this, args) : null;
-        setTimeout(setup, 300);
-        return res;
-      };
-    })();
     renderCategories();
 
     renderTools();
