@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batchit - Free Chat Rooms</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- આઇકોન્સ માટે -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- ઉપરનું બ્લુ હેડર -->
+    <header class="top-header">
+        <div class="logo">
+            <i class="fa-solid fa-comments"></i> Batchit
+        </div>
+        <nav class="top-nav">
+            <a href="#"><i class="fa-solid fa-users"></i> Free chat rooms</a>
+            <a href="#"><i class="fa-solid fa-user"></i> 1 On 1 Chat</a>
+            <a href="#"><i class="fa-solid fa-id-badge"></i> Profile</a>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <!-- ડાબી બાજુનો સાઇડબાર (યુઝર્સ લિસ્ટ) -->
+        <aside class="sidebar">
+            <div class="sidebar-tabs">
+                <button class="active">Online</button>
+                <button>Gender</button>
+                <button>Search</button>
+            </div>
+            
+            <div class="users-list">
+                <!-- ડેમો યુઝર 1 -->
+                <div class="user-item">
+                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User">
+                    <div class="user-info">
+                        <h4>Rahul</h4>
+                        <p>25 Yrs, Gujarat, India</p>
+                    </div>
+                    <span class="badge">1</span>
+                </div>
+                <!-- ડેમો યુઝર 2 -->
+                <div class="user-item">
+                    <img src="https://cdn-icons-png.flaticon.com/512/219/219969.png" alt="User">
+                    <div class="user-info">
+                        <h4>Priya</h4>
+                        <p>22 Yrs, Mumbai, India</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- જમણી બાજુનો મેસેજ એરિયા -->
+        <main class="chat-area">
+            <div class="welcome-banner">
+                <h2>Welcome to Batchit!</h2>
+                <p>Batchit is the best place to find new people around you & make new friendships!</p>
+                <ul>
+                    <li>Batchit is FREE! & will always stay free :)</li>
+                    <li>Start chatting by choosing a person from the list & say Hi!</li>
+                </ul>
+            </div>
+
+            <div class="chat-box" id="chat-box">
+                <!-- મેસેજ અહીં દેખાશે -->
+            </div>
+
+            <div class="message-input-area">
+                <input type="text" id="message-input" placeholder="Type a message here...">
+                <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
