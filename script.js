@@ -122,8 +122,8 @@ imageInput.addEventListener('change', async (e) => {
     formData.append("image", file);
 
     try {
-        // Free ImgBB API Key
-        const res = await fetch("[https://api.imgbb.com/1/upload?key=7ce1a67d15e7ad03a0130dfd6f2973b0", {
+        // Free ImgBB API Key (ભૂલ સુધારેલ છે)
+        const res = await fetch("https://api.imgbb.com/1/upload?key=7ce1a67d15e7ad03a0130dfd6f2973b0", {
             method: "POST",
             body: formData
         });
@@ -143,6 +143,6 @@ imageInput.addEventListener('change', async (e) => {
         alert("નેટવર્ક એરર!");
     }
 
-    imgBtn.innerHTML = '<i class="fa-solid fa-paperclip"></i>';
+    imgBtn.innerHTML = '📎';
     imageInput.value = "";
 });
