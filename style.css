@@ -1,0 +1,164 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f0f2f5;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styles */
+.top-header {
+    background-color: #0084ff;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.top-nav a {
+    color: white;
+    text-decoration: none;
+    margin-right: 20px;
+    font-size: 14px;
+}
+
+/* Main Container */
+.main-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 300px;
+    background-color: white;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+}
+
+.sidebar-tabs button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: #f8f9fa;
+    cursor: pointer;
+}
+
+.sidebar-tabs button.active {
+    background: white;
+    border-bottom: 2px solid #0084ff;
+    font-weight: bold;
+    color: #0084ff;
+}
+
+.users-list {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.user-item:hover {
+    background-color: #f0f2f5;
+}
+
+.user-item img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.user-info h4 {
+    font-size: 14px;
+    color: #333;
+}
+
+.user-info p {
+    font-size: 12px;
+    color: #777;
+}
+
+.badge {
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 8px;
+    font-size: 12px;
+    margin-left: auto;
+}
+
+/* Chat Area Styles */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+.welcome-banner {
+    background-color: #00c3ff;
+    color: white;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 8px;
+}
+
+.welcome-banner h2 { margin-bottom: 10px; }
+.welcome-banner ul { margin-left: 20px; margin-top: 10px; }
+
+.chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.message-input-area {
+    padding: 15px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    background-color: #f0f2f5;
+}
+
+.message-input-area input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+}
+
+.message-input-area button {
+    background-color: #0084ff;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    margin-left: 10px;
+    border-radius: 20px;
+    cursor: pointer;
+}
