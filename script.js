@@ -123,7 +123,7 @@ imageInput.addEventListener('change', async (e) => {
 
     try {
         // Free ImgBB API Key
-        const res = await fetch("https://api.imgbb.com/1/upload?key=d324b172a159ea3bbcb29b28a885f6bb", {
+        const res = await fetch("[https://api.imgbb.com/1/upload?key=7ce1a67d15e7ad03a0130dfd6f2973b0", {
             method: "POST",
             body: formData
         });
