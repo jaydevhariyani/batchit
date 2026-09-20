@@ -38,7 +38,7 @@ const onlineUsersDiv = document.getElementById('online-users');
 const imgBtn = document.getElementById('img-btn');
 const imageInput = document.getElementById('image-input');
 
-// ઓનલાઇન યુઝર લિસ્ટ
+// ઓનલાઇન યુઝર લિસ્ટ (પ્રોફાઇલ ફોટા સાથે)
 if(onlineUsersDiv) {
     onSnapshot(collection(db, "online_users"), (snapshot) => {
         onlineUsersDiv.innerHTML = ""; 
@@ -49,47 +49,88 @@ if(onlineUsersDiv) {
             userDiv.style.borderBottom = "1px solid #ddd";
             userDiv.style.display = "flex";
             userDiv.style.alignItems = "center";
-            userDiv.innerHTML = `<span style="background: #25D366; width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 10px;"></span> <strong style="color:#333;">${data.name}</strong>`;
+            
+            // ઓટોમેટિક અવતાર ફોટો
+            let avatarUrl = `https://ui-avatars.com/api/?name=${data.name}&background=random&color=fff&rounded=true&size=35`;
+            
+            userDiv.innerHTML = `
+                <div style="position: relative; margin-right: 12px;">
+                    <img src="${avatarUrl}" style="width: 35px; height: 35px; border-radius: 50%;">
+                    <span style="background: #25D366; width: 10px; height: 10px; border-radius: 50%; position: absolute; bottom: 0; right: 0; border: 2px solid white;"></span>
+                </div>
+                <strong style="color:#333;">${data.name}</strong>
+            `;
             onlineUsersDiv.appendChild(userDiv);
         });
     });
 }
 
-// મેસેજ અને ઇમેજ ડિસ્પ્લે
+// મેસેજ, ફોટો અને સમય ડિસ્પ્લે
 const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
 onSnapshot(q, (snapshot) => {
     chatBox.innerHTML = ""; 
     snapshot.forEach((doc) => {
         const data = doc.data();
-        const msgDiv = document.createElement('div');
         
-        if(data.user === username) {
+        // મુખ્ય લાઈન (અવતાર + મેસેજ)
+        const rowDiv = document.createElement('div');
+        rowDiv.style.display = "flex";
+        rowDiv.style.gap = "8px";
+        rowDiv.style.marginBottom = "15px";
+        rowDiv.style.alignItems = "flex-end"; // અવતાર નીચે રહે એ માટે
+        
+        const isMe = data.user === username;
+        if(isMe) rowDiv.style.flexDirection = "row-reverse"; // તમારો મેસેજ જમણી બાજુ
+
+        // અવતાર ફોટો
+        const avatarImg = document.createElement('img');
+        avatarImg.src = `https://ui-avatars.com/api/?name=${data.user}&background=random&color=fff&rounded=true&size=30`;
+        avatarImg.style.width = "30px";
+        avatarImg.style.height = "30px";
+        avatarImg.style.borderRadius = "50%";
+        
+        // મેસેજ બબલ
+        const msgDiv = document.createElement('div');
+        msgDiv.style.padding = "8px 12px";
+        msgDiv.style.maxWidth = "70%";
+        msgDiv.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
+        
+        if(isMe) {
             msgDiv.style.background = "#0084ff";
             msgDiv.style.color = "white";
-            msgDiv.style.alignSelf = "flex-end";
-            msgDiv.style.marginLeft = "auto";
+            msgDiv.style.borderRadius = "15px 15px 2px 15px"; // WhatsApp જેવો શેપ
         } else {
-            msgDiv.style.background = "#e1f5fe";
+            msgDiv.style.background = "white";
             msgDiv.style.color = "black";
-            msgDiv.style.alignSelf = "flex-start";
+            msgDiv.style.borderRadius = "15px 15px 15px 2px";
+            msgDiv.style.border = "1px solid #eee";
         }
         
-        msgDiv.style.padding = "10px 15px";
-        msgDiv.style.margin = "5px 0";
-        msgDiv.style.borderRadius = "15px";
-        msgDiv.style.width = "fit-content";
-        msgDiv.style.maxWidth = "70%";
+        // સમય સેટિંગ
+        let timeString = "Now";
+        if(data.timestamp) {
+            let date = data.timestamp.toDate();
+            timeString = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+        }
+
+        // મેસેજની અંદરનું કન્ટેન્ટ
+        let content = `<div style="font-size:11px; opacity:0.8; font-weight:bold; margin-bottom:3px;">${data.user}</div>`;
         
-        let content = `<small style="font-size:10px; opacity:0.8;">${data.user}</small><br>`;
         if(data.imageUrl) {
-            content += `<img src="${data.imageUrl}" style="max-width: 220px; border-radius: 8px; margin-top: 5px; display: block;"/><br>`;
+            content += `<img src="${data.imageUrl}" style="max-width: 220px; border-radius: 8px; margin-bottom: 5px; display: block;"/><br>`;
         }
         if(data.text) {
-            content += `${data.text}`;
+            content += `<div style="font-size: 15px;">${data.text}</div>`;
         }
+        
+        // સમય બતાવવા માટે
+        content += `<div style="font-size: 10px; opacity: ${isMe ? '0.8' : '0.5'}; text-align: right; margin-top: 4px;">${timeString}</div>`;
+        
         msgDiv.innerHTML = content;
         
-        chatBox.appendChild(msgDiv);
+        rowDiv.appendChild(avatarImg);
+        rowDiv.appendChild(msgDiv);
+        chatBox.appendChild(rowDiv);
     });
     chatBox.scrollTop = chatBox.scrollHeight; 
 });
@@ -122,7 +163,6 @@ imageInput.addEventListener('change', async (e) => {
     formData.append("image", file);
 
     try {
-        // Free ImgBB API Key (ભૂલ સુધારેલ છે)
         const res = await fetch("https://api.imgbb.com/1/upload?key=7ce1a67d15e7ad03a0130dfd6f2973b0", {
             method: "POST",
             body: formData
