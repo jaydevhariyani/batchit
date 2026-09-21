@@ -17,7 +17,7 @@ const db = getFirestore(app);
 // યુઝરનેમ સેટઅપ
 let username = localStorage.getItem('username');
 if(!username) {
-    username = prompt("તમારું નામ લખો (Enter your name):");
+    username = prompt("Please enter your name to join the chat:");
     if(!username) username = "Guest_" + Math.floor(Math.random() * 1000);
     localStorage.setItem('username', username);
 }
@@ -177,10 +177,10 @@ imageInput.addEventListener('change', async (e) => {
                 timestamp: serverTimestamp()
             });
         } else {
-            alert("ઇમેજ અપલોડ ન થઈ શકી!");
+            alert("Image upload failed! Please try again.");
         }
     } catch(err) {
-        alert("નેટવર્ક એરર!");
+        alert("Network error! Please check your internet connection.");
     }
 
     imgBtn.innerHTML = '📎';
