@@ -1,6 +1,8 @@
-// Firebase Firestore
+// Firebase Setup
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+// Authentication (Login) માટે નવો કોડ
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCxl2AUWy8SjNEUauG_DtPfUcqkR_zDhVA",
@@ -13,152 +15,219 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app); // Auth ચાલુ કર્યું
 
-// યુઝરનેમ સેટઅપ
-let username = localStorage.getItem('username');
-if(!username) {
-    username = prompt("Please enter your name to join the chat:");
-    if(!username) username = "Guest_" + Math.floor(Math.random() * 1000);
-    localStorage.setItem('username', username);
-}
+// HTML Elements
+const authPage = document.getElementById('auth-page');
+const mainApp = document.getElementById('main-app');
+const emailInput = document.getElementById('email-input');
+const passwordInput = document.getElementById('password-input');
+const loginBtn = document.getElementById('login-btn');
+const registerBtn = document.getElementById('register-btn');
+const logoutBtn = document.getElementById('logout-btn');
 
-// ઓનલાઇન સ્ટેટસ
-const userDocRef = doc(db, "online_users", username);
-setDoc(userDocRef, { name: username, timestamp: serverTimestamp() });
-
-window.addEventListener("beforeunload", () => {
-    deleteDoc(userDocRef);
-});
-
-// એલિમેન્ટ્સ
+const usersListDiv = document.getElementById('all-users-list');
+const chatHeader = document.getElementById('chat-header');
 const chatBox = document.getElementById('chat-box');
+const inputArea = document.getElementById('input-area');
 const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
-const onlineUsersDiv = document.getElementById('online-users');
 const imgBtn = document.getElementById('img-btn');
 const imageInput = document.getElementById('image-input');
 
-// ઓનલાઇન યુઝર લિસ્ટ (પ્રોફાઇલ ફોટા સાથે)
-if(onlineUsersDiv) {
-    onSnapshot(collection(db, "online_users"), (snapshot) => {
-        onlineUsersDiv.innerHTML = ""; 
-        snapshot.forEach((doc) => {
-            const data = doc.data();
-            const userDiv = document.createElement('div');
-            userDiv.style.padding = "10px";
-            userDiv.style.borderBottom = "1px solid #ddd";
-            userDiv.style.display = "flex";
-            userDiv.style.alignItems = "center";
+// Variables
+let currentUser = null;
+let currentChatUser = null;
+let currentChatId = null;
+let unsubscribeMessages = null;
+
+// 1. ચેક કરો કે યુઝર Login છે કે નહીં?
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUser = user;
+        authPage.style.display = 'none'; // લોગિન પેજ છુપાવો
+        mainApp.style.display = 'block'; // ચેટ એપ બતાવો
+
+        // યુઝરનું નામ ડેટાબેઝમાં સેવ કરો જેથી બીજા લોકો તેને જોઈ શકે
+        setDoc(doc(db, "users", user.email), {
+            email: user.email,
+            name: user.email.split('@')[0] // ઇમેઇલ પરથી નામ બનાવશે
+        });
+
+        loadUsersList();
+    } else {
+        currentUser = null;
+        authPage.style.display = 'flex'; // લોગિન પેજ બતાવો
+        mainApp.style.display = 'none'; // ચેટ એપ છુપાવો
+    }
+});
+
+// 2. Login & Register સિસ્ટમ (All in English)
+loginBtn.addEventListener('click', async () => {
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    if(!email || !password) return alert("Please enter email and password!");
+    
+    loginBtn.innerHTML = "Logging in...";
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+        alert("Login Failed: Incorrect email or password.");
+    }
+    loginBtn.innerHTML = "Login";
+});
+
+registerBtn.addEventListener('click', async () => {
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    if(!email || !password) return alert("Please enter email and password!");
+    
+    registerBtn.innerHTML = "Creating Account...";
+    try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        alert("Account created successfully!");
+    } catch (error) {
+        alert("Registration Failed: " + error.message);
+    }
+    registerBtn.innerHTML = "Create New Account";
+});
+
+logoutBtn.addEventListener('click', () => {
+    signOut(auth);
+    chatBox.innerHTML = "";
+    inputArea.style.display = 'none';
+    chatHeader.innerHTML = "<h2>Select a user from the list to start private chat</h2>";
+});
+
+// 3. ડાબી બાજુ બધા યુઝર્સનું લિસ્ટ બતાવવા માટે
+function loadUsersList() {
+    onSnapshot(collection(db, "users"), (snapshot) => {
+        usersListDiv.innerHTML = "";
+        snapshot.forEach((docSnap) => {
+            const userData = docSnap.data();
             
-            // ઓટોમેટિક અવતાર ફોટો
-            let avatarUrl = `https://ui-avatars.com/api/?name=${data.name}&background=random&color=fff&rounded=true&size=35`;
-            
-            userDiv.innerHTML = `
-                <div style="position: relative; margin-right: 12px;">
-                    <img src="${avatarUrl}" style="width: 35px; height: 35px; border-radius: 50%;">
-                    <span style="background: #25D366; width: 10px; height: 10px; border-radius: 50%; position: absolute; bottom: 0; right: 0; border: 2px solid white;"></span>
-                </div>
-                <strong style="color:#333;">${data.name}</strong>
-            `;
-            onlineUsersDiv.appendChild(userDiv);
+            // લિસ્ટમાં પોતાનું નામ ન બતાવવું જોઈએ
+            if(userData.email !== currentUser.email) {
+                const userDiv = document.createElement('div');
+                userDiv.style.padding = "10px";
+                userDiv.style.borderBottom = "1px solid #ddd";
+                userDiv.style.cursor = "pointer";
+                userDiv.style.display = "flex";
+                userDiv.style.alignItems = "center";
+
+                const avatarUrl = `https://ui-avatars.com/api/?name=${userData.name}&background=random&color=fff&rounded=true&size=35`;
+
+                userDiv.innerHTML = `
+                    <img src="${avatarUrl}" style="margin-right: 12px; width: 35px; height: 35px; border-radius: 50%;">
+                    <strong style="color:#333;">${userData.name}</strong>
+                `;
+
+                // યુઝરના નામ પર ક્લિક કરવાથી ચેટ ખુલે
+                userDiv.addEventListener('click', () => {
+                    selectUser(userData.email, userData.name);
+                });
+
+                usersListDiv.appendChild(userDiv);
+            }
         });
     });
 }
 
-// મેસેજ, ફોટો અને સમય ડિસ્પ્લે
-const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
-onSnapshot(q, (snapshot) => {
-    chatBox.innerHTML = ""; 
-    snapshot.forEach((doc) => {
-        const data = doc.data();
-        
-        // મુખ્ય લાઈન (અવતાર + મેસેજ)
-        const rowDiv = document.createElement('div');
-        rowDiv.style.display = "flex";
-        rowDiv.style.gap = "8px";
-        rowDiv.style.marginBottom = "15px";
-        rowDiv.style.alignItems = "flex-end"; // અવતાર નીચે રહે એ માટે
-        
-        const isMe = data.user === username;
-        if(isMe) rowDiv.style.flexDirection = "row-reverse"; // તમારો મેસેજ જમણી બાજુ
+// 4. પ્રાઇવેટ ચેટ શરૂ કરવાનું સેટિંગ
+function selectUser(userEmail, userName) {
+    currentChatUser = userEmail;
+    
+    // બે યુઝર વચ્ચે એક યુનિક સિક્રેટ રૂમ (ID) બનાવશે
+    const emails = [currentUser.email, userEmail].sort();
+    currentChatId = `${emails[0]}_${emails[1]}`;
 
-        // અવતાર ફોટો
-        const avatarImg = document.createElement('img');
-        avatarImg.src = `https://ui-avatars.com/api/?name=${data.user}&background=random&color=fff&rounded=true&size=30`;
-        avatarImg.style.width = "30px";
-        avatarImg.style.height = "30px";
-        avatarImg.style.borderRadius = "50%";
-        
-        // મેસેજ બબલ
-        const msgDiv = document.createElement('div');
-        msgDiv.style.padding = "8px 12px";
-        msgDiv.style.maxWidth = "70%";
-        msgDiv.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
-        
-        if(isMe) {
-            msgDiv.style.background = "#0084ff";
-            msgDiv.style.color = "white";
-            msgDiv.style.borderRadius = "15px 15px 2px 15px"; // WhatsApp જેવો શેપ
-        } else {
-            msgDiv.style.background = "white";
-            msgDiv.style.color = "black";
-            msgDiv.style.borderRadius = "15px 15px 15px 2px";
-            msgDiv.style.border = "1px solid #eee";
-        }
-        
-        // સમય સેટિંગ
-        let timeString = "Now";
-        if(data.timestamp) {
-            let date = data.timestamp.toDate();
-            timeString = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-        }
+    chatHeader.innerHTML = `<h2 style="margin:0;"><i class="fa-solid fa-user"></i> Chatting with ${userName}</h2>`;
+    inputArea.style.display = 'flex'; // મેસેજ ટાઈપ કરવાનું બોક્સ બતાવો
 
-        // મેસેજની અંદરનું કન્ટેન્ટ
-        let content = `<div style="font-size:11px; opacity:0.8; font-weight:bold; margin-bottom:3px;">${data.user}</div>`;
-        
-        if(data.imageUrl) {
-            content += `<img src="${data.imageUrl}" style="max-width: 220px; border-radius: 8px; margin-bottom: 5px; display: block;"/><br>`;
-        }
-        if(data.text) {
-            content += `<div style="font-size: 15px;">${data.text}</div>`;
-        }
-        
-        // સમય બતાવવા માટે
-        content += `<div style="font-size: 10px; opacity: ${isMe ? '0.8' : '0.5'}; text-align: right; margin-top: 4px;">${timeString}</div>`;
-        
-        msgDiv.innerHTML = content;
-        
-        rowDiv.appendChild(avatarImg);
-        rowDiv.appendChild(msgDiv);
-        chatBox.appendChild(rowDiv);
+    loadPrivateMessages();
+}
+
+// 5. માત્ર પ્રાઇવેટ મેસેજ જ લોડ કરવાનું સેટિંગ
+function loadPrivateMessages() {
+    if(unsubscribeMessages) unsubscribeMessages(); // જૂની ચેટ બંધ કરો
+
+    const q = query(collection(db, "private_chats", currentChatId, "messages"), orderBy("timestamp", "asc"));
+    unsubscribeMessages = onSnapshot(q, (snapshot) => {
+        chatBox.innerHTML = "";
+        snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            const isMe = data.sender === currentUser.email;
+
+            const rowDiv = document.createElement('div');
+            rowDiv.style.display = "flex";
+            rowDiv.style.gap = "8px";
+            rowDiv.style.marginBottom = "15px";
+            rowDiv.style.alignItems = "flex-end";
+            if(isMe) rowDiv.style.flexDirection = "row-reverse";
+
+            const msgDiv = document.createElement('div');
+            msgDiv.style.padding = "8px 12px";
+            msgDiv.style.maxWidth = "70%";
+            msgDiv.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
+
+            if(isMe) {
+                msgDiv.style.background = "#0084ff";
+                msgDiv.style.color = "white";
+                msgDiv.style.borderRadius = "15px 15px 2px 15px";
+            } else {
+                msgDiv.style.background = "white";
+                msgDiv.style.color = "black";
+                msgDiv.style.borderRadius = "15px 15px 15px 2px";
+                msgDiv.style.border = "1px solid #eee";
+            }
+
+            let timeString = "Now";
+            if(data.timestamp) {
+                let date = data.timestamp.toDate();
+                timeString = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+            }
+
+            let content = ``;
+            if(data.imageUrl) {
+                content += `<img src="${data.imageUrl}" style="max-width: 220px; border-radius: 8px; margin-bottom: 5px; display: block;"/><br>`;
+            }
+            if(data.text) {
+                content += `<div style="font-size: 15px;">${data.text}</div>`;
+            }
+            content += `<div style="font-size: 10px; opacity: ${isMe ? '0.8' : '0.5'}; text-align: right; margin-top: 4px;">${timeString}</div>`;
+
+            msgDiv.innerHTML = content;
+            rowDiv.appendChild(msgDiv);
+            chatBox.appendChild(rowDiv);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
     });
-    chatBox.scrollTop = chatBox.scrollHeight; 
-});
+}
 
-// ટેક્સ્ટ મેસેજ મોકલો
+// 6. પ્રાઇવેટ મેસેજ મોકલો
 sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
-    if(message.trim() !== "") {
-        await addDoc(collection(db, "messages"), {
-            user: username,
+    if(message.trim() !== "" && currentChatId) {
+        await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
+            sender: currentUser.email,
             text: message,
             timestamp: serverTimestamp()
         });
-        messageInput.value = ""; 
+        messageInput.value = "";
     }
 });
 
-// ૧૦૦% ફ્રી ફોટો અપલોડ (ImgBB API)
+// 7. પ્રાઇવેટ ઇમેજ (ફોટો) મોકલો (English Alerts)
 imgBtn.addEventListener('click', () => {
+    if(!currentChatId) return alert("Please select a user to chat with first!");
     imageInput.click();
 });
 
 imageInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
-    if(!file) return;
+    if(!file || !currentChatId) return;
 
     imgBtn.innerHTML = "⏳";
-
     const formData = new FormData();
     formData.append("image", file);
 
@@ -170,8 +239,8 @@ imageInput.addEventListener('change', async (e) => {
         const result = await res.json();
 
         if(result.success) {
-            await addDoc(collection(db, "messages"), {
-                user: username,
+            await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
+                sender: currentUser.email,
                 text: "",
                 imageUrl: result.data.url,
                 timestamp: serverTimestamp()
