@@ -99,14 +99,13 @@ logoutBtn.addEventListener('click', () => {
     chatHeader.innerHTML = "<h2>Select a user from the list to start private chat</h2>";
 });
 
-// 3. ડાબી બાજુ બધા યુઝર્સનું લિસ્ટ બતાવવા માટે
+// 3. ડાબી બાજુ યુઝર્સનું લિસ્ટ અને Notification Badge
 function loadUsersList() {
     onSnapshot(collection(db, "users"), (snapshot) => {
         usersListDiv.innerHTML = "";
         snapshot.forEach((docSnap) => {
             const userData = docSnap.data();
             
-            // લિસ્ટમાં પોતાનું નામ ન બતાવવું જોઈએ
             if(userData.email !== currentUser.email) {
                 const userDiv = document.createElement('div');
                 userDiv.style.padding = "10px";
@@ -114,16 +113,55 @@ function loadUsersList() {
                 userDiv.style.cursor = "pointer";
                 userDiv.style.display = "flex";
                 userDiv.style.alignItems = "center";
+                userDiv.style.justifyContent = "space-between"; // Badge ne jamni baju dhakelva
 
                 const avatarUrl = `https://ui-avatars.com/api/?name=${userData.name}&background=random&color=fff&rounded=true&size=35`;
+                
+                // Nam ane Photo
+                const leftDiv = document.createElement('div');
+                leftDiv.style.display = "flex";
+                leftDiv.style.alignItems = "center";
+                leftDiv.innerHTML = `<img src="${avatarUrl}" style="margin-right: 12px; width: 35px; height: 35px; border-radius: 50%;"> <strong style="color:#333;">${userData.name}</strong>`;
+                
+                // Lal color nu 'New' badge (Default chhupavelu hase)
+                const badgeElement = document.createElement('span');
+                badgeElement.innerText = "New";
+                badgeElement.style.background = "red";
+                badgeElement.style.color = "white";
+                badgeElement.style.borderRadius = "10px";
+                badgeElement.style.padding = "3px 8px";
+                badgeElement.style.fontSize = "11px";
+                badgeElement.style.fontWeight = "bold";
+                badgeElement.style.display = "none"; 
 
-                userDiv.innerHTML = `
-                    <img src="${avatarUrl}" style="margin-right: 12px; width: 35px; height: 35px; border-radius: 50%;">
-                    <strong style="color:#333;">${userData.name}</strong>
-                `;
+                userDiv.appendChild(leftDiv);
+                userDiv.appendChild(badgeElement);
 
-                // યુઝરના નામ પર ક્લિક કરવાથી ચેટ ખુલે
+                // Check karse ke aa user no navo message aavyo chhe ke nahi
+                const email1 = currentUser.email.toLowerCase();
+                const email2 = userData.email.toLowerCase();
+                const emails = [email1, email2].sort();
+                const chatId = `${emails[0]}_${emails[1]}`;
+                
+                // Ascending order ma messages malse
+                const qChat = query(collection(db, "private_chats", chatId, "messages"), orderBy("timestamp", "asc"));
+                
+                onSnapshot(qChat, (chatSnap) => {
+                    if(!chatSnap.empty) {
+                        const docs = chatSnap.docs;
+                        const lastMsg = docs[docs.length - 1].data(); // Sauthi chhello message
+                        
+                        // Jo chhello message same valae mokalyo hoy ane aapanu current chat e na hoy, to 'New' batavo
+                        if(lastMsg.sender === userData.email.toLowerCase() && currentChatUser !== userData.email.toLowerCase()) {
+                            badgeElement.style.display = 'block';
+                        } else {
+                            badgeElement.style.display = 'none';
+                        }
+                    }
+                });
+
                 userDiv.addEventListener('click', () => {
+                    badgeElement.style.display = 'none'; // Click kare etle badge gayab
                     selectUser(userData.email, userData.name);
                 });
 
