@@ -1,71 +1,69 @@
 <!DOCTYPE html>
-<html lang="gu">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batchit - Free Chat Rooms</title>
+    <title>Batchit - Private Chat</title>
     <link rel="stylesheet" href="style.css">
-    <!-- આઇકોન્સ માટે -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- ઉપરનું બ્લુ હેડર -->
-    <header class="top-header">
-        <div class="logo">
-            <i class="fa-solid fa-comments"></i> Batchit
-        </div>
-        <nav class="top-nav">
-            <a href="#"><i class="fa-solid fa-users"></i> Free chat rooms</a>
-            <a href="#"><i class="fa-solid fa-user"></i> 1 On 1 Chat</a>
-            <a href="#"><i class="fa-solid fa-id-badge"></i> Profile</a>
-        </nav>
-    </header>
 
-    <div class="main-container">
-        <!-- ડાબી બાજુનો સાઇડબાર (યુઝર્સ લિસ્ટ) -->
-        <aside class="sidebar">
-            <div class="sidebar-tabs">
-                <button class="active">Online</button>
-                <button>Gender</button>
-                <button>Search</button>
-            </div>
+    <!-- LOGIN / REGISTER PAGE -->
+    <div id="auth-page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5;">
+        <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; text-align: center;">
+            <h2 style="color: #0084ff; margin-bottom: 20px;"><i class="fa-solid fa-comments"></i> Batchit Login</h2>
+            <input type="email" id="email-input" placeholder="Email Address" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
+            <input type="password" id="password-input" placeholder="Password" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
             
-           <div class="users-list">
-                <div id="online-users"></div>
-            </div>
-        </aside>
-
-        <!-- જમણી બાજુનો મેસેજ એરિયા -->
-        <main class="chat-area">
-            <div class="welcome-banner">
-                <h2>Welcome to Batchit!</h2>
-                <p>Batchit is the best place to find new people around you & make new friendships!</p>
-                <ul>
-                    <li>Batchit is FREE! & will always stay free :)</li>
-                    <li>Start chatting by choosing a person from the list & say Hi!</li>
-                </ul>
-            </div>
-
-            <div class="chat-box" id="chat-box">
-                <!-- મેસેજ અહીં દેખાશે -->
-            </div>
-
-            <div class="message-input-area">
-                <!-- ફોટો સિલેક્ટ કરવા માટે -->
-                <input type="file" id="image-input" accept="image/*" style="display: none;">
-                
-                <!-- કાયમ દેખાય તેવું પેપરક્લિપ બટન -->
-                <button id="img-btn" type="button" style="background: none; border: none; font-size: 24px; cursor: pointer; margin-right: 10px;">
-                    📎
-                </button>
-                
-                <input type="text" id="message-input" placeholder="Type a message here...">
-                <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
-            </div>
-        </main>
+            <button id="login-btn" style="width: 100%; padding: 10px; background: #0084ff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 10px; font-weight: bold;">Login</button>
+            <button id="register-btn" style="width: 100%; padding: 10px; background: #25D366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Create New Account</button>
+        </div>
     </div>
 
-    <!-- સૌથી નીચેનો ભાગ -->
+    <!-- MAIN CHAT APP (Login pachi j dekhase) -->
+    <div id="main-app" style="display: none;">
+        <!-- Upar nu blue header -->
+        <header class="top-header">
+            <div class="logo">
+                <i class="fa-solid fa-comments"></i> Batchit
+            </div>
+            <nav class="top-nav">
+                <button id="logout-btn" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            </nav>
+        </header>
+
+        <div class="main-container">
+            <!-- Dabi baju no sidebar (Users List) -->
+            <aside class="sidebar">
+                <div class="sidebar-tabs">
+                    <button class="active">All Users</button>
+                </div>
+                <div class="users-list">
+                    <div id="all-users-list"></div>
+                </div>
+            </aside>
+
+            <!-- Jamni baju no message area -->
+            <main class="chat-area">
+                <div class="welcome-banner" id="chat-header">
+                    <h2>Select a user from the list to start private chat</h2>
+                </div>
+
+                <div class="chat-box" id="chat-box">
+                    <!-- Messages ahi dekhase -->
+                </div>
+
+                <div class="message-input-area" id="input-area" style="display: none;">
+                    <input type="file" id="image-input" accept="image/*" style="display: none;">
+                    <button id="img-btn" type="button" style="background: none; border: none; font-size: 24px; cursor: pointer; margin-right: 10px;">📎</button>
+                    <input type="text" id="message-input" placeholder="Type a private message...">
+                    <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </main>
+        </div>
+    </div>
+
     <script type="module" src="script.js"></script>
 </body>
 </html>
