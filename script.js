@@ -296,20 +296,18 @@ sendBtn.addEventListener('click', async () => {
 
         if(currentChatUser === "bot@batchit.com") {
             
-            // તમારી અસલી કી અહીંયા છે
-            const GEMINI_API_KEY = "AQ.Ab8RN6LJTWJFjSyazBD7DZnc4pwbf6hCWlTmkEXyEwcMm1J-JA"; 
+            // Ahiya tamari aa navi key nakheli j che
+            const GEMINI_API_KEY = "AQ.Ab8RN6Lo82eD6q6Q6HyTHWT6q46Q5mRiM_ckC27L-p5ZgkHVcg"; 
             
             let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
             let promptText = `You are a friendly chatting partner named ${botName}. The human just said: "${message}". Reply naturally in the exact same language/script they used.`;
 
             try {
                 setTimeout(async () => {
-                    // ગૂગલનું નવું અપડેટ થયેલું મૉડલ (gemini-2.5-flash) અહી લગાવી દીધું છે!
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`, {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY.trim()}`, {
                         method: "POST",
                         headers: { 
-                            "Content-Type": "application/json",
-                            "x-goog-api-key": GEMINI_API_KEY.trim()
+                            "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
                             contents: [{ parts: [{ text: promptText }] }]
@@ -320,11 +318,11 @@ sendBtn.addEventListener('click', async () => {
                     let aiReply = "";
                     
                     if (data.error) {
-                         aiReply = `અરે! ગૂગલ ના પાડે છે. Error: ${data.error.message}`;
+                         aiReply = `ગૂગલની એરર: ${data.error.message}`;
                     } else if(data.candidates && data.candidates[0].content.parts[0].text) {
                          aiReply = data.candidates[0].content.parts[0].text;
                     } else {
-                         aiReply = `કંઈક નવો જ લોચો છે: ${JSON.stringify(data)}`;
+                         aiReply = "Sorry, કોઈ જવાબ ના મળ્યો.";
                     }
 
                     await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
