@@ -137,12 +137,15 @@ function loadUsersList() {
 function selectUser(userEmail, userName) {
     currentChatUser = userEmail;
     
-    // બે યુઝર વચ્ચે એક યુનિક સિક્રેટ રૂમ (ID) બનાવશે
-    const emails = [currentUser.email, userEmail].sort();
+    // ઇમેઇલને ફરજિયાત નાના અક્ષરોમાં (lowercase) ફેરવીને રૂમ ID બનાવશે
+    const email1 = currentUser.email.toLowerCase();
+    const email2 = userEmail.toLowerCase();
+    const emails = [email1, email2].sort();
+    
     currentChatId = `${emails[0]}_${emails[1]}`;
 
     chatHeader.innerHTML = `<h2 style="margin:0;"><i class="fa-solid fa-user"></i> Chatting with ${userName}</h2>`;
-    inputArea.style.display = 'flex'; // મેસેજ ટાઈપ કરવાનું બોક્સ બતાવો
+    inputArea.style.display = 'flex';
 
     loadPrivateMessages();
 }
