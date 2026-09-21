@@ -34,7 +34,7 @@ const imgBtn = document.getElementById('img-btn');
 const imageInput = document.getElementById('image-input');
 
 let currentUser = null;
-let currentUserData = null; // User nu gender check karva mate
+let currentUserData = null; 
 let currentChatUser = null;
 let currentChatId = null;
 let unsubscribeMessages = null;
@@ -46,7 +46,6 @@ onAuthStateChanged(auth, async (user) => {
         authPage.style.display = 'none';
         mainApp.style.display = 'block';
 
-        // Login thaya pachi database mathi user nu Gender check karse
         const userDoc = await getDoc(doc(db, "users", user.email.toLowerCase()));
         if(userDoc.exists()) {
             currentUserData = userDoc.data();
@@ -141,7 +140,6 @@ function loadUsersList() {
             selectUser(botEmail, botName);
         });
         usersListDiv.appendChild(botDiv);
-        // --- BOT SETTING PURU ---
 
         // Bija normal users nu list
         snapshot.forEach((docSnap) => {
@@ -284,11 +282,11 @@ function loadPrivateMessages() {
     });
 }
 
-// 7. Send Text (BOT Auto-Reply Logic Sath)
+// 7. Send Text (REAL AI CHATBOT LOGIC SATHE - Tamari API Key Inbuilt Chhe)
 sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
     if(message.trim() !== "" && currentChatId) {
-        // Tamara taraf thi message jay chhe
+        
         await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
             sender: currentUser.email.toLowerCase(),
             text: message,
@@ -296,27 +294,47 @@ sendBtn.addEventListener('click', async () => {
         });
         messageInput.value = "";
 
-        // --- BOT AUTO-REPLY LOGIC ---
+        // --- REAL AI BOT LOGIC ---
         if(currentChatUser === "bot@batchit.com") {
-            setTimeout(async () => {
-                let botReplies = [];
-                if(currentUserData?.gender === "Female") {
-                    // Chhokri mate Rahul na replies
-                    botReplies = ["Hi beautiful! 👋", "Hu Rahul chu. Batchit ma tamaru swagat che!", "Bolo, aaje shu chale che?", "Tamari sathe vat karine maja aavi!", "Tame kyana cho?"];
-                } else {
-                    // Chhokra mate Priya na replies
-                    botReplies = ["Hi handsome! 👋", "Hu Priya chu. Batchit ma tamaru swagat che!", "Bolo, shu chale che?", "Tamaro photo mast che ho! 😉", "Tame kyana cho?"];
-                }
-                
-                // Randomly koi ek reply select kari ne bot mokalse
-                let randomReply = botReplies[Math.floor(Math.random() * botReplies.length)];
-                
+            
+            // Tamari API Key ahi fix kari didhi chhe
+            const GEMINI_API_KEY = "AQ.Ab8RN6LJTWJFjSyazBD7DZnc4pwbf6hCWlTmkEXyEwcMm1J-JA"; 
+            
+            let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
+            
+            let promptText = `You are a friendly chatting partner named ${botName}. You are talking to a human in a chat app. The human just said: "${message}". Reply naturally like a real human. MUST respond in the EXACT SAME LANGUAGE and script the human used (e.g. if they type in Gujarati, reply in Gujarati. If they type Gujarati in English alphabets, reply in Gujarati in English alphabets. Same for Hindi or English). Keep the reply short and conversational.`;
+
+            try {
+                setTimeout(async () => {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: promptText }] }]
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    let aiReply = "Sorry, hu samji na sakyu.";
+                    
+                    if(data.candidates && data.candidates[0].content.parts[0].text) {
+                         aiReply = data.candidates[0].content.parts[0].text;
+                    }
+
+                    await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
+                        sender: "bot@batchit.com",
+                        text: aiReply,
+                        timestamp: serverTimestamp()
+                    });
+                }, 1000);
+            } catch(error) {
+                console.log("AI Bot error: ", error);
                 await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
                     sender: "bot@batchit.com",
-                    text: randomReply,
+                    text: "Network thodu slow chhe, fari thi kaho ne shu kahyu?",
                     timestamp: serverTimestamp()
                 });
-            }, 1500); // 1.5 second pachi bot reply aapase jethi real lage
+            }
         }
     }
 });
@@ -350,7 +368,6 @@ imageInput.addEventListener('change', async (e) => {
                 timestamp: serverTimestamp()
             });
             
-            // Bot ne image moklo to te emoji aapse
             if(currentChatUser === "bot@batchit.com") {
                 setTimeout(async () => {
                     await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
