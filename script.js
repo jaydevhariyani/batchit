@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -34,19 +34,27 @@ const imgBtn = document.getElementById('img-btn');
 const imageInput = document.getElementById('image-input');
 
 let currentUser = null;
+let currentUserData = null; // User nu gender check karva mate
 let currentChatUser = null;
 let currentChatId = null;
 let unsubscribeMessages = null;
 
 // 1. Auth State
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
         authPage.style.display = 'none';
         mainApp.style.display = 'block';
+
+        // Login thaya pachi database mathi user nu Gender check karse
+        const userDoc = await getDoc(doc(db, "users", user.email.toLowerCase()));
+        if(userDoc.exists()) {
+            currentUserData = userDoc.data();
+        }
         loadUsersList();
     } else {
         currentUser = null;
+        currentUserData = null;
         authPage.style.display = 'flex';
         mainApp.style.display = 'none';
     }
@@ -80,14 +88,15 @@ registerBtn.addEventListener('click', async () => {
     try {
         await createUserWithEmailAndPassword(auth, email, password);
         
-        // Database ma User nu nam ane gender save karo
         await setDoc(doc(db, "users", email.toLowerCase()), {
             email: email.toLowerCase(),
             name: email.split('@')[0],
             gender: gender
         });
         
+        currentUserData = { email: email.toLowerCase(), name: email.split('@')[0], gender: gender };
         alert("Account created successfully!");
+        loadUsersList();
     } catch (error) {
         alert("Registration Failed: " + error.message);
     }
@@ -102,10 +111,39 @@ logoutBtn.addEventListener('click', () => {
     chatHeader.innerHTML = "<h2>Select a user from the list to start private chat</h2>";
 });
 
-// 4. Load Users List with Gender Icon
+// 4. Load Users List with AI BOT
 function loadUsersList() {
     onSnapshot(collection(db, "users"), (snapshot) => {
         usersListDiv.innerHTML = "";
+        
+        // --- AI BOT NE LIST MA ADD KARVANU SETTING ---
+        const botDiv = document.createElement('div');
+        botDiv.style.padding = "10px";
+        botDiv.style.borderBottom = "1px solid #ddd";
+        botDiv.style.cursor = "pointer";
+        botDiv.style.display = "flex";
+        botDiv.style.alignItems = "center";
+        botDiv.style.background = "#f8f9fa";
+        
+        let botName = currentUserData?.gender === "Female" ? "Rahul (AI) 👦" : "Priya (AI) 👧";
+        let botEmail = "bot@batchit.com";
+        let botAvatar = `https://ui-avatars.com/api/?name=${botName}&background=random&color=fff&rounded=true&size=35`;
+        
+        botDiv.innerHTML = `
+            <div style="display: flex; align-items: center; width: 100%;">
+                <img src="${botAvatar}" style="margin-right: 12px; width: 35px; height: 35px; border-radius: 50%;"> 
+                <strong style="color:#0084ff;">${botName}</strong>
+                <span style="margin-left: 10px; font-size: 9px; background: #25D366; color: white; padding: 2px 5px; border-radius: 10px;">BOT</span>
+            </div>
+        `;
+        
+        botDiv.addEventListener('click', () => {
+            selectUser(botEmail, botName);
+        });
+        usersListDiv.appendChild(botDiv);
+        // --- BOT SETTING PURU ---
+
+        // Bija normal users nu list
         snapshot.forEach((docSnap) => {
             const userData = docSnap.data();
             
@@ -120,7 +158,6 @@ function loadUsersList() {
 
                 const avatarUrl = `https://ui-avatars.com/api/?name=${userData.name}&background=random&color=fff&rounded=true&size=35`;
                 
-                // Gender Icon Set karo
                 let genderIcon = "";
                 if(userData.gender === "Male") genderIcon = "👦";
                 else if(userData.gender === "Female") genderIcon = "👧";
@@ -247,16 +284,40 @@ function loadPrivateMessages() {
     });
 }
 
-// 7. Send Text
+// 7. Send Text (BOT Auto-Reply Logic Sath)
 sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
     if(message.trim() !== "" && currentChatId) {
+        // Tamara taraf thi message jay chhe
         await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
             sender: currentUser.email.toLowerCase(),
             text: message,
             timestamp: serverTimestamp()
         });
         messageInput.value = "";
+
+        // --- BOT AUTO-REPLY LOGIC ---
+        if(currentChatUser === "bot@batchit.com") {
+            setTimeout(async () => {
+                let botReplies = [];
+                if(currentUserData?.gender === "Female") {
+                    // Chhokri mate Rahul na replies
+                    botReplies = ["Hi beautiful! 👋", "Hu Rahul chu. Batchit ma tamaru swagat che!", "Bolo, aaje shu chale che?", "Tamari sathe vat karine maja aavi!", "Tame kyana cho?"];
+                } else {
+                    // Chhokra mate Priya na replies
+                    botReplies = ["Hi handsome! 👋", "Hu Priya chu. Batchit ma tamaru swagat che!", "Bolo, shu chale che?", "Tamaro photo mast che ho! 😉", "Tame kyana cho?"];
+                }
+                
+                // Randomly koi ek reply select kari ne bot mokalse
+                let randomReply = botReplies[Math.floor(Math.random() * botReplies.length)];
+                
+                await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
+                    sender: "bot@batchit.com",
+                    text: randomReply,
+                    timestamp: serverTimestamp()
+                });
+            }, 1500); // 1.5 second pachi bot reply aapase jethi real lage
+        }
     }
 });
 
@@ -288,6 +349,18 @@ imageInput.addEventListener('change', async (e) => {
                 imageUrl: result.data.url,
                 timestamp: serverTimestamp()
             });
+            
+            // Bot ne image moklo to te emoji aapse
+            if(currentChatUser === "bot@batchit.com") {
+                setTimeout(async () => {
+                    await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
+                        sender: "bot@batchit.com",
+                        text: "Wow! Nice picture! 😍",
+                        timestamp: serverTimestamp()
+                    });
+                }, 1500);
+            }
+            
         } else {
             alert("Image upload failed! Please try again.");
         }
