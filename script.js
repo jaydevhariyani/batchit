@@ -282,7 +282,7 @@ function loadPrivateMessages() {
     });
 }
 
-// 7. Send Text (REAL AI CHATBOT LOGIC SATHE - Tamari API Key Inbuilt Chhe)
+// 7. Send Text (REAL AI CHATBOT LOGIC)
 sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
     if(message.trim() !== "" && currentChatId) {
@@ -294,15 +294,13 @@ sendBtn.addEventListener('click', async () => {
         });
         messageInput.value = "";
 
-        // --- REAL AI BOT LOGIC ---
         if(currentChatUser === "bot@batchit.com") {
             
-            // Tamari API Key ahi fix kari didhi chhe
+            // તમારી અસલી કી અહીંયા છે
             const GEMINI_API_KEY = "AQ.Ab8RN6LJTWJFjSyazBD7DZnc4pwbf6hCWlTmkEXyEwcMm1J-JA"; 
             
             let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
-            
-            let promptText = `You are a friendly chatting partner named ${botName}. You are talking to a human in a chat app. The human just said: "${message}". Reply naturally like a real human. MUST respond in the EXACT SAME LANGUAGE and script the human used (e.g. if they type in Gujarati, reply in Gujarati. If they type Gujarati in English alphabets, reply in Gujarati in English alphabets. Same for Hindi or English). Keep the reply short and conversational.`;
+            let promptText = `You are a friendly chatting partner named ${botName}. The human just said: "${message}". Reply naturally in the exact same language/script they used.`;
 
             try {
                 setTimeout(async () => {
@@ -315,10 +313,15 @@ sendBtn.addEventListener('click', async () => {
                     });
                     
                     const data = await response.json();
-                    let aiReply = "Sorry, hu samji na sakyu.";
+                    let aiReply = "";
                     
-                    if(data.candidates && data.candidates[0].content.parts[0].text) {
+                    // અહી ગૂગલની અસલી એરર પકડાશે!
+                    if (data.error) {
+                         aiReply = `અરે! ગૂગલ ના પાડે છે. Error: ${data.error.message}`;
+                    } else if(data.candidates && data.candidates[0].content.parts[0].text) {
                          aiReply = data.candidates[0].content.parts[0].text;
+                    } else {
+                         aiReply = `કંઈક નવો જ લોચો છે: ${JSON.stringify(data)}`;
                     }
 
                     await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
@@ -328,10 +331,9 @@ sendBtn.addEventListener('click', async () => {
                     });
                 }, 1000);
             } catch(error) {
-                console.log("AI Bot error: ", error);
                 await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
                     sender: "bot@batchit.com",
-                    text: "Network thodu slow chhe, fari thi kaho ne shu kahyu?",
+                    text: `Network Error: ${error.message}`,
                     timestamp: serverTimestamp()
                 });
             }
