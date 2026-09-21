@@ -296,16 +296,16 @@ sendBtn.addEventListener('click', async () => {
 
         if(currentChatUser === "bot@batchit.com") {
             
-            // તમારી નવી બનાવેલી સાચી કી અહીં પેસ્ટ કરો!
-            const GEMINI_API_KEY = "AQ.Ab8RN6I0uq7JgLO1GI6WmTfcQN_D6lEN976zhArszIJnKy40bQ"; 
+            // તમારી અસલી કી અહીંયા છે
+            const GEMINI_API_KEY = "AQ.Ab8RN6LJTWJFjSyazBD7DZnc4pwbf6hCWlTmkEXyEwcMm1J-JA"; 
             
             let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
             let promptText = `You are a friendly chatting partner named ${botName}. The human just said: "${message}". Reply naturally in the exact same language/script they used.`;
 
             try {
                 setTimeout(async () => {
-                    // URL માંથી ?key= કાઢીને હેડરમાં મોકલી છે જેથી એરર ના આવે
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
+                    // ગૂગલનું નવું અપડેટ થયેલું મૉડલ (gemini-2.5-flash) અહી લગાવી દીધું છે!
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`, {
                         method: "POST",
                         headers: { 
                             "Content-Type": "application/json",
