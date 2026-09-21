@@ -1,7 +1,5 @@
-// Firebase Setup
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-// Authentication (Login) માટે નવો કોડ
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -15,13 +13,13 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app); // Auth ચાલુ કર્યું
+const auth = getAuth(app);
 
-// HTML Elements
 const authPage = document.getElementById('auth-page');
 const mainApp = document.getElementById('main-app');
 const emailInput = document.getElementById('email-input');
 const passwordInput = document.getElementById('password-input');
+const genderInput = document.getElementById('gender-input');
 const loginBtn = document.getElementById('login-btn');
 const registerBtn = document.getElementById('register-btn');
 const logoutBtn = document.getElementById('logout-btn');
@@ -35,34 +33,26 @@ const sendBtn = document.getElementById('send-btn');
 const imgBtn = document.getElementById('img-btn');
 const imageInput = document.getElementById('image-input');
 
-// Variables
 let currentUser = null;
 let currentChatUser = null;
 let currentChatId = null;
 let unsubscribeMessages = null;
 
-// 1. ચેક કરો કે યુઝર Login છે કે નહીં?
+// 1. Auth State
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser = user;
-        authPage.style.display = 'none'; // લોગિન પેજ છુપાવો
-        mainApp.style.display = 'block'; // ચેટ એપ બતાવો
-
-        // યુઝરનું નામ ડેટાબેઝમાં સેવ કરો જેથી બીજા લોકો તેને જોઈ શકે
-        setDoc(doc(db, "users", user.email), {
-            email: user.email,
-            name: user.email.split('@')[0] // ઇમેઇલ પરથી નામ બનાવશે
-        });
-
+        authPage.style.display = 'none';
+        mainApp.style.display = 'block';
         loadUsersList();
     } else {
         currentUser = null;
-        authPage.style.display = 'flex'; // લોગિન પેજ બતાવો
-        mainApp.style.display = 'none'; // ચેટ એપ છુપાવો
+        authPage.style.display = 'flex';
+        mainApp.style.display = 'none';
     }
 });
 
-// 2. Login & Register સિસ્ટમ (All in English)
+// 2. Login
 loginBtn.addEventListener('click', async () => {
     const email = emailInput.value;
     const password = passwordInput.value;
@@ -77,14 +67,26 @@ loginBtn.addEventListener('click', async () => {
     loginBtn.innerHTML = "Login";
 });
 
+// 3. Register with Gender
 registerBtn.addEventListener('click', async () => {
     const email = emailInput.value;
     const password = passwordInput.value;
+    const gender = genderInput.value;
+
     if(!email || !password) return alert("Please enter email and password!");
+    if(!gender) return alert("Please select your Gender!");
     
     registerBtn.innerHTML = "Creating Account...";
     try {
         await createUserWithEmailAndPassword(auth, email, password);
+        
+        // Database ma User nu nam ane gender save karo
+        await setDoc(doc(db, "users", email.toLowerCase()), {
+            email: email.toLowerCase(),
+            name: email.split('@')[0],
+            gender: gender
+        });
+        
         alert("Account created successfully!");
     } catch (error) {
         alert("Registration Failed: " + error.message);
@@ -92,6 +94,7 @@ registerBtn.addEventListener('click', async () => {
     registerBtn.innerHTML = "Create New Account";
 });
 
+// Logout
 logoutBtn.addEventListener('click', () => {
     signOut(auth);
     chatBox.innerHTML = "";
@@ -99,7 +102,7 @@ logoutBtn.addEventListener('click', () => {
     chatHeader.innerHTML = "<h2>Select a user from the list to start private chat</h2>";
 });
 
-// 3. ડાબી બાજુ યુઝર્સનું લિસ્ટ અને Notification Badge
+// 4. Load Users List with Gender Icon
 function loadUsersList() {
     onSnapshot(collection(db, "users"), (snapshot) => {
         usersListDiv.innerHTML = "";
@@ -113,17 +116,20 @@ function loadUsersList() {
                 userDiv.style.cursor = "pointer";
                 userDiv.style.display = "flex";
                 userDiv.style.alignItems = "center";
-                userDiv.style.justifyContent = "space-between"; // Badge ne jamni baju dhakelva
+                userDiv.style.justifyContent = "space-between";
 
                 const avatarUrl = `https://ui-avatars.com/api/?name=${userData.name}&background=random&color=fff&rounded=true&size=35`;
                 
-                // Nam ane Photo
+                // Gender Icon Set karo
+                let genderIcon = "";
+                if(userData.gender === "Male") genderIcon = "👦";
+                else if(userData.gender === "Female") genderIcon = "👧";
+
                 const leftDiv = document.createElement('div');
                 leftDiv.style.display = "flex";
                 leftDiv.style.alignItems = "center";
-                leftDiv.innerHTML = `<img src="${avatarUrl}" style="margin-right: 12px; width: 35px; height: 35px; border-radius: 50%;"> <strong style="color:#333;">${userData.name}</strong>`;
+                leftDiv.innerHTML = `<img src="${avatarUrl}" style="margin-right: 12px; width: 35px; height: 35px; border-radius: 50%;"> <strong style="color:#333;">${userData.name}${genderIcon}</strong>`;
                 
-                // Lal color nu 'New' badge (Default chhupavelu hase)
                 const badgeElement = document.createElement('span');
                 badgeElement.innerText = "New";
                 badgeElement.style.background = "red";
@@ -137,21 +143,18 @@ function loadUsersList() {
                 userDiv.appendChild(leftDiv);
                 userDiv.appendChild(badgeElement);
 
-                // Check karse ke aa user no navo message aavyo chhe ke nahi
                 const email1 = currentUser.email.toLowerCase();
                 const email2 = userData.email.toLowerCase();
                 const emails = [email1, email2].sort();
                 const chatId = `${emails[0]}_${emails[1]}`;
                 
-                // Ascending order ma messages malse
                 const qChat = query(collection(db, "private_chats", chatId, "messages"), orderBy("timestamp", "asc"));
                 
                 onSnapshot(qChat, (chatSnap) => {
                     if(!chatSnap.empty) {
                         const docs = chatSnap.docs;
-                        const lastMsg = docs[docs.length - 1].data(); // Sauthi chhello message
+                        const lastMsg = docs[docs.length - 1].data();
                         
-                        // Jo chhello message same valae mokalyo hoy ane aapanu current chat e na hoy, to 'New' batavo
                         if(lastMsg.sender === userData.email.toLowerCase() && currentChatUser !== userData.email.toLowerCase()) {
                             badgeElement.style.display = 'block';
                         } else {
@@ -161,7 +164,7 @@ function loadUsersList() {
                 });
 
                 userDiv.addEventListener('click', () => {
-                    badgeElement.style.display = 'none'; // Click kare etle badge gayab
+                    badgeElement.style.display = 'none';
                     selectUser(userData.email, userData.name);
                 });
 
@@ -171,11 +174,10 @@ function loadUsersList() {
     });
 }
 
-// 4. પ્રાઇવેટ ચેટ શરૂ કરવાનું સેટિંગ
+// 5. Select User
 function selectUser(userEmail, userName) {
-    currentChatUser = userEmail;
+    currentChatUser = userEmail.toLowerCase();
     
-    // ઇમેઇલને ફરજિયાત નાના અક્ષરોમાં (lowercase) ફેરવીને રૂમ ID બનાવશે
     const email1 = currentUser.email.toLowerCase();
     const email2 = userEmail.toLowerCase();
     const emails = [email1, email2].sort();
@@ -188,16 +190,16 @@ function selectUser(userEmail, userName) {
     loadPrivateMessages();
 }
 
-// 5. માત્ર પ્રાઇવેટ મેસેજ જ લોડ કરવાનું સેટિંગ
+// 6. Load Private Messages
 function loadPrivateMessages() {
-    if(unsubscribeMessages) unsubscribeMessages(); // જૂની ચેટ બંધ કરો
+    if(unsubscribeMessages) unsubscribeMessages(); 
 
     const q = query(collection(db, "private_chats", currentChatId, "messages"), orderBy("timestamp", "asc"));
     unsubscribeMessages = onSnapshot(q, (snapshot) => {
         chatBox.innerHTML = "";
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
-            const isMe = data.sender === currentUser.email;
+            const isMe = data.sender === currentUser.email.toLowerCase();
 
             const rowDiv = document.createElement('div');
             rowDiv.style.display = "flex";
@@ -245,12 +247,12 @@ function loadPrivateMessages() {
     });
 }
 
-// 6. પ્રાઇવેટ મેસેજ મોકલો
+// 7. Send Text
 sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
     if(message.trim() !== "" && currentChatId) {
         await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
-            sender: currentUser.email,
+            sender: currentUser.email.toLowerCase(),
             text: message,
             timestamp: serverTimestamp()
         });
@@ -258,7 +260,7 @@ sendBtn.addEventListener('click', async () => {
     }
 });
 
-// 7. પ્રાઇવેટ ઇમેજ (ફોટો) મોકલો (English Alerts)
+// 8. Send Image
 imgBtn.addEventListener('click', () => {
     if(!currentChatId) return alert("Please select a user to chat with first!");
     imageInput.click();
@@ -281,7 +283,7 @@ imageInput.addEventListener('change', async (e) => {
 
         if(result.success) {
             await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
-                sender: currentUser.email,
+                sender: currentUser.email.toLowerCase(),
                 text: "",
                 imageUrl: result.data.url,
                 timestamp: serverTimestamp()
