@@ -296,17 +296,21 @@ sendBtn.addEventListener('click', async () => {
 
         if(currentChatUser === "bot@batchit.com") {
             
-            // તમારી અસલી કી અહીંયા છે
-            const GEMINI_API_KEY = "AQ.Ab8RN6LJTWJFjSyazBD7DZnc4pwbf6hCWlTmkEXyEwcMm1J-JA"; 
+            // તમારી નવી બનાવેલી સાચી કી અહીં પેસ્ટ કરો!
+            const GEMINI_API_KEY = "AQ.Ab8RN6I0uq7JgLO1GI6WmTfcQN_D6lEN976zhArszIJnKy40bQ"; 
             
             let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
             let promptText = `You are a friendly chatting partner named ${botName}. The human just said: "${message}". Reply naturally in the exact same language/script they used.`;
 
             try {
                 setTimeout(async () => {
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                    // URL માંથી ?key= કાઢીને હેડરમાં મોકલી છે જેથી એરર ના આવે
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "x-goog-api-key": GEMINI_API_KEY.trim()
+                        },
                         body: JSON.stringify({
                             contents: [{ parts: [{ text: promptText }] }]
                         })
@@ -315,7 +319,6 @@ sendBtn.addEventListener('click', async () => {
                     const data = await response.json();
                     let aiReply = "";
                     
-                    // અહી ગૂગલની અસલી એરર પકડાશે!
                     if (data.error) {
                          aiReply = `અરે! ગૂગલ ના પાડે છે. Error: ${data.error.message}`;
                     } else if(data.candidates && data.candidates[0].content.parts[0].text) {
