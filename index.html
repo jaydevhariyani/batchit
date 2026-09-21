@@ -16,14 +16,20 @@
             <input type="email" id="email-input" placeholder="Email Address" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
             <input type="password" id="password-input" placeholder="Password" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
             
+            <!-- Gender Select Option -->
+            <select id="gender-input" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; background: white;">
+                <option value="" disabled selected>Select Gender (Male/Female)</option>
+                <option value="Male">Male 👦</option>
+                <option value="Female">Female 👧</option>
+            </select>
+            
             <button id="login-btn" style="width: 100%; padding: 10px; background: #0084ff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 10px; font-weight: bold;">Login</button>
             <button id="register-btn" style="width: 100%; padding: 10px; background: #25D366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Create New Account</button>
         </div>
     </div>
 
-    <!-- MAIN CHAT APP (Login pachi j dekhase) -->
+    <!-- MAIN CHAT APP -->
     <div id="main-app" style="display: none;">
-        <!-- Upar nu blue header -->
         <header class="top-header">
             <div class="logo">
                 <i class="fa-solid fa-comments"></i> Batchit
@@ -34,7 +40,6 @@
         </header>
 
         <div class="main-container">
-            <!-- Dabi baju no sidebar (Users List) -->
             <aside class="sidebar">
                 <div class="sidebar-tabs">
                     <button class="active">All Users</button>
@@ -44,15 +49,12 @@
                 </div>
             </aside>
 
-            <!-- Jamni baju no message area -->
             <main class="chat-area">
                 <div class="welcome-banner" id="chat-header">
                     <h2>Select a user from the list to start private chat</h2>
                 </div>
 
-                <div class="chat-box" id="chat-box">
-                    <!-- Messages ahi dekhase -->
-                </div>
+                <div class="chat-box" id="chat-box"></div>
 
                 <div class="message-input-area" id="input-area" style="display: none;">
                     <input type="file" id="image-input" accept="image/*" style="display: none;">
