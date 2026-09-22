@@ -296,8 +296,8 @@ sendBtn.addEventListener('click', async () => {
 
         if(currentChatUser === "bot@batchit.com") {
             
-            // Groq console mathi banaveli gsk_... vali key ahiya paste karo
-            const GROQ_API_KEY = "gsk_...5yOh"; 
+            // Tamari aakhi sachi Groq API key ahiya set che
+            const GROQ_API_KEY = "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"; 
             
             let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
             let promptText = `You are a friendly chatting partner named ${botName}. The human just said: "${message}". Reply naturally, intelligently, and in the exact same language or script they used.`;
