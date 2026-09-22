@@ -311,7 +311,7 @@ sendBtn.addEventListener('click', async () => {
                             "Authorization": `Bearer ${GROQ_API_KEY.trim()}`
                         },
                         body: JSON.stringify({
-                            model: "llama3-8b-8192",
+                            model: "llama-3.1-8b-instant",
                             messages: [{ role: "user", content: promptText }]
                         })
                     });
