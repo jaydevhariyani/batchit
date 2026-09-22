@@ -282,7 +282,7 @@ function loadPrivateMessages() {
     });
 }
 
-// 7. Send Text (SMART MULTILINGUAL BOT LOGIC - NO API KEY NEEDED)
+// 7. Send Text (GROQ AI CHATBOT LOGIC - 100% FREE & FAST)
 sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
     if(message.trim() !== "" && currentChatId) {
@@ -295,64 +295,54 @@ sendBtn.addEventListener('click', async () => {
         messageInput.value = "";
 
         if(currentChatUser === "bot@batchit.com") {
-            let userText = message.trim();
-            let lowerMsg = userText.toLowerCase();
-            let aiReply = "";
+            
+            // Groq console mathi banaveli gsk_... vali key ahiya paste karo
+            const GROQ_API_KEY = "gsk_...5yOh"; 
+            
+            let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
+            let promptText = `You are a friendly chatting partner named ${botName}. The human just said: "${message}". Reply naturally, intelligently, and in the exact same language or script they used.`;
 
-            // Check language and reply accordingly
-            let isGujaratiScript = /[ગુજરાતી]/.test(userText);
-            let isHindiScript = /[हिंदी]/.test(userText);
-            let isGujaratiEng = lowerMsg.includes("kem") || lowerMsg.includes("shu") || lowerMsg.includes("che") || lowerMsg.includes("tame") || lowerMsg.includes("su") || lowerMsg.includes("chhe");
-            let isHindiEng = lowerMsg.includes("kya") || lowerMsg.includes("kaise") || lowerMsg.includes("kya kar rahe");
+            try {
+                setTimeout(async () => {
+                    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: "POST",
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${GROQ_API_KEY.trim()}`
+                        },
+                        body: JSON.stringify({
+                            model: "llama-3.3-70b-versatile",
+                            messages: [{ role: "user", content: promptText }]
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    let aiReply = "";
+                    
+                    if (data.error) {
+                         aiReply = `Groq Error: ${data.error.message}`;
+                    } else if(data.choices && data.choices[0].message.content) {
+                         aiReply = data.choices[0].message.content;
+                    } else {
+                         aiReply = "Sorry, કોઈ જવાબ ના મળ્યો.";
+                    }
 
-            if (lowerMsg.includes("how are you") || lowerMsg.includes("kem cho") || lowerMsg.includes("केम छो")) {
-                if (isGujaratiEng) {
-                    aiReply = "Hu ekdam maja ma chhu! Tame kaho, tame kem chho?";
-                } else if (isHindiEng || isHindiScript) {
-                    aiReply = "Main ekdam badhiya hoon! Aap batao, aap kaise ho?";
-                } else {
-                    aiReply = "I'm doing great! How are you doing today?";
-                }
-            } 
-            else if (lowerMsg.includes("what are you doing") || lowerMsg.includes("shu kare chhe") || lowerMsg.includes("su kare che")) {
-                if (isGujaratiEng) {
-                    aiReply = "Bas tari sathe vat karva beto chho! Bolo, shu plan chhe aaje?";
-                } else if (isHindiEng || isHindiScript) {
-                    aiReply = "Bas aapke sath chat kar raha hoon! Boliye, kya chal raha hai?";
-                } else {
-                    aiReply = "Just chatting with you! What's up with you?";
-                }
-            }
-            else if (lowerMsg.includes("hi") || lowerMsg.includes("hello") || lowerMsg.includes("hey")) {
-                if (isGujaratiEng) {
-                    aiReply = "Hello! Kem chhe badhu majama?";
-                } else if (isHindiEng || isHindiScript) {
-                    aiReply = "Hello! Sab badhiya?";
-                } else {
-                    aiReply = "Hey there! How can I help you today?";
-                }
-            }
-            else {
-                // Dynamic smart echo matching user's language style
-                if (isGujaratiEng) {
-                    aiReply = `Vaah! Tari aa vat bhu sachi che: "${userText}". Aaje biji su navi vat che?`;
-                } else if (isHindiEng || isHindiScript) {
-                    aiReply = `Sahi baat hai yaar! Aapki yeh baat mujhe pasand aayi: "${userText}". Aur bataiye?`;
-                } else {
-                    aiReply = `That's interesting! You mentioned: "${userText}". Tell me more about it!`;
-                }
-            }
-
-            setTimeout(async () => {
+                    await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
+                        sender: "bot@batchit.com",
+                        text: aiReply,
+                        timestamp: serverTimestamp()
+                    });
+                }, 1000);
+            } catch(error) {
                 await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
                     sender: "bot@batchit.com",
-                    text: aiReply,
+                    text: `Network Error: ${error.message}`,
                     timestamp: serverTimestamp()
                 });
-            }, 1000);
+            }
         }
     }
-});;
+});
 
 // 8. Send Image
 imgBtn.addEventListener('click', () => {
