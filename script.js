@@ -314,8 +314,14 @@ sendBtn.addEventListener('click', async () => {
                             model: "command-a-plus-05-2026", 
                             messages: [
                                 {
+                                    // બોટને એની ડ્યૂટી સમજાવવા માટે
+                                    role: "system",
+                                    content: `You are a friendly chatting partner named ${botName}. Always reply naturally in the EXACT SAME LANGUAGE the user types in. If they type English, reply in English. If Gujarati, reply in Gujarati.`
+                                },
+                                {
+                                    // તમારો અસલી મેસેજ
                                     role: "user",
-                                    content: promptText
+                                    content: message
                                 }
                             ]
                         })
