@@ -280,7 +280,7 @@ function loadPrivateMessages() {
     });
 }
 
-// 7. Send Text (COHERE AI CHATBOT LOGIC - V2 API)
+// 7. Send Text (COHERE AI CHATBOT LOGIC)
 sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
     if(message.trim() !== "" && currentChatId) {
@@ -302,8 +302,8 @@ sendBtn.addEventListener('click', async () => {
             let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
             let promptText = `You are a friendly chatting partner named ${botName}. The user says: "${message}". You MUST reply naturally and intelligently in the EXACT SAME LANGUAGE the user typed. Do not use default language.`;
 
-            try {
-                setTimeout(async () => {
+            setTimeout(async () => {
+                try {
                     const response = await fetch("https://api.cohere.ai/v2/chat", {
                         method: "POST",
                         headers: { 
@@ -311,7 +311,7 @@ sendBtn.addEventListener('click', async () => {
                             "Authorization": `Bearer ${COHERE_API_KEY}`
                         },
                         body: JSON.stringify({
-                            model: "command-a-plus-05-2026",
+                            model: "command-r-plus", 
                             messages: [
                                 {
                                     role: "user",
@@ -339,14 +339,14 @@ sendBtn.addEventListener('click', async () => {
                         text: aiReply,
                         timestamp: serverTimestamp()
                     });
-                }, 1000);
-            } catch(error) {
-                await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
-                    sender: "bot@batchit.com",
-                    text: `Network Error: ${error.message}`,
-                    timestamp: serverTimestamp()
-                });
-            }
+                } catch(error) {
+                    await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
+                        sender: "bot@batchit.com",
+                        text: `Network Error: ${error.message}`,
+                        timestamp: serverTimestamp()
+                    });
+                }
+            }, 1000);
         }
     }
 });
