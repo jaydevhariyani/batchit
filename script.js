@@ -282,11 +282,12 @@ function loadPrivateMessages() {
     });
 }
 
-// 7. Send Text (GROQ AI CHATBOT LOGIC - 100% FREE & FAST)
+// 7. Send Text (COHERE AI CHATBOT LOGIC - 100% FREE & LIFETIME)
 sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
     if(message.trim() !== "" && currentChatId) {
         
+        // 1. User no message Firebase ma save karo
         await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
             sender: currentUser.email.toLowerCase(),
             text: message,
@@ -296,25 +297,54 @@ sendBtn.addEventListener('click', async () => {
 
         if(currentChatUser === "bot@batchit.com") {
             
-            // Tamari aakhi sachi Groq API key ahiya set che
-            const GROQ_API_KEY = "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"; 
+            // Tamari sachi Cohere API key ahiya set chhe
+            const COHERE_API_KEY = "fG9m8ksuIRFbYrQLmR1TJwEtmbBhgmnReAOSt3It"; 
             
             let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
             let promptText = `You are a friendly chatting partner named ${botName}. The human just said: "${message}". Reply naturally, intelligently, and in the exact same language or script they used.`;
 
             try {
                 setTimeout(async () => {
-                    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    const response = await fetch("https://api.cohere.ai/v1/chat", {
                         method: "POST",
                         headers: { 
                             "Content-Type": "application/json",
-                            "Authorization": `Bearer ${GROQ_API_KEY.trim()}`
+                            "Authorization": `Bearer ${COHERE_API_KEY.trim()}`
                         },
                         body: JSON.stringify({
-                            model: "mixtral-8x7b-32768",
-                            messages: [{ role: "user", content: promptText }]
+                            model: "command",
+                            message: promptText
                         })
                     });
+                    
+                    const data = await response.json();
+                    let aiReply = "";
+                    
+                    if (data.message && data.message.toLowerCase().includes("error")) {
+                         aiReply = `Cohere Error: ${data.message}`;
+                    } else if(data.text) {
+                         aiReply = data.text;
+                    } else {
+                         aiReply = "Sorry, મને સમજ ના પડી. ફરી કહેશો?";
+                    }
+
+                    // 2. Bot no reply Firebase ma save karo
+                    await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
+                        sender: "bot@batchit.com",
+                        text: aiReply,
+                        timestamp: serverTimestamp()
+                    });
+                }, 1000);
+            } catch(error) {
+                await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
+                    sender: "bot@batchit.com",
+                    text: `Network Error: ${error.message}`,
+                    timestamp: serverTimestamp()
+                });
+            }
+        }
+    }
+});
                     
                     const data = await response.json();
                     let aiReply = "";
