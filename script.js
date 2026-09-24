@@ -346,7 +346,6 @@ sendBtn.addEventListener('click', async () => {
         }
     }
 });
-});
 
 // 8. Send Image
 imgBtn.addEventListener('click', () => {
