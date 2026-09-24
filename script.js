@@ -282,7 +282,7 @@ function loadPrivateMessages() {
     });
 }
 
-// 7. Send Text (COHERE AI CHATBOT LOGIC - 100% FREE & SAFE)
+// 7. Send Text (COHERE AI CHATBOT LOGIC)
 sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
     if(message.trim() !== "" && currentChatId) {
@@ -296,14 +296,14 @@ sendBtn.addEventListener('click', async () => {
 
         if(currentChatUser === "bot@batchit.com") {
             
-            // GitHub scanner thi bachva key na 3 tukda
             const p1 = "fG9m8ksuIRFb";
             const p2 = "YrQLmR1TJwEt";
             const p3 = "mbBhgmnReAOSt3It";
             const COHERE_API_KEY = p1 + p2 + p3;
             
             let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
-            let promptText = `You are a friendly chatting partner named ${botName}. The human just said: "${message}". Reply naturally, intelligently, and in the exact same language or script they used.`;
+            // અહીંયા સ્પષ્ટ કહી દીધું છે કે યુઝરની ભાષામાં જ જવાબ આપવાનો છે
+            let promptText = `You are a friendly chatting partner named ${botName}. The user says: "${message}". You MUST reply naturally and intelligently in the EXACT SAME LANGUAGE the user typed. Do not use default language.`;
 
             try {
                 setTimeout(async () => {
@@ -322,12 +322,13 @@ sendBtn.addEventListener('click', async () => {
                     const data = await response.json();
                     let aiReply = "";
                     
-                    if (data.message && data.message.toLowerCase().includes("error")) {
-                         aiReply = `Cohere Error: ${data.message}`;
-                    } else if(data.text) {
+                    if (data.text) {
                          aiReply = data.text;
+                    } else if (data.message) {
+                         aiReply = `API Error: ${data.message}`;
                     } else {
-                         aiReply = "Sorry, મને સમજ ના પડી. ફરી કહેશો?";
+                         // જો ભૂલ હશે તો હવે સીધી અહી દેખાશે
+                         aiReply = `System Log: ${JSON.stringify(data)}`;
                     }
 
                     await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
