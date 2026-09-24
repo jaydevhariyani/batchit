@@ -302,8 +302,8 @@ sendBtn.addEventListener('click', async () => {
             let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
             let promptText = `You are a friendly chatting partner named ${botName}. The user says: "${message}". You MUST reply naturally and intelligently in the EXACT SAME LANGUAGE the user typed. Do not use default language.`;
 
-            setTimeout(async () => {
-                try {
+            try {
+                setTimeout(async () => {
                     const response = await fetch("https://api.cohere.ai/v2/chat", {
                         method: "POST",
                         headers: { 
@@ -324,29 +324,35 @@ sendBtn.addEventListener('click', async () => {
                     const data = await response.json();
                     let aiReply = "";
                     
-                    if (data.message && data.message.content && data.message.content[0]) {
+                    // નવું બુલેટપ્રૂફ સેટિંગ
+                    if (data?.message?.content && data.message.content.length > 0) {
                          aiReply = data.message.content[0].text;
-                    } else if (data.text) {
+                    } else if (data?.text) {
                          aiReply = data.text;
-                    } else if (data.message && typeof data.message === "string") {
+                    } else if (typeof data?.message === "string") {
                          aiReply = `API Error: ${data.message}`;
                     } else {
                          aiReply = `System Log: ${JSON.stringify(data)}`;
                     }
+                    
+                    // Firebase ને 'undefined' જતું રોકવા ફાઇનલ સેફ્ટી
+                    if (!aiReply) {
+                        aiReply = "Error: Bot response was empty or formatting changed.";
+                    }
 
                     await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
                         sender: "bot@batchit.com",
-                        text: aiReply,
+                        text: String(aiReply),
                         timestamp: serverTimestamp()
                     });
-                } catch(error) {
-                    await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
-                        sender: "bot@batchit.com",
-                        text: `Network Error: ${error.message}`,
-                        timestamp: serverTimestamp()
-                    });
-                }
-            }, 1000);
+                }, 1000);
+            } catch(error) {
+                await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
+                    sender: "bot@batchit.com",
+                    text: `Network Error: ${error.message}`,
+                    timestamp: serverTimestamp()
+                });
+            }
         }
     }
 });
