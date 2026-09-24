@@ -324,11 +324,15 @@ sendBtn.addEventListener('click', async () => {
                     const data = await response.json();
                     let aiReply = "";
                     
+                    // ફાઇનલ સોલ્યુશન: "thinking" ને ઇગ્નોર કરીને સીધો "text" જવાબ પકડવાનું સેટિંગ
                     if (data && data.message && data.message.content) {
                         if (typeof data.message.content === "string") {
                             aiReply = data.message.content; 
-                        } else if (Array.isArray(data.message.content) && data.message.content.length > 0) {
-                            aiReply = data.message.content[0].text; 
+                        } else if (Array.isArray(data.message.content)) {
+                            let textItem = data.message.content.find(item => item.type === "text");
+                            if (textItem && textItem.text) {
+                                aiReply = textItem.text;
+                            }
                         }
                     } else if (data && data.text) {
                         aiReply = data.text;
