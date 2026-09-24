@@ -66,6 +66,12 @@
         </div>
     </div>
 
-    <script type="module" src="script.js?v=111"></script>
+    <script>
+    let script = document.createElement('script');
+    script.type = 'module';
+    // આ લાઈન જાતે જ નવો ટાઈમ (વર્ઝન) લગાવી દેશે
+    script.src = 'script.js?v=' + new Date().getTime();
+    document.body.appendChild(script);
+</script>
 </body>
 </html>
