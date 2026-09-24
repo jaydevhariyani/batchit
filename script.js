@@ -314,7 +314,7 @@ sendBtn.addEventListener('click', async () => {
                             "Authorization": `Bearer ${COHERE_API_KEY}`
                         },
                         body: JSON.stringify({
-                            model: "command",
+                            model: "command-r",
                             message: promptText
                         })
                     });
