@@ -305,45 +305,7 @@ sendBtn.addEventListener('click', async () => {
             // અહીંયા સ્પષ્ટ કહી દીધું છે કે યુઝરની ભાષામાં જ જવાબ આપવાનો છે
             let promptText = `You are a friendly chatting partner named ${botName}. The user says: "${message}". You MUST reply naturally and intelligently in the EXACT SAME LANGUAGE the user typed. Do not use default language.`;
 
-            try {
-                setTimeout(async () => {
-                    const response = await fetch("https://api.cohere.ai/v2/chat", {
-                        method: "POST",
-                        headers: { 
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${COHERE_API_KEY}`
-                        },
-                        body: JSON.stringify({
-                            model: "command-a-plus-05-2026",
-                            message: promptText
-                        })
-                    });
-                    
-                    const data = await response.json();
-                    let aiReply = "";
-                    
-                    if (data.text) {
-                         aiReply = data.text;
-                    } else if (data.message) {
-                         aiReply = `API Error: ${data.message}`;
-                    } else {
-                         // જો ભૂલ હશે તો હવે સીધી અહી દેખાશે
-                         aiReply = `System Log: ${JSON.stringify(data)}`;
-                    }
-
-                    await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
-                        sender: "bot@batchit.com",
-                        text: aiReply,
-                        timestamp: serverTimestamp()
-                    });
-                }, 1000);
-            } catch(error) {
-                await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
-                    sender: "bot@batchit.com",
-                    text: `Network Error: ${error.message}`,
-                    timestamp: serverTimestamp()
-                });
-            }
+            
         }
     }
 });
