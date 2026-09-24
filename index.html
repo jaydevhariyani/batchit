@@ -3,22 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batchit - Private Chat</title>
+    
+    <!-- 100% SEO OPTIMIZATION TAGS -->
+    <meta name="description" content="Batchit - A free private and random online chatting app. Meet new people securely, chat with AI, and make friends.">
+    <meta name="keywords" content="random chat, private chat, online chatting, AI chat, free chat app, Batchit, meet new people">
+    <meta name="author" content="Batchit Chat">
+    <meta name="robots" content="index, follow">
+    <!-- Open Graph for Social Media Sharing -->
+    <meta property="og:title" content="Batchit - Private & Random Chat">
+    <meta property="og:description" content="Join Batchit to meet new people randomly or chat privately in a secure environment.">
+    <meta property="og:type" content="website">
+    
+    <title>Batchit - Private & Random Chatting App</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Green Dot CSS */
+        .online-dot {
+            width: 10px; height: 10px; background-color: #25D366; 
+            border-radius: 50%; border: 2px solid white; 
+            position: absolute; bottom: 0; right: 0;
+        }
+        .offline-dot { background-color: #ccc; }
+        
+        /* Ad Spaces CSS */
+        .ad-container { background: #f8f9fa; border: 1px dashed #ccc; text-align: center; color: #888; display: flex; align-items: center; justify-content: center;}
+        .top-ad { width: 100%; height: 60px; margin-bottom: 10px; }
+        .sidebar-ad { width: 100%; height: 250px; margin-top: 15px; }
+    </style>
 </head>
 <body>
 
     <!-- LOGIN / REGISTER PAGE -->
     <div id="auth-page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5;">
         <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; text-align: center;">
-            <h2 style="color: #0084ff; margin-bottom: 20px;"><i class="fa-solid fa-comments"></i> Batchit Login</h2>
+            <h2 style="color: #0084ff; margin-bottom: 20px;"><i class="fa-solid fa-comments"></i> Batchit</h2>
             <input type="email" id="email-input" placeholder="Email Address" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
             <input type="password" id="password-input" placeholder="Password" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
             
-            <!-- Gender Select Option -->
             <select id="gender-input" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; background: white;">
-                <option value="" disabled selected>Select Gender (Male/Female)</option>
+                <option value="" disabled selected>Select Gender</option>
                 <option value="Male">Male 👦</option>
                 <option value="Female">Female 👧</option>
             </select>
@@ -31,9 +56,7 @@
     <!-- MAIN CHAT APP -->
     <div id="main-app" style="display: none;">
         <header class="top-header">
-            <div class="logo">
-                <i class="fa-solid fa-comments"></i> Batchit
-            </div>
+            <div class="logo"><i class="fa-solid fa-comments"></i> Batchit</div>
             <nav class="top-nav">
                 <button id="logout-btn" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
             </nav>
@@ -42,16 +65,35 @@
         <div class="main-container">
             <aside class="sidebar">
                 <div class="sidebar-tabs">
-                    <button class="active">All Users</button>
+                    <button class="active" id="tab-all-users">All Users</button>
+                    <button id="tab-random-chat" style="background: #ff9800; color: white; font-weight: bold;">Random Chat</button>
                 </div>
+                
                 <div class="users-list">
                     <div id="all-users-list"></div>
+                    
+                    <!-- Random Chat Find Match Area (Hidden by default) -->
+                    <div id="random-chat-area" style="display: none; padding: 20px; text-align: center;">
+                        <h3>Meet Strangers!</h3>
+                        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Click below to connect with a random online user.</p>
+                        <button id="find-match-btn" style="background: #ff9800; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%;">🔍 Find Match</button>
+                    </div>
+                </div>
+
+                <!-- SIDEBAR ADVERTISEMENT SPACE -->
+                <div class="ad-container sidebar-ad">
+                    <small>AdSense Space (300x250)</small>
                 </div>
             </aside>
 
             <main class="chat-area">
+                <!-- TOP BANNER ADVERTISEMENT SPACE -->
+                <div class="ad-container top-ad">
+                    <small>AdSense Leaderboard Banner (728x90)</small>
+                </div>
+
                 <div class="welcome-banner" id="chat-header">
-                    <h2>Select a user from the list to start private chat</h2>
+                    <h2>Select a user or find a random match to start chatting</h2>
                 </div>
 
                 <div class="chat-box" id="chat-box"></div>
@@ -59,19 +101,19 @@
                 <div class="message-input-area" id="input-area" style="display: none;">
                     <input type="file" id="image-input" accept="image/*" style="display: none;">
                     <button id="img-btn" type="button" style="background: none; border: none; font-size: 24px; cursor: pointer; margin-right: 10px;">📎</button>
-                    <input type="text" id="message-input" placeholder="Type a private message...">
+                    <input type="text" id="message-input" placeholder="Type a message...">
                     <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
                 </div>
             </main>
         </div>
     </div>
 
+    <!-- Permanent Cache Busting Script Load -->
     <script>
-    let script = document.createElement('script');
-    script.type = 'module';
-    // આ લાઈન જાતે જ નવો ટાઈમ (વર્ઝન) લગાવી દેશે
-    script.src = 'script.js?v=' + new Date().getTime();
-    document.body.appendChild(script);
-</script>
+        let script = document.createElement('script');
+        script.type = 'module';
+        script.src = 'script.js?v=' + new Date().getTime();
+        document.body.appendChild(script);
+    </script>
 </body>
 </html>
