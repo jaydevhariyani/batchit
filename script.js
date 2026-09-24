@@ -324,6 +324,44 @@ sendBtn.addEventListener('click', async () => {
                     const data = await response.json();
                     let aiReply = "";
                     
+                    // 100% ફાઇનલ ડેટા પકડવાનું સેટિંગ (સ્ટ્રિંગ હોય કે એરે, બધું જ પકડી લેશે)
+                    if (data && data.message && data.message.content) {
+                        if (typeof data.message.content === "string") {
+                            aiReply = data.message.content; 
+                        } else if (Array.isArray(data.message.content) && data.message.content.length > 0) {
+                            aiReply = data.message.content[0].text; 
+                        }
+                    } else if (data && data.text) {
+                        aiReply = data.text;
+                    } else if (data && typeof data.message === "string") {
+                        aiReply = `API Error: ${data.message}`;
+                    }
+                    
+                    // જો હજુ પણ કંઈ ના મળે તો આખો API ડેટા જ છાપી દેશે જેથી રિયલ આઉટપુટ દેખાય 
+                    if (!aiReply || aiReply === "undefined") {
+                        aiReply = `DEBUG RAW RESPONSE: ${JSON.stringify(data)}`;
+                    }
+
+                    await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
+                        sender: "bot@batchit.com",
+                        text: String(aiReply),
+                        timestamp: serverTimestamp()
+                    });
+                }, 1000);
+            } catch(error) {
+                await addDoc(collection(db, "private_chats", currentChatId, "messages"), {
+                    sender: "bot@batchit.com",
+                    text: `Network Error: ${error.message}`,
+                    timestamp: serverTimestamp()
+                });
+            }
+        }
+    }
+});
+                    
+                    const data = await response.json();
+                    let aiReply = "";
+                    
                     // નવું બુલેટપ્રૂફ સેટિંગ
                     if (data?.message?.content && data.message.content.length > 0) {
                          aiReply = data.message.content[0].text;
