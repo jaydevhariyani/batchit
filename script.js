@@ -307,7 +307,7 @@ sendBtn.addEventListener('click', async () => {
 
             try {
                 setTimeout(async () => {
-                    const response = await fetch("https://api.cohere.ai/v1/chat", {
+                    const response = await fetch("https://api.cohere.ai/v2/chat", {
                         method: "POST",
                         headers: { 
                             "Content-Type": "application/json",
