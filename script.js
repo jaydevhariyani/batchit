@@ -43,20 +43,40 @@ let currentUser = null;
 let currentUserData = null; 
 let currentChatUser = null;
 let currentChatId = null;
-let currentMode = 'private'; // 'private' or 'global'
+let currentMode = 'private'; 
 let unsubscribeMessages = null;
 
-// 1. Auth State
+// 1. Auth State & Online Presence
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
         authPage.style.display = 'none';
         mainApp.style.display = 'block';
 
-        const userDoc = await getDoc(doc(db, "users", user.email.toLowerCase()));
+        const userRef = doc(db, "users", user.email.toLowerCase());
+        const userDoc = await getDoc(userRef);
         if(userDoc.exists()) {
             currentUserData = userDoc.data();
         }
+        
+        // --- ONLINE STATUS LOGIC ---
+        await setDoc(userRef, { isOnline: true }, { merge: true });
+        
+        // બ્રાઉઝર બંધ કરે ત્યારે ઓફલાઈન કરવા માટે
+        window.addEventListener('beforeunload', () => {
+            setDoc(userRef, { isOnline: false, lastSeen: serverTimestamp() }, { merge: true });
+        });
+        
+        // મોબાઈલમાં મિનિમાઇઝ કરે ત્યારે ઓફલાઈન કરવા માટે
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'visible') {
+                setDoc(userRef, { isOnline: true }, { merge: true });
+            } else {
+                setDoc(userRef, { isOnline: false, lastSeen: serverTimestamp() }, { merge: true });
+            }
+        });
+        // ---------------------------
+
         loadUsersList();
     } else {
         currentUser = null;
@@ -95,7 +115,8 @@ registerBtn.addEventListener('click', async () => {
         await setDoc(doc(db, "users", email.toLowerCase()), {
             email: email.toLowerCase(),
             name: email.split('@')[0],
-            gender: gender
+            gender: gender,
+            isOnline: true
         });
         currentUserData = { email: email.toLowerCase(), name: email.split('@')[0], gender: gender };
         alert("Account created successfully!");
@@ -106,7 +127,11 @@ registerBtn.addEventListener('click', async () => {
     registerBtn.innerHTML = "Create New Account";
 });
 
-logoutBtn.addEventListener('click', () => {
+logoutBtn.addEventListener('click', async () => {
+    if(currentUser) {
+        // લોગઆઉટ થતા જ ઓફલાઈન બતાવશે
+        await setDoc(doc(db, "users", currentUser.email.toLowerCase()), { isOnline: false }, { merge: true });
+    }
     signOut(auth);
 });
 
@@ -152,7 +177,7 @@ tabGlobal.addEventListener('click', () => {
     loadGlobalMessages();
 });
 
-// 4. Load Private Users List
+// 4. Load Private Users List (WITH GREEN DOT)
 function loadUsersList() {
     onSnapshot(collection(db, "users"), (snapshot) => {
         usersListDiv.innerHTML = "";
@@ -172,7 +197,10 @@ function loadUsersList() {
         
         botDiv.innerHTML = `
             <div style="display: flex; align-items: center; width: 100%;">
-                <img src="${botAvatar}" style="margin-right: 12px; width: 35px; height: 35px; border-radius: 50%;"> 
+                <div style="position: relative; margin-right: 12px; display: flex;">
+                    <img src="${botAvatar}" style="width: 35px; height: 35px; border-radius: 50%;"> 
+                    <div class="online-dot"></div>
+                </div>
                 <strong style="color:#0084ff;">${botName}</strong>
                 <span style="margin-left: 10px; font-size: 9px; background: #25D366; color: white; padding: 2px 5px; border-radius: 10px;">BOT</span>
             </div>
@@ -193,9 +221,19 @@ function loadUsersList() {
 
                 const avatarUrl = `https://ui-avatars.com/api/?name=${userData.name}&background=random&color=fff&rounded=true&size=35`;
                 let genderIcon = userData.gender === "Male" ? "👦" : "👧";
+                
+                // ડેટાબેઝના આધારે લીલું કે ગ્રે ટપકું નક્કી થશે
+                let dotClass = userData.isOnline ? "online-dot" : "online-dot offline-dot";
 
-                userDiv.innerHTML = `<img src="${avatarUrl}" style="margin-right: 12px; width: 35px; height: 35px; border-radius: 50%;"> 
-                                     <strong style="color:#333;">${userData.name}${genderIcon}</strong>`;
+                userDiv.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <div style="position: relative; margin-right: 12px; display: flex;">
+                            <img src="${avatarUrl}" style="width: 35px; height: 35px; border-radius: 50%;"> 
+                            <div class="${dotClass}"></div>
+                        </div>
+                        <strong style="color:#333;">${userData.name}${genderIcon}</strong>
+                    </div>
+                `;
                 
                 userDiv.addEventListener('click', () => selectUser(userData.email, userData.name));
                 usersListDiv.appendChild(userDiv);
@@ -206,7 +244,7 @@ function loadUsersList() {
 
 // 5. Select User (Private Chat)
 async function selectUser(userEmail, userName) {
-    if(currentMode !== 'private') tabPrivate.click(); // Switch to private tab if in global
+    if(currentMode !== 'private') tabPrivate.click(); 
     
     currentChatUser = userEmail.toLowerCase();
     const emails = [currentUser.email.toLowerCase(), currentChatUser].sort();
@@ -215,7 +253,6 @@ async function selectUser(userEmail, userName) {
     chatHeaderTitle.innerHTML = `<i class="fa-solid fa-user"></i> Chatting with ${userName}`;
     inputArea.style.display = 'flex';
     
-    // Check Block Status
     if(currentChatUser !== "bot@batchit.com") {
         blockBtn.style.display = 'block';
         const blockDoc = await getDoc(doc(db, "users", currentUser.email.toLowerCase(), "blocked", currentChatUser));
@@ -233,7 +270,6 @@ async function selectUser(userEmail, userName) {
     loadPrivateMessages();
 }
 
-// Block / Unblock User Action
 blockBtn.addEventListener('click', async () => {
     const blockRef = doc(db, "users", currentUser.email.toLowerCase(), "blocked", currentChatUser);
     const blockDoc = await getDoc(blockRef);
@@ -261,8 +297,7 @@ function loadPrivateMessages() {
     unsubscribeMessages = onSnapshot(q, (snapshot) => {
         chatBox.innerHTML = "";
         snapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-            renderMessage(data);
+            renderMessage(docSnap.data());
         });
         chatBox.scrollTop = chatBox.scrollHeight;
     });
@@ -276,14 +311,12 @@ function loadGlobalMessages() {
     unsubscribeMessages = onSnapshot(q, (snapshot) => {
         chatBox.innerHTML = "";
         snapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-            renderMessage(data, true); // true indicates it's a global message
+            renderMessage(docSnap.data(), true); 
         });
         chatBox.scrollTop = chatBox.scrollHeight;
     });
 }
 
-// Helper: Render Message UI
 function renderMessage(data, isGlobal = false) {
     const isMe = data.sender === currentUser.email.toLowerCase();
     const rowDiv = document.createElement('div');
@@ -317,7 +350,6 @@ function renderMessage(data, isGlobal = false) {
 
     let content = ``;
     
-    // In Global Chat, show sender's name and make it clickable for Private Chat
     if(isGlobal && !isMe) {
         const senderName = data.senderName || data.sender.split('@')[0];
         content += `<div class="global-sender-name" style="font-size: 11px; font-weight: bold; color: #ff9800; margin-bottom: 3px; cursor: pointer;">~ ${senderName} (Click to Chat)</div>`;
@@ -333,7 +365,6 @@ function renderMessage(data, isGlobal = false) {
 
     msgDiv.innerHTML = content;
     
-    // Add Click Event for Direct Private Chat from Global Room
     if(isGlobal && !isMe) {
         msgDiv.querySelector('.global-sender-name')?.addEventListener('click', () => {
             selectUser(data.sender, data.senderName || data.sender.split('@')[0]);
@@ -349,7 +380,6 @@ sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
     if(message.trim() === "" || !currentChatId) return;
     
-    // Check if user is blocked before sending in private
     if(currentMode === 'private' && currentChatUser !== 'bot@batchit.com') {
         const blockDoc = await getDoc(doc(db, "users", currentUser.email.toLowerCase(), "blocked", currentChatUser));
         if(blockDoc.exists()) return alert("You have blocked this user. Unblock to send messages.");
@@ -368,7 +398,6 @@ sendBtn.addEventListener('click', async () => {
     } else {
         await addDoc(collection(db, "private_chats", currentChatId, "messages"), msgData);
         
-        // AI BOT LOGIC FOR PRIVATE CHAT ONLY
         if(currentChatUser === "bot@batchit.com") {
             const p1 = "fG9m8ksuIRFb";
             const p2 = "YrQLmR1TJwEt";
