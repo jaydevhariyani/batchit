@@ -39,10 +39,11 @@
         body.dark-mode #all-users-list > div { border-color: #3e4042 !important; }
         body.dark-mode strong { color: #e4e6eb !important; }
         
-        /* DARK MODE FOR PROFILE MODAL */
+        /* PROFILE MODAL CSS */
         body.dark-mode .modal-content { background: #242526 !important; color: #e4e6eb !important; border: 1px solid #3e4042; }
         body.dark-mode #upload-profile-img-btn { background: #3a3b3c !important; color: white !important; border-color: #555 !important; }
         body.dark-mode #close-profile { color: white !important; }
+        body.dark-mode #mic-btn { color: #e4e6eb !important; }
     </style>
 </head>
 <body>
@@ -64,7 +65,7 @@
         </div>
     </div>
 
-    <!-- LOGIN / REGISTER PAGE -->
+    <!-- LOGIN PAGE -->
     <div id="auth-page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5;">
         <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; text-align: center;">
             <h2 style="color: #0084ff; margin-bottom: 20px;"><i class="fa-solid fa-comments"></i> Batchit</h2>
@@ -80,7 +81,7 @@
         </div>
     </div>
 
-    <!-- MAIN CHAT APP -->
+    <!-- MAIN APP -->
     <div id="main-app" style="display: none;">
         <header class="top-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border-bottom: 1px solid #ddd;">
             <div class="logo" style="font-weight: bold; font-size: 20px; color: #0084ff;"><i class="fa-solid fa-comments"></i> Batchit</div>
@@ -123,7 +124,11 @@
 
                 <div class="message-input-area" id="input-area" style="display: none; padding: 15px; background: white; border-top: 1px solid #ddd; align-items: center;">
                     <input type="file" id="image-input" accept="image/*" style="display: none;">
+                    
                     <button id="img-btn" type="button" style="background: none; border: none; font-size: 24px; cursor: pointer; margin-right: 10px;">📎</button>
+                    <!-- VOICE MESSAGE BUTTON -->
+                    <button id="mic-btn" type="button" style="background: none; border: none; font-size: 22px; cursor: pointer; margin-right: 10px; color: #555;"><i class="fa-solid fa-microphone"></i></button>
+                    
                     <input type="text" id="message-input" placeholder="Type a message..." style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 20px; margin-right: 10px;">
                     <button id="send-btn" style="background: #0084ff; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
                 </div>
