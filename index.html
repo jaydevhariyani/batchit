@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0084ff">
-<link rel="apple-touch-icon" href="icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Batchit - A free private and global online chatting app.">
@@ -11,6 +8,12 @@
     <meta name="author" content="Batchit Chat">
     <meta name="robots" content="index, follow">
     <title>Batchit - Private & Global Chatting App</title>
+    
+    <!-- PWA & App Icons -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0084ff">
+    <link rel="apple-touch-icon" href="icon.png">
+
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -41,37 +44,41 @@
         body.dark-mode .ad-container { background: #3a3b3c; border-color: #555; color: #aaa; }
         body.dark-mode #all-users-list > div { border-color: #3e4042 !important; }
         body.dark-mode strong { color: #e4e6eb !important; }
-        
-        /* PROFILE MODAL CSS */
         body.dark-mode .modal-content { background: #242526 !important; color: #e4e6eb !important; border: 1px solid #3e4042; }
         body.dark-mode #upload-profile-img-btn { background: #3a3b3c !important; color: white !important; border-color: #555 !important; }
-        body.dark-mode #close-profile { color: white !important; }
-        body.dark-mode #mic-btn { color: #e4e6eb !important; }
-    /* MOBILE RESPONSIVE CSS */
+        body.dark-mode #close-profile, body.dark-mode #mic-btn { color: white !important; }
+        body.dark-mode #back-btn-mobile { color: #e4e6eb; }
+
+        /* PROFESSIONAL MOBILE UI CSS */
         @media (max-width: 768px) {
-            .main-container { flex-direction: column !important; height: auto !important; }
-            .sidebar { width: 100% !important; height: 35vh !important; border-right: none !important; border-bottom: 2px solid #0084ff !important; }
-            .chat-area { width: 100% !important; height: 65vh !important; }
-            .top-header { flex-wrap: wrap; justify-content: center; gap: 10px; padding: 10px; }
-            #install-app-btn { font-size: 11px; padding: 5px 10px; }
-            .ad-container { display: none; } /* Mobile ma ads jagya roke etle hide karyu */
+            .main-container { position: relative; overflow: hidden; }
+            .sidebar { width: 100% !important; border: none !important; height: calc(100vh - 60px) !important; }
+            /* Chat area ne default hide rakhiye chiye */
+            .chat-area { display: none; position: absolute; top: 0; left: 0; width: 100% !important; height: calc(100vh - 60px) !important; z-index: 100; background: #e9ecef; }
+            
+            /* Jyare chat active hoy tyare aavu thase */
+            .chat-active-mobile .sidebar { display: none !important; }
+            .chat-active-mobile .chat-area { display: flex !important; flex-direction: column !important; }
+            
+            #back-btn-mobile { display: inline-block !important; }
+            .ad-container { display: none; }
         }
+        
+        #back-btn-mobile { display: none; background: none; border: none; font-size: 20px; margin-right: 15px; cursor: pointer; color: #333; }
     </style>
 </head>
 <body>
 
-    <!-- PROFILE POPUP MODAL -->
+    <!-- PROFILE MODAL -->
     <div id="profile-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center;">
         <div class="modal-content" style="background: white; padding: 20px; border-radius: 10px; width: 300px; text-align: center; position: relative;">
             <button id="close-profile" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; cursor: pointer; color: #333;">&times;</button>
             <h3 style="margin-top: 0;">My Profile</h3>
-            
             <img id="profile-preview" src="" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; background: #eee; border: 2px solid #0084ff;">
             <br>
             <input type="file" id="profile-image-input" accept="image/*" style="display: none;">
             <button id="upload-profile-img-btn" style="background: #e9ecef; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-bottom: 15px;"><i class="fa-solid fa-camera"></i> Change Photo</button>
             <br>
-            
             <input type="text" id="bio-input" placeholder="Write a short bio (e.g. Available, Busy)..." style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
             <button id="save-profile-btn" style="background: #0084ff; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold;">Save Profile</button>
         </div>
@@ -99,7 +106,6 @@
             <div class="logo" style="font-weight: bold; font-size: 20px; color: #0084ff;"><i class="fa-solid fa-comments"></i> Batchit</div>
             
             <div style="display: flex; align-items: center;">
-                <!-- NEW DOWNLOAD APP BUTTON -->
                 <button id="install-app-btn" style="display: none; background: #ff9800; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 15px; font-size: 13px;"><i class="fa-solid fa-download"></i> Install App</button>
                 <button id="theme-toggle" style="background: none; border: none; font-size: 20px; cursor: pointer; margin-right: 15px; color: #0084ff;" title="Toggle Dark Mode"><i class="fa-solid fa-moon"></i></button>
                 <button id="open-profile-btn" style="background: none; border: none; font-size: 20px; cursor: pointer; margin-right: 15px; color: #0084ff;" title="My Profile"><i class="fa-solid fa-circle-user"></i></button>
@@ -127,9 +133,13 @@
                 </div>
 
                 <div class="welcome-banner" id="chat-header-container" style="background: white; padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; flex-direction: column;">
-                        <h2 id="chat-header-title" style="margin: 0; font-size: 18px; color: #333;">Select a user to chat</h2>
-                        <span id="typing-indicator" style="font-size: 12px; color: #25D366; display: none; font-weight: bold; margin-top: 3px;">typing...</span>
+                    <div style="display: flex; align-items: center;">
+                        <!-- BACK BUTTON ADDED HERE -->
+                        <button id="back-btn-mobile"><i class="fa-solid fa-arrow-left"></i></button>
+                        <div style="display: flex; flex-direction: column;">
+                            <h2 id="chat-header-title" style="margin: 0; font-size: 18px; color: #333;">Select a user to chat</h2>
+                            <span id="typing-indicator" style="font-size: 12px; color: #25D366; display: none; font-weight: bold; margin-top: 3px;">typing...</span>
+                        </div>
                     </div>
                     <button id="block-user-btn" style="display: none; background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-ban"></i> Block User</button>
                 </div>
@@ -140,7 +150,6 @@
                     <input type="file" id="image-input" accept="image/*" style="display: none;">
                     
                     <button id="img-btn" type="button" style="background: none; border: none; font-size: 24px; cursor: pointer; margin-right: 10px;">📎</button>
-                    <!-- VOICE MESSAGE BUTTON -->
                     <button id="mic-btn" type="button" style="background: none; border: none; font-size: 22px; cursor: pointer; margin-right: 10px; color: #555;"><i class="fa-solid fa-microphone"></i></button>
                     
                     <input type="text" id="message-input" placeholder="Type a message..." style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 20px; margin-right: 10px;">
@@ -150,13 +159,7 @@
         </div>
     </div>
 
-    <script>
-        let script = document.createElement('script');
-        script.type = 'module';
-        script.src = 'script.js?v=' + new Date().getTime();
-        document.body.appendChild(script);
-    </script>
-<!-- FOOTER FOR LEGAL PAGES -->
+    <!-- FOOTER FOR LEGAL PAGES -->
     <footer style="text-align: center; padding: 15px; background: #f8f9fa; border-top: 1px solid #ddd; font-size: 12px; margin-top: auto;">
         <a href="about.html" style="color: #555; text-decoration: none; margin: 0 10px;">About Us</a> | 
         <a href="privacy.html" style="color: #555; text-decoration: none; margin: 0 10px;">Privacy Policy</a> | 
@@ -164,11 +167,15 @@
         <br><br>
         &copy; 2026 Batchit. All rights reserved.
     </footer>
+
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-            .then(() => console.log("Service Worker Registered!"));
+            navigator.serviceWorker.register('sw.js').then(() => console.log("Service Worker Registered!"));
         }
+        let script = document.createElement('script');
+        script.type = 'module';
+        script.src = 'script.js?v=' + new Date().getTime();
+        document.body.appendChild(script);
     </script>
 </body>
 </html>
