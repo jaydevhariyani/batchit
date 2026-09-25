@@ -635,21 +635,32 @@ window.addEventListener('appinstalled', () => {
     if(installAppBtn) installAppBtn.style.display = 'none';
     deferredPrompt = null;
 });
-// --- MOBILE PROFESSIONAL BACK BUTTON LOGIC ---
+// --- MOBILE PROFESSIONAL BACK BUTTON LOGIC (FIXED) ---
 const backBtnMobile = document.getElementById('back-btn-mobile');
 const mainContainerDiv = document.querySelector('.main-container');
-const tabPrivateBtn = document.getElementById('tab-private');
 
+// ૧. એપ ચાલુ થાય ત્યારે હંમેશા User List જ દેખાય
+if(mainContainerDiv) {
+    mainContainerDiv.classList.remove('chat-active-mobile');
+}
+
+// ૨. Back (⬅) બટન દબાવવાથી પાછું User List આવી જાય
 if(backBtnMobile) {
-    backBtnMobile.addEventListener('click', () => {
-        // Back dabavvathi chat-area hide thase ane user list pachi aavse
+    backBtnMobile.addEventListener('click', (e) => {
+        e.preventDefault();
         mainContainerDiv.classList.remove('chat-active-mobile');
-        tabPrivateBtn.click(); // Reset to users list
     });
 }
 
-// Jyare koi pan user na nam par click thase, tyare chat full screen thase
+// ૩. Private User પર ક્લિક થાય ત્યારે જ ચેટ ખૂલે
 document.getElementById('all-users-list').addEventListener('click', () => {
+    setTimeout(() => {
+        mainContainerDiv.classList.add('chat-active-mobile');
+    }, 100);
+});
+
+// ૪. Global Room પર ક્લિક થાય ત્યારે ચેટ ખૂલે
+document.getElementById('tab-global').addEventListener('click', () => {
     mainContainerDiv.classList.add('chat-active-mobile');
 });
 
