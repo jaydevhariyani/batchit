@@ -38,12 +38,26 @@ const tabPrivate = document.getElementById('tab-private');
 const tabGlobal = document.getElementById('tab-global');
 const themeToggleBtn = document.getElementById('theme-toggle');
 
+// PROFILE MODAL ELEMENTS
+const profileModal = document.getElementById('profile-modal');
+const openProfileBtn = document.getElementById('open-profile-btn');
+const closeProfileBtn = document.getElementById('close-profile');
+const profilePreview = document.getElementById('profile-preview');
+const uploadProfileImgBtn = document.getElementById('upload-profile-img-btn');
+const profileImageInput = document.getElementById('profile-image-input');
+const bioInput = document.getElementById('bio-input');
+const saveProfileBtn = document.getElementById('save-profile-btn');
+const typingIndicator = document.getElementById('typing-indicator');
+
 let currentUser = null;
 let currentUserData = null; 
 let currentChatUser = null;
 let currentChatId = null;
 let currentMode = 'private'; 
 let unsubscribeMessages = null;
+let unsubscribeTyping = null;
+let typingTimeout = null;
+let newAvatarUrlTemp = null;
 
 // --- DARK MODE LOGIC ---
 if(localStorage.getItem('theme') === 'dark') {
@@ -63,6 +77,52 @@ themeToggleBtn.addEventListener('click', () => {
         themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
         themeToggleBtn.style.color = '#0084ff';
     }
+});
+
+// --- PROFILE MODAL LOGIC ---
+openProfileBtn.addEventListener('click', () => {
+    profileModal.style.display = 'flex';
+    newAvatarUrlTemp = currentUserData.avatarUrl || `https://ui-avatars.com/api/?name=${currentUserData.name}&background=random&color=fff&rounded=true&size=80`;
+    profilePreview.src = newAvatarUrlTemp;
+    bioInput.value = currentUserData.bio || "";
+});
+
+closeProfileBtn.addEventListener('click', () => { profileModal.style.display = 'none'; });
+
+uploadProfileImgBtn.addEventListener('click', () => profileImageInput.click());
+
+profileImageInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    
+    uploadProfileImgBtn.innerHTML = "⏳ Uploading...";
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+        const res = await fetch("https://api.imgbb.com/1/upload?key=7ce1a67d15e7ad03a0130dfd6f2973b0", { method: "POST", body: formData });
+        const result = await res.json();
+        if(result.success) {
+            newAvatarUrlTemp = result.data.url;
+            profilePreview.src = newAvatarUrlTemp;
+        } else alert("Image upload failed!");
+    } catch(err) { alert("Network error!"); }
+    uploadProfileImgBtn.innerHTML = '<i class="fa-solid fa-camera"></i> Change Photo';
+});
+
+saveProfileBtn.addEventListener('click', async () => {
+    saveProfileBtn.innerHTML = "Saving...";
+    await setDoc(doc(db, "users", currentUser.email.toLowerCase()), {
+        avatarUrl: newAvatarUrlTemp,
+        bio: bioInput.value
+    }, { merge: true });
+    
+    currentUserData.avatarUrl = newAvatarUrlTemp;
+    currentUserData.bio = bioInput.value;
+    
+    saveProfileBtn.innerHTML = "Save Profile";
+    profileModal.style.display = 'none';
+    alert("Profile Updated Successfully!");
 });
 
 // --- AUTH LOGIC ---
@@ -97,7 +157,6 @@ loginBtn.addEventListener('click', async () => {
     const email = emailInput.value;
     const password = passwordInput.value;
     if(!email || !password) return alert("Please enter email and password!");
-    
     loginBtn.innerHTML = "Logging in...";
     try { await signInWithEmailAndPassword(auth, email, password); } 
     catch (error) { alert("Login Failed: Incorrect email or password."); }
@@ -108,7 +167,6 @@ registerBtn.addEventListener('click', async () => {
     const email = emailInput.value;
     const password = passwordInput.value;
     const gender = genderInput.value;
-
     if(!email || !password) return alert("Please enter email and password!");
     if(!gender) return alert("Please select your Gender!");
     
@@ -136,7 +194,6 @@ tabPrivate.addEventListener('click', () => {
     tabPrivate.classList.replace('tab-inactive', 'tab-active');
     tabPrivate.style.background = '#0084ff';
     tabPrivate.style.color = 'white';
-    
     tabGlobal.classList.replace('tab-active', 'tab-inactive');
     tabGlobal.style.background = 'transparent';
     tabGlobal.style.color = 'inherit';
@@ -146,9 +203,11 @@ tabPrivate.addEventListener('click', () => {
     inputArea.style.display = 'none';
     chatHeaderTitle.innerHTML = "Select a user to chat";
     blockBtn.style.display = 'none';
+    typingIndicator.style.display = 'none';
     currentChatId = null;
     currentChatUser = null;
     if(unsubscribeMessages) unsubscribeMessages();
+    if(unsubscribeTyping) unsubscribeTyping();
 });
 
 tabGlobal.addEventListener('click', () => {
@@ -156,22 +215,23 @@ tabGlobal.addEventListener('click', () => {
     tabGlobal.classList.replace('tab-inactive', 'tab-active');
     tabGlobal.style.background = '#25D366';
     tabGlobal.style.color = 'white';
-    
     tabPrivate.classList.replace('tab-active', 'tab-inactive');
     tabPrivate.style.background = 'transparent';
     tabPrivate.style.color = 'inherit';
     
     usersListDiv.style.display = 'none';
     blockBtn.style.display = 'none';
+    typingIndicator.style.display = 'none';
     inputArea.style.display = 'flex';
     chatHeaderTitle.innerHTML = `<i class="fa-solid fa-earth-americas"></i> Global Public Room`;
     
     currentChatUser = 'global';
     currentChatId = 'global_room';
+    if(unsubscribeTyping) unsubscribeTyping();
     loadGlobalMessages();
 });
 
-// --- LOAD USERS LIST ---
+// --- LOAD USERS LIST WITH CUSTOM AVATAR & BIO ---
 function loadUsersList() {
     onSnapshot(collection(db, "users"), (snapshot) => {
         usersListDiv.innerHTML = "";
@@ -192,8 +252,10 @@ function loadUsersList() {
                     <img src="${botAvatar}" style="width: 35px; height: 35px; border-radius: 50%;"> 
                     <div class="online-dot"></div>
                 </div>
-                <strong style="color:#0084ff;">${botName}</strong>
-                <span style="margin-left: 10px; font-size: 9px; background: #25D366; color: white; padding: 2px 5px; border-radius: 10px;">BOT</span>
+                <div style="display: flex; flex-direction: column;">
+                    <div><strong style="color:#0084ff;">${botName}</strong><span style="margin-left: 10px; font-size: 9px; background: #25D366; color: white; padding: 2px 5px; border-radius: 10px;">BOT</span></div>
+                    <span style="font-size: 11px; color: #888;">Always here to chat!</span>
+                </div>
             </div>
         `;
         botDiv.addEventListener('click', () => selectUser("bot@batchit.com", botName));
@@ -209,17 +271,21 @@ function loadUsersList() {
                 userDiv.style.display = "flex";
                 userDiv.style.alignItems = "center";
 
-                const avatarUrl = `https://ui-avatars.com/api/?name=${userData.name}&background=random&color=fff&rounded=true&size=35`;
+                const avatarUrl = userData.avatarUrl || `https://ui-avatars.com/api/?name=${userData.name}&background=random&color=fff&rounded=true&size=35`;
+                const bioText = userData.bio || "Available";
                 let genderIcon = userData.gender === "Male" ? "👦" : "👧";
                 let dotClass = userData.isOnline ? "online-dot" : "online-dot offline-dot";
 
                 userDiv.innerHTML = `
                     <div style="display: flex; align-items: center;">
                         <div style="position: relative; margin-right: 12px; display: flex;">
-                            <img src="${avatarUrl}" style="width: 35px; height: 35px; border-radius: 50%;"> 
+                            <img src="${avatarUrl}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;"> 
                             <div class="${dotClass}"></div>
                         </div>
-                        <strong style="color: inherit;">${userData.name}${genderIcon}</strong>
+                        <div style="display: flex; flex-direction: column;">
+                            <strong style="color: inherit;">${userData.name}${genderIcon}</strong>
+                            <span style="font-size: 11px; color: #888; overflow: hidden; text-overflow: ellipsis; max-width: 150px; white-space: nowrap;">${bioText}</span>
+                        </div>
                     </div>
                 `;
                 userDiv.addEventListener('click', () => selectUser(userData.email, userData.name));
@@ -229,7 +295,7 @@ function loadUsersList() {
     });
 }
 
-// --- SELECT USER ---
+// --- SELECT USER & TYPING LISTENER ---
 async function selectUser(userEmail, userName) {
     if(currentMode !== 'private') tabPrivate.click(); 
     
@@ -240,6 +306,7 @@ async function selectUser(userEmail, userName) {
     chatHeaderTitle.innerHTML = `<i class="fa-solid fa-user"></i> Chatting with ${userName}`;
     inputArea.style.display = 'flex';
     
+    // BLOCK BTN LOGIC
     if(currentChatUser !== "bot@batchit.com") {
         blockBtn.style.display = 'block';
         const blockDoc = await getDoc(doc(db, "users", currentUser.email.toLowerCase(), "blocked", currentChatUser));
@@ -253,6 +320,18 @@ async function selectUser(userEmail, userName) {
     } else {
         blockBtn.style.display = 'none';
     }
+    
+    // TYPING LISTENER LOGIC
+    if(unsubscribeTyping) unsubscribeTyping();
+    if(currentChatUser !== "bot@batchit.com") {
+        unsubscribeTyping = onSnapshot(doc(db, "private_chats", currentChatId, "typing", currentChatUser), (docSnap) => {
+            if(docSnap.exists() && docSnap.data().isTyping) typingIndicator.style.display = 'block';
+            else typingIndicator.style.display = 'none';
+        });
+    } else {
+        typingIndicator.style.display = 'none';
+    }
+
     loadPrivateMessages();
 }
 
@@ -295,7 +374,6 @@ function loadGlobalMessages() {
     });
 }
 
-// --- RENDER MESSAGES & DELETE LOGIC ---
 function renderMessage(docSnap, isGlobal = false) {
     const data = docSnap.data();
     const docId = docSnap.id;
@@ -326,9 +404,7 @@ function renderMessage(docSnap, isGlobal = false) {
     }
 
     let timeString = "Now";
-    if(data.timestamp) {
-        timeString = data.timestamp.toDate().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-    }
+    if(data.timestamp) timeString = data.timestamp.toDate().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
 
     let content = ``;
     if(isGlobal && !isMe) {
@@ -339,7 +415,6 @@ function renderMessage(docSnap, isGlobal = false) {
     if(data.imageUrl) content += `<img src="${data.imageUrl}" style="max-width: 220px; border-radius: 8px; margin-bottom: 5px; display: block;"/><br>`;
     if(data.text) content += `<div style="font-size: 15px;">${data.text}</div>`;
     
-    // Time and Delete Icon Logic
     let timeHtml = `<div style="font-size: 10px; opacity: ${isMe ? '0.9' : '0.5'}; text-align: right; margin-top: 4px; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">`;
     if(isMe) timeHtml += `<i class="fa-solid fa-trash delete-btn" style="cursor: pointer; color: #ffcccc;" title="Delete for everyone"></i>`;
     timeHtml += `<span>${timeString}</span></div>`;
@@ -347,10 +422,7 @@ function renderMessage(docSnap, isGlobal = false) {
 
     msgDiv.innerHTML = content;
     
-    // Event Listeners for Chat and Delete
-    if(isGlobal && !isMe) {
-        msgDiv.querySelector('.global-sender-name')?.addEventListener('click', () => selectUser(data.sender, data.senderName || data.sender.split('@')[0]));
-    }
+    if(isGlobal && !isMe) msgDiv.querySelector('.global-sender-name')?.addEventListener('click', () => selectUser(data.sender, data.senderName || data.sender.split('@')[0]));
     
     if(isMe) {
         msgDiv.querySelector('.delete-btn')?.addEventListener('click', async () => {
@@ -367,6 +439,19 @@ function renderMessage(docSnap, isGlobal = false) {
     chatBox.appendChild(rowDiv);
 }
 
+// --- TYPING INDICATOR WRITER ---
+messageInput.addEventListener('input', async () => {
+    if(currentMode !== 'private' || !currentChatId || currentChatUser === 'bot@batchit.com') return;
+    
+    const typingRef = doc(db, "private_chats", currentChatId, "typing", currentUser.email.toLowerCase());
+    await setDoc(typingRef, { isTyping: true });
+    
+    if(typingTimeout) clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(async () => {
+        await setDoc(typingRef, { isTyping: false });
+    }, 1500);
+});
+
 // --- SEND MESSAGES ---
 sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
@@ -375,6 +460,10 @@ sendBtn.addEventListener('click', async () => {
     if(currentMode === 'private' && currentChatUser !== 'bot@batchit.com') {
         const blockDoc = await getDoc(doc(db, "users", currentUser.email.toLowerCase(), "blocked", currentChatUser));
         if(blockDoc.exists()) return alert("You have blocked this user. Unblock to send messages.");
+        
+        // Stop typing indicator when message is sent
+        const typingRef = doc(db, "private_chats", currentChatId, "typing", currentUser.email.toLowerCase());
+        await setDoc(typingRef, { isTyping: false });
     }
 
     messageInput.value = "";
@@ -387,6 +476,10 @@ sendBtn.addEventListener('click', async () => {
         if(currentChatUser === "bot@batchit.com") {
             const COHERE_API_KEY = "fG9m8ksuIRFb" + "YrQLmR1TJwEt" + "mbBhgmnReAOSt3It";
             let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
+            
+            // Bot Typing Indicator Simulation
+            typingIndicator.style.display = 'block';
+            
             try {
                 setTimeout(async () => {
                     const response = await fetch("https://api.cohere.ai/v2/chat", {
@@ -411,9 +504,11 @@ sendBtn.addEventListener('click', async () => {
                     else if (typeof data?.message === "string") aiReply = `API Error: ${data.message}`;
                     if (!aiReply || aiReply === "undefined") aiReply = `DEBUG: ${JSON.stringify(data)}`;
 
+                    typingIndicator.style.display = 'none'; // Stop Bot typing
                     await addDoc(collection(db, "private_chats", currentChatId, "messages"), { sender: "bot@batchit.com", text: String(aiReply), timestamp: serverTimestamp() });
                 }, 1000);
             } catch(error) {
+                typingIndicator.style.display = 'none';
                 await addDoc(collection(db, "private_chats", currentChatId, "messages"), { sender: "bot@batchit.com", text: `Network Error: ${error.message}`, timestamp: serverTimestamp() });
             }
         }
