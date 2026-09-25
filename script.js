@@ -635,3 +635,25 @@ window.addEventListener('appinstalled', () => {
     if(installAppBtn) installAppBtn.style.display = 'none';
     deferredPrompt = null;
 });
+// --- MOBILE PROFESSIONAL BACK BUTTON LOGIC ---
+const backBtnMobile = document.getElementById('back-btn-mobile');
+const mainContainerDiv = document.querySelector('.main-container');
+const tabPrivateBtn = document.getElementById('tab-private');
+
+if(backBtnMobile) {
+    backBtnMobile.addEventListener('click', () => {
+        // Back dabavvathi chat-area hide thase ane user list pachi aavse
+        mainContainerDiv.classList.remove('chat-active-mobile');
+        tabPrivateBtn.click(); // Reset to users list
+    });
+}
+
+// Jyare koi pan user na nam par click thase, tyare chat full screen thase
+document.getElementById('all-users-list').addEventListener('click', () => {
+    mainContainerDiv.classList.add('chat-active-mobile');
+});
+
+// Global chat par click thase tyare pan chat full screen thase
+document.getElementById('tab-global').addEventListener('click', () => {
+    mainContainerDiv.classList.add('chat-active-mobile');
+});
