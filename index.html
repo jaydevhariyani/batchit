@@ -3,16 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- 100% SEO OPTIMIZATION TAGS -->
-    <meta name="description" content="Batchit - A free private and global online chatting app. Meet new people securely, chat with AI, and make friends.">
-    <meta name="keywords" content="global chat, private chat, online chatting, AI chat, free chat app, Batchit, meet new people">
+    <meta name="description" content="Batchit - A free private and global online chatting app.">
+    <meta name="keywords" content="global chat, private chat, online chatting, AI chat">
     <meta name="author" content="Batchit Chat">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="Batchit - Private & Global Chat">
-    <meta property="og:description" content="Join Batchit to chat globally with everyone or chat privately in a secure environment.">
-    <meta property="og:type" content="website">
-    
     <title>Batchit - Private & Global Chatting App</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -26,6 +20,24 @@
         .tab-btn { padding: 10px; border: none; cursor: pointer; flex: 1; font-weight: bold; }
         .tab-active { background: #0084ff; color: white; }
         .tab-inactive { background: #e9ecef; color: #333; }
+
+        /* DARK MODE CSS */
+        body.dark-mode { background: #18191a; color: #e4e6eb; }
+        body.dark-mode #auth-page { background: #18191a; }
+        body.dark-mode #auth-page > div { background: #242526; color: #e4e6eb; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        body.dark-mode .top-header, 
+        body.dark-mode #chat-header-container, 
+        body.dark-mode #input-area, 
+        body.dark-mode .sidebar { background: #242526 !important; border-color: #3e4042 !important; }
+        body.dark-mode .chat-area { background: #18191a !important; }
+        body.dark-mode .message-other { background: #3a3b3c !important; color: #e4e6eb !important; border-color: #3e4042 !important; }
+        body.dark-mode input, body.dark-mode select { background: #3a3b3c !important; color: white !important; border-color: #555 !important; }
+        body.dark-mode .sidebar-tabs { border-color: #3e4042 !important; }
+        body.dark-mode .tab-inactive { background: #3a3b3c !important; color: #e4e6eb !important; }
+        body.dark-mode #chat-header-title { color: #e4e6eb !important; }
+        body.dark-mode .ad-container { background: #3a3b3c; border-color: #555; color: #aaa; }
+        body.dark-mode #all-users-list > div { border-color: #3e4042 !important; }
+        body.dark-mode strong { color: #e4e6eb !important; }
     </style>
 </head>
 <body>
@@ -50,14 +62,18 @@
 
     <!-- MAIN CHAT APP -->
     <div id="main-app" style="display: none;">
-        <header class="top-header" style="display: flex; justify-content: space-between; padding: 15px; background: white; border-bottom: 1px solid #ddd;">
+        <header class="top-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border-bottom: 1px solid #ddd;">
             <div class="logo" style="font-weight: bold; font-size: 20px; color: #0084ff;"><i class="fa-solid fa-comments"></i> Batchit</div>
-            <button id="logout-btn" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            
+            <div style="display: flex; align-items: center;">
+                <!-- DARK MODE BUTTON -->
+                <button id="theme-toggle" style="background: none; border: none; font-size: 20px; cursor: pointer; margin-right: 20px; color: #0084ff;" title="Toggle Dark Mode"><i class="fa-solid fa-moon"></i></button>
+                <button id="logout-btn" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            </div>
         </header>
 
         <div class="main-container" style="display: flex; height: calc(100vh - 60px);">
             <aside class="sidebar" style="width: 300px; border-right: 1px solid #ddd; display: flex; flex-direction: column;">
-                <!-- TABS FOR PRIVATE OR GLOBAL -->
                 <div class="sidebar-tabs" style="display: flex; border-bottom: 1px solid #ddd;">
                     <button class="tab-btn tab-active" id="tab-private">Private</button>
                     <button class="tab-btn tab-inactive" id="tab-global" style="background: #25D366; color: white;">Global Room</button>
@@ -67,21 +83,18 @@
                     <div id="all-users-list"></div>
                 </div>
 
-                <!-- SIDEBAR ADVERTISEMENT SPACE -->
                 <div class="ad-container sidebar-ad">
                     <small>AdSense Space (300x250)</small>
                 </div>
             </aside>
 
             <main class="chat-area" style="flex: 1; display: flex; flex-direction: column; background: #e9ecef;">
-                <!-- TOP BANNER ADVERTISEMENT SPACE -->
                 <div class="ad-container top-ad">
                     <small>AdSense Leaderboard Banner (728x90)</small>
                 </div>
 
                 <div class="welcome-banner" id="chat-header-container" style="background: white; padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
-                    <h2 id="chat-header-title" style="margin: 0; font-size: 18px;">Select a user to chat</h2>
-                    <!-- BLOCK BUTTON (Hidden by default) -->
+                    <h2 id="chat-header-title" style="margin: 0; font-size: 18px; color: #333;">Select a user to chat</h2>
                     <button id="block-user-btn" style="display: none; background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-ban"></i> Block User</button>
                 </div>
 
