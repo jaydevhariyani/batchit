@@ -1,6 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+// NEW: Firebase Storage for Voice Messages
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCxl2AUWy8SjNEUauG_DtPfUcqkR_zDhVA",
@@ -14,6 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+const storage = getStorage(app); // Storage Init
 
 const authPage = document.getElementById('auth-page');
 const mainApp = document.getElementById('main-app');
@@ -32,13 +35,12 @@ const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
 const imgBtn = document.getElementById('img-btn');
 const imageInput = document.getElementById('image-input');
+const micBtn = document.getElementById('mic-btn'); // Mic Button
 const blockBtn = document.getElementById('block-user-btn');
-
 const tabPrivate = document.getElementById('tab-private');
 const tabGlobal = document.getElementById('tab-global');
 const themeToggleBtn = document.getElementById('theme-toggle');
 
-// PROFILE MODAL ELEMENTS
 const profileModal = document.getElementById('profile-modal');
 const openProfileBtn = document.getElementById('open-profile-btn');
 const closeProfileBtn = document.getElementById('close-profile');
@@ -59,7 +61,14 @@ let unsubscribeTyping = null;
 let typingTimeout = null;
 let newAvatarUrlTemp = null;
 
-// --- DARK MODE LOGIC ---
+// Audio Recording Variables
+let mediaRecorder;
+let audioChunks = [];
+let isRecording = false;
+
+// Notification Sound (Simple Ping)
+const notifSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+
 if(localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-mode');
     themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
@@ -79,26 +88,22 @@ themeToggleBtn.addEventListener('click', () => {
     }
 });
 
-// --- PROFILE MODAL LOGIC ---
+// PROFILE MODAL
 openProfileBtn.addEventListener('click', () => {
     profileModal.style.display = 'flex';
     newAvatarUrlTemp = currentUserData.avatarUrl || `https://ui-avatars.com/api/?name=${currentUserData.name}&background=random&color=fff&rounded=true&size=80`;
     profilePreview.src = newAvatarUrlTemp;
     bioInput.value = currentUserData.bio || "";
 });
-
 closeProfileBtn.addEventListener('click', () => { profileModal.style.display = 'none'; });
-
 uploadProfileImgBtn.addEventListener('click', () => profileImageInput.click());
 
 profileImageInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if(!file) return;
-    
     uploadProfileImgBtn.innerHTML = "⏳ Uploading...";
     const formData = new FormData();
     formData.append("image", file);
-
     try {
         const res = await fetch("https://api.imgbb.com/1/upload?key=7ce1a67d15e7ad03a0130dfd6f2973b0", { method: "POST", body: formData });
         const result = await res.json();
@@ -112,38 +117,35 @@ profileImageInput.addEventListener('change', async (e) => {
 
 saveProfileBtn.addEventListener('click', async () => {
     saveProfileBtn.innerHTML = "Saving...";
-    await setDoc(doc(db, "users", currentUser.email.toLowerCase()), {
-        avatarUrl: newAvatarUrlTemp,
-        bio: bioInput.value
-    }, { merge: true });
-    
+    await setDoc(doc(db, "users", currentUser.email.toLowerCase()), { avatarUrl: newAvatarUrlTemp, bio: bioInput.value }, { merge: true });
     currentUserData.avatarUrl = newAvatarUrlTemp;
     currentUserData.bio = bioInput.value;
-    
     saveProfileBtn.innerHTML = "Save Profile";
     profileModal.style.display = 'none';
-    alert("Profile Updated Successfully!");
 });
 
-// --- AUTH LOGIC ---
+// AUTH LOGIC
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
         authPage.style.display = 'none';
         mainApp.style.display = 'block';
 
+        // ASK FOR NOTIFICATION PERMISSION
+        if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
+
         const userRef = doc(db, "users", user.email.toLowerCase());
         const userDoc = await getDoc(userRef);
         if(userDoc.exists()) currentUserData = userDoc.data();
         
         await setDoc(userRef, { isOnline: true }, { merge: true });
-        
         window.addEventListener('beforeunload', () => setDoc(userRef, { isOnline: false, lastSeen: serverTimestamp() }, { merge: true }));
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === 'visible') setDoc(userRef, { isOnline: true }, { merge: true });
             else setDoc(userRef, { isOnline: false, lastSeen: serverTimestamp() }, { merge: true });
         });
-
         loadUsersList();
     } else {
         currentUser = null;
@@ -177,7 +179,6 @@ registerBtn.addEventListener('click', async () => {
             email: email.toLowerCase(), name: email.split('@')[0], gender: gender, isOnline: true
         });
         currentUserData = { email: email.toLowerCase(), name: email.split('@')[0], gender: gender };
-        alert("Account created successfully!");
         loadUsersList();
     } catch (error) { alert("Registration Failed: " + error.message); }
     registerBtn.innerHTML = "Create New Account";
@@ -188,7 +189,7 @@ logoutBtn.addEventListener('click', async () => {
     signOut(auth);
 });
 
-// --- TAB SWITCHING ---
+// TAB SWITCHING
 tabPrivate.addEventListener('click', () => {
     currentMode = 'private';
     tabPrivate.classList.replace('tab-inactive', 'tab-active');
@@ -231,11 +232,10 @@ tabGlobal.addEventListener('click', () => {
     loadGlobalMessages();
 });
 
-// --- LOAD USERS LIST WITH CUSTOM AVATAR & BIO ---
+// LOAD USERS LIST
 function loadUsersList() {
     onSnapshot(collection(db, "users"), (snapshot) => {
         usersListDiv.innerHTML = "";
-        
         const botDiv = document.createElement('div');
         botDiv.style.padding = "10px";
         botDiv.style.borderBottom = "1px solid #ddd";
@@ -270,12 +270,10 @@ function loadUsersList() {
                 userDiv.style.cursor = "pointer";
                 userDiv.style.display = "flex";
                 userDiv.style.alignItems = "center";
-
                 const avatarUrl = userData.avatarUrl || `https://ui-avatars.com/api/?name=${userData.name}&background=random&color=fff&rounded=true&size=35`;
                 const bioText = userData.bio || "Available";
                 let genderIcon = userData.gender === "Male" ? "👦" : "👧";
                 let dotClass = userData.isOnline ? "online-dot" : "online-dot offline-dot";
-
                 userDiv.innerHTML = `
                     <div style="display: flex; align-items: center;">
                         <div style="position: relative; margin-right: 12px; display: flex;">
@@ -295,18 +293,15 @@ function loadUsersList() {
     });
 }
 
-// --- SELECT USER & TYPING LISTENER ---
+// SELECT USER & TYPING
 async function selectUser(userEmail, userName) {
     if(currentMode !== 'private') tabPrivate.click(); 
-    
     currentChatUser = userEmail.toLowerCase();
     const emails = [currentUser.email.toLowerCase(), currentChatUser].sort();
     currentChatId = `${emails[0]}_${emails[1]}`;
-
     chatHeaderTitle.innerHTML = `<i class="fa-solid fa-user"></i> Chatting with ${userName}`;
     inputArea.style.display = 'flex';
     
-    // BLOCK BTN LOGIC
     if(currentChatUser !== "bot@batchit.com") {
         blockBtn.style.display = 'block';
         const blockDoc = await getDoc(doc(db, "users", currentUser.email.toLowerCase(), "blocked", currentChatUser));
@@ -317,20 +312,15 @@ async function selectUser(userEmail, userName) {
             blockBtn.innerHTML = `<i class="fa-solid fa-ban"></i> Block User`;
             blockBtn.style.background = "#dc3545";
         }
-    } else {
-        blockBtn.style.display = 'none';
-    }
+    } else { blockBtn.style.display = 'none'; }
     
-    // TYPING LISTENER LOGIC
     if(unsubscribeTyping) unsubscribeTyping();
     if(currentChatUser !== "bot@batchit.com") {
         unsubscribeTyping = onSnapshot(doc(db, "private_chats", currentChatId, "typing", currentChatUser), (docSnap) => {
             if(docSnap.exists() && docSnap.data().isTyping) typingIndicator.style.display = 'block';
             else typingIndicator.style.display = 'none';
         });
-    } else {
-        typingIndicator.style.display = 'none';
-    }
+    } else typingIndicator.style.display = 'none';
 
     loadPrivateMessages();
 }
@@ -353,24 +343,60 @@ blockBtn.addEventListener('click', async () => {
     }
 });
 
-// --- LOAD MESSAGES ---
+// LOAD MESSAGES (WITH NOTIFICATIONS)
 function loadPrivateMessages() {
     if(unsubscribeMessages) unsubscribeMessages(); 
     const q = query(collection(db, "private_chats", currentChatId, "messages"), orderBy("timestamp", "asc"));
+    
+    let isInitialLoad = true;
     unsubscribeMessages = onSnapshot(q, (snapshot) => {
         chatBox.innerHTML = "";
         snapshot.forEach((docSnap) => renderMessage(docSnap));
         chatBox.scrollTop = chatBox.scrollHeight;
+        
+        // PUSH NOTIFICATION LOGIC
+        if(!isInitialLoad) {
+            snapshot.docChanges().forEach((change) => {
+                if(change.type === "added") {
+                    const data = change.doc.data();
+                    if(data.sender !== currentUser.email.toLowerCase()) {
+                        notifSound.play().catch(e => console.log("Audio play blocked by browser"));
+                        if(Notification.permission === "granted" && document.visibilityState !== "visible") {
+                            new Notification("New message from " + (data.senderName || "User"), { body: data.text || "Voice/Image attachment" });
+                        }
+                    }
+                }
+            });
+        }
+        isInitialLoad = false;
     });
 }
 
 function loadGlobalMessages() {
     if(unsubscribeMessages) unsubscribeMessages(); 
     const q = query(collection(db, "global_messages"), orderBy("timestamp", "asc"));
+    
+    let isInitialLoad = true;
     unsubscribeMessages = onSnapshot(q, (snapshot) => {
         chatBox.innerHTML = "";
         snapshot.forEach((docSnap) => renderMessage(docSnap, true));
         chatBox.scrollTop = chatBox.scrollHeight;
+        
+        // PUSH NOTIFICATION LOGIC
+        if(!isInitialLoad) {
+            snapshot.docChanges().forEach((change) => {
+                if(change.type === "added") {
+                    const data = change.doc.data();
+                    if(data.sender !== currentUser.email.toLowerCase()) {
+                        notifSound.play().catch(e => console.log("Audio blocked"));
+                        if(Notification.permission === "granted" && document.visibilityState !== "visible") {
+                            new Notification("Global Chat: " + (data.senderName || "User"), { body: data.text || "Sent an attachment" });
+                        }
+                    }
+                }
+            });
+        }
+        isInitialLoad = false;
     });
 }
 
@@ -412,7 +438,12 @@ function renderMessage(docSnap, isGlobal = false) {
         content += `<div class="global-sender-name" style="font-size: 11px; font-weight: bold; color: #ff9800; margin-bottom: 3px; cursor: pointer;">~ ${senderName} (Click to Chat)</div>`;
     }
 
+    // IMAGE RENDER
     if(data.imageUrl) content += `<img src="${data.imageUrl}" style="max-width: 220px; border-radius: 8px; margin-bottom: 5px; display: block;"/><br>`;
+    
+    // VOICE AUDIO RENDER
+    if(data.audioUrl) content += `<audio controls src="${data.audioUrl}" style="max-width: 220px; margin-bottom: 5px; display: block;"></audio><br>`;
+    
     if(data.text) content += `<div style="font-size: 15px;">${data.text}</div>`;
     
     let timeHtml = `<div style="font-size: 10px; opacity: ${isMe ? '0.9' : '0.5'}; text-align: right; margin-top: 4px; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">`;
@@ -423,7 +454,6 @@ function renderMessage(docSnap, isGlobal = false) {
     msgDiv.innerHTML = content;
     
     if(isGlobal && !isMe) msgDiv.querySelector('.global-sender-name')?.addEventListener('click', () => selectUser(data.sender, data.senderName || data.sender.split('@')[0]));
-    
     if(isMe) {
         msgDiv.querySelector('.delete-btn')?.addEventListener('click', async () => {
             if(confirm("Are you sure you want to delete this message for everyone?")) {
@@ -434,25 +464,20 @@ function renderMessage(docSnap, isGlobal = false) {
             }
         });
     }
-
     rowDiv.appendChild(msgDiv);
     chatBox.appendChild(rowDiv);
 }
 
-// --- TYPING INDICATOR WRITER ---
+// TYPING INDICATOR WRITER
 messageInput.addEventListener('input', async () => {
     if(currentMode !== 'private' || !currentChatId || currentChatUser === 'bot@batchit.com') return;
-    
     const typingRef = doc(db, "private_chats", currentChatId, "typing", currentUser.email.toLowerCase());
     await setDoc(typingRef, { isTyping: true });
-    
     if(typingTimeout) clearTimeout(typingTimeout);
-    typingTimeout = setTimeout(async () => {
-        await setDoc(typingRef, { isTyping: false });
-    }, 1500);
+    typingTimeout = setTimeout(async () => { await setDoc(typingRef, { isTyping: false }); }, 1500);
 });
 
-// --- SEND MESSAGES ---
+// SEND TEXT MESSAGE
 sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
     if(message.trim() === "" || !currentChatId) return;
@@ -460,8 +485,6 @@ sendBtn.addEventListener('click', async () => {
     if(currentMode === 'private' && currentChatUser !== 'bot@batchit.com') {
         const blockDoc = await getDoc(doc(db, "users", currentUser.email.toLowerCase(), "blocked", currentChatUser));
         if(blockDoc.exists()) return alert("You have blocked this user. Unblock to send messages.");
-        
-        // Stop typing indicator when message is sent
         const typingRef = doc(db, "private_chats", currentChatId, "typing", currentUser.email.toLowerCase());
         await setDoc(typingRef, { isTyping: false });
     }
@@ -476,10 +499,7 @@ sendBtn.addEventListener('click', async () => {
         if(currentChatUser === "bot@batchit.com") {
             const COHERE_API_KEY = "fG9m8ksuIRFb" + "YrQLmR1TJwEt" + "mbBhgmnReAOSt3It";
             let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
-            
-            // Bot Typing Indicator Simulation
             typingIndicator.style.display = 'block';
-            
             try {
                 setTimeout(async () => {
                     const response = await fetch("https://api.cohere.ai/v2/chat", {
@@ -504,7 +524,7 @@ sendBtn.addEventListener('click', async () => {
                     else if (typeof data?.message === "string") aiReply = `API Error: ${data.message}`;
                     if (!aiReply || aiReply === "undefined") aiReply = `DEBUG: ${JSON.stringify(data)}`;
 
-                    typingIndicator.style.display = 'none'; // Stop Bot typing
+                    typingIndicator.style.display = 'none'; 
                     await addDoc(collection(db, "private_chats", currentChatId, "messages"), { sender: "bot@batchit.com", text: String(aiReply), timestamp: serverTimestamp() });
                 }, 1000);
             } catch(error) {
@@ -515,7 +535,7 @@ sendBtn.addEventListener('click', async () => {
     }
 });
 
-// --- SEND IMAGES ---
+// SEND IMAGE
 imgBtn.addEventListener('click', () => {
     if(!currentChatId) return alert("Please select a chat first!");
     imageInput.click();
@@ -524,11 +544,9 @@ imgBtn.addEventListener('click', () => {
 imageInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if(!file || !currentChatId) return;
-
     imgBtn.innerHTML = "⏳";
     const formData = new FormData();
     formData.append("image", file);
-
     try {
         const res = await fetch("https://api.imgbb.com/1/upload?key=7ce1a67d15e7ad03a0130dfd6f2973b0", { method: "POST", body: formData });
         const result = await res.json();
@@ -545,4 +563,50 @@ imageInput.addEventListener('change', async (e) => {
     } catch(err) { alert("Network error!"); }
     imgBtn.innerHTML = '📎';
     imageInput.value = "";
+});
+
+// VOICE MESSAGE RECORDING LOGIC
+micBtn.addEventListener('click', async () => {
+    if(!currentChatId) return alert("Please select a chat first!");
+    
+    if(!isRecording) {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.start();
+            isRecording = true;
+            
+            micBtn.innerHTML = '<i class="fa-solid fa-stop"></i>';
+            micBtn.style.color = "red";
+            
+            mediaRecorder.addEventListener("dataavailable", event => { audioChunks.push(event.data); });
+            
+            mediaRecorder.addEventListener("stop", async () => {
+                micBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
+                micBtn.style.color = "inherit";
+                
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                audioChunks = [];
+                
+                try {
+                    // Upload to Firebase Storage
+                    const audioRef = sRef(storage, `audio_messages/${Date.now()}.webm`);
+                    await uploadBytes(audioRef, audioBlob);
+                    const audioUrl = await getDownloadURL(audioRef);
+                    
+                    const msgData = { sender: currentUser.email.toLowerCase(), senderName: currentUserData.name, text: "", audioUrl: audioUrl, timestamp: serverTimestamp() };
+                    
+                    if(currentMode === 'global') await addDoc(collection(db, "global_messages"), msgData);
+                    else await addDoc(collection(db, "private_chats", currentChatId, "messages"), msgData);
+                    
+                } catch(err) {
+                    alert("Audio upload failed! Make sure your Firebase Storage Rules allow read/write.");
+                }
+                stream.getTracks().forEach(track => track.stop());
+            });
+        } catch(err) { alert("Microphone access denied!"); }
+    } else {
+        mediaRecorder.stop();
+        isRecording = false;
+    }
 });
