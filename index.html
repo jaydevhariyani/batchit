@@ -47,6 +47,15 @@
         body.dark-mode #upload-profile-img-btn { background: #3a3b3c !important; color: white !important; border-color: #555 !important; }
         body.dark-mode #close-profile { color: white !important; }
         body.dark-mode #mic-btn { color: #e4e6eb !important; }
+    /* MOBILE RESPONSIVE CSS */
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column !important; height: auto !important; }
+            .sidebar { width: 100% !important; height: 35vh !important; border-right: none !important; border-bottom: 2px solid #0084ff !important; }
+            .chat-area { width: 100% !important; height: 65vh !important; }
+            .top-header { flex-wrap: wrap; justify-content: center; gap: 10px; padding: 10px; }
+            #install-app-btn { font-size: 11px; padding: 5px 10px; }
+            .ad-container { display: none; } /* Mobile ma ads jagya roke etle hide karyu */
+        }
     </style>
 </head>
 <body>
