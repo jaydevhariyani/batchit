@@ -610,3 +610,28 @@ micBtn.addEventListener('click', async () => {
         isRecording = false;
     }
 });
+// --- APP DOWNLOAD (PWA) BUTTON LOGIC ---
+const installAppBtn = document.getElementById('install-app-btn');
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // બ્રાઉઝરનું પોતાનું પોપ-અપ રોકીને આપણું બટન બતાવો
+    e.preventDefault();
+    deferredPrompt = e;
+    if(installAppBtn) installAppBtn.style.display = 'block';
+});
+
+if(installAppBtn) {
+    installAppBtn.addEventListener('click', async () => {
+        installAppBtn.style.display = 'none';
+        deferredPrompt.prompt(); // ઇન્સ્ટોલ કરવાનું પોપ-અપ લાવશે
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+    });
+}
+
+window.addEventListener('appinstalled', () => {
+    // એપ ઇન્સ્ટોલ થઈ જાય એટલે બટન ગાયબ કરી દો
+    if(installAppBtn) installAppBtn.style.display = 'none';
+    deferredPrompt = null;
+});
