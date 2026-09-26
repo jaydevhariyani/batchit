@@ -1,3 +1,4 @@
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
@@ -89,7 +90,7 @@ document.getElementById('start-guest-chat-btn')?.addEventListener('click', async
     }
 });
 
-// --- 2. MATCHMAKING RADAR LOGIC ---
+// --- 2. REAL MATCHMAKING LOGIC ---
 async function startMatchmaking() {
     if(mainChatScreen) mainChatScreen.style.display = 'none';
     if(radarScreen) radarScreen.style.display = 'flex';
@@ -97,30 +98,68 @@ async function startMatchmaking() {
     currentChatId = null;
     currentChatPartner = null;
     if(unsubscribeMessages) unsubscribeMessages();
+    if(searchTimeout) clearTimeout(searchTimeout);
 
-    // 1. Queue ma potani entry nakho
-    await setDoc(doc(db, "matching_queue", currentUser.uid), { uid: currentUser.uid, timestamp: serverTimestamp() });
+    // ૧. પોતાને કતાર (Queue) માં મૂકો
+    const myQueueRef = doc(db, "matching_queue", currentUser.uid);
+    await setDoc(myQueueRef, { uid: currentUser.uid, timestamp: serverTimestamp(), matchedWith: null });
 
-    // 2. 4 second wait karo, matching mate
-    searchTimeout = setTimeout(async () => {
-        // Delete self from queue
-        await deleteDoc(doc(db, "matching_queue", currentUser.uid));
-        
-        // Connect to AI Bot
-        currentChatPartner = "bot";
-        currentChatId = "chat_" + currentUser.uid + "_bot";
-        if(chatPartnerName) chatPartnerName.innerHTML = selectedGender === "Female" ? "Rahul 👦" : "Priya 👧";
-        
-        if(radarScreen) radarScreen.style.display = 'none';
-        if(mainChatScreen) mainChatScreen.style.display = 'flex';
-        
-        // Bot says hi first
-        await addDoc(collection(db, "chats", currentChatId, "messages"), { 
-            sender: "bot", text: "Hi there! I am connected with you. Say something!", timestamp: serverTimestamp() 
-        });
-        
-        loadMessages();
-    }, 4000);
+    // ૨. કોઈ બીજો માણસ ઓનલાઈન છે કે નહીં તે ચેક કરો
+    const q = query(collection(db, "matching_queue"), orderBy("timestamp", "asc"));
+    const snapshot = await getDocs(q);
+    let foundMatch = false;
+
+    for (const docSnap of snapshot.docs) {
+        const otherUser = docSnap.data();
+        if (otherUser.uid !== currentUser.uid && !otherUser.matchedWith) {
+            foundMatch = true;
+            currentChatPartner = otherUser.uid;
+            currentChatId = "chat_" + (currentUser.uid < otherUser.uid ? currentUser.uid + "_" + otherUser.uid : otherUser.uid + "_" + currentUser.uid);
+            
+            // સામેવાળાને જણાવી દો કે મેચ મળી ગયો
+            await setDoc(doc(db, "matching_queue", otherUser.uid), { matchedWith: currentChatId }, { merge: true });
+            await deleteDoc(myQueueRef);
+            
+            connectToChat("Stranger");
+            break;
+        }
+    }
+
+    // ૩. જો કોઈ ના મળે, તો થોડીવાર રાહ જુઓ
+    if (!foundMatch) {
+        let checkInterval = setInterval(async () => {
+            const myDoc = await getDoc(myQueueRef);
+            if (myDoc.exists() && myDoc.data().matchedWith) {
+                clearInterval(checkInterval);
+                clearTimeout(searchTimeout);
+                currentChatId = myDoc.data().matchedWith;
+                currentChatPartner = "real_user";
+                await deleteDoc(myQueueRef);
+                connectToChat("Stranger");
+            }
+        }, 2000);
+
+        // ૪. જો ૧૦ સેકન્ડ સુધી કોઈ માણસ ના મળે, તો જ AI બોટને બોલાવો
+        searchTimeout = setTimeout(async () => {
+            clearInterval(checkInterval);
+            await deleteDoc(myQueueRef);
+            currentChatPartner = "bot";
+            currentChatId = "chat_" + currentUser.uid + "_bot";
+            connectToChat(selectedGender === "Female" ? "Rahul (AI)" : "Priya (AI)");
+            
+            // બોટનો પહેલો મેસેજ (લૂપ વગર)
+            await addDoc(collection(db, "chats", currentChatId, "messages"), { 
+                sender: "bot", text: "Hi there! Couldn't find a human, so I'm here. How are you?", timestamp: serverTimestamp() 
+            });
+        }, 10000); // 10 સેકન્ડનો ટાઈમ
+    }
+}
+
+function connectToChat(partnerName) {
+    if(chatPartnerName) chatPartnerName.innerHTML = partnerName;
+    if(radarScreen) radarScreen.style.display = 'none';
+    if(mainChatScreen) mainChatScreen.style.display = 'flex';
+    loadMessages();
 }
 
 document.getElementById('cancel-search-btn')?.addEventListener('click', async () => {
