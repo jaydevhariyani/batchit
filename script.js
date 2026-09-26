@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc, deleteDoc, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -27,15 +27,17 @@ const typingIndicator = document.getElementById('typing-indicator');
 
 let currentUser = null;
 let currentChatId = null;
-let currentChatPartner = null; // 'bot' or 'real_uid'
+let currentChatPartner = null; 
 let unsubscribeMessages = null;
 let selectedGender = "Male";
 let searchTimeout = null;
 
 // --- 1. ONBOARDING & START ---
-document.getElementById('open-onboard-btn').addEventListener('click', () => onboardModal.style.display = 'flex');
+document.getElementById('open-onboard-btn')?.addEventListener('click', () => {
+    if(onboardModal) onboardModal.style.display = 'flex';
+});
 
-document.getElementById('random-name-btn').addEventListener('click', () => {
+document.getElementById('random-name-btn')?.addEventListener('click', () => {
     const names = ["CoolNinja", "SkyRider", "Ghost", "Star", "Leo", "Tiger", "Falcon"];
     document.getElementById('guest-name-input').value = names[Math.floor(Math.random() * names.length)] + Math.floor(Math.random() * 1000);
 });
@@ -50,7 +52,7 @@ document.querySelectorAll('.gender-btn').forEach(btn => {
     });
 });
 
-document.getElementById('start-guest-chat-btn').addEventListener('click', async () => {
+document.getElementById('start-guest-chat-btn')?.addEventListener('click', async () => {
     const btn = document.getElementById('start-guest-chat-btn');
     btn.innerHTML = "Connecting...";
     try {
@@ -60,9 +62,9 @@ document.getElementById('start-guest-chat-btn').addEventListener('click', async 
         let name = document.getElementById('guest-name-input').value.trim() || "Guest" + Math.floor(Math.random() * 9999);
         await setDoc(doc(db, "users", currentUser.uid), { uid: currentUser.uid, name: name, gender: selectedGender, isOnline: true });
         
-        onboardModal.style.display = 'none';
-        landingPage.style.display = 'none';
-        startMatchmaking(); // સીધું રાડાર ચાલુ!
+        if(onboardModal) onboardModal.style.display = 'none';
+        if(landingPage) landingPage.style.display = 'none';
+        startMatchmaking(); 
     } catch(err) {
         alert("Error: Please enable 'Anonymous' sign-in in Firebase Auth.");
         btn.innerHTML = "Continue";
@@ -71,9 +73,9 @@ document.getElementById('start-guest-chat-btn').addEventListener('click', async 
 
 // --- 2. MATCHMAKING RADAR LOGIC ---
 async function startMatchmaking() {
-    mainChatScreen.style.display = 'none';
-    radarScreen.style.display = 'flex';
-    chatBox.innerHTML = "";
+    if(mainChatScreen) mainChatScreen.style.display = 'none';
+    if(radarScreen) radarScreen.style.display = 'flex';
+    if(chatBox) chatBox.innerHTML = "";
     currentChatId = null;
     currentChatPartner = null;
     if(unsubscribeMessages) unsubscribeMessages();
@@ -81,7 +83,7 @@ async function startMatchmaking() {
     // 1. Queue ma potani entry nakho
     await setDoc(doc(db, "matching_queue", currentUser.uid), { uid: currentUser.uid, timestamp: serverTimestamp() });
 
-    // 2. 4 second wait karo, jo koi real manas online hase to match thase, nai to Bot sathe match!
+    // 2. 4 second wait karo, matching mate
     searchTimeout = setTimeout(async () => {
         // Delete self from queue
         await deleteDoc(doc(db, "matching_queue", currentUser.uid));
@@ -89,10 +91,10 @@ async function startMatchmaking() {
         // Connect to AI Bot
         currentChatPartner = "bot";
         currentChatId = "chat_" + currentUser.uid + "_bot";
-        chatPartnerName.innerHTML = selectedGender === "Female" ? "Rahul 👦" : "Priya 👧";
+        if(chatPartnerName) chatPartnerName.innerHTML = selectedGender === "Female" ? "Rahul 👦" : "Priya 👧";
         
-        radarScreen.style.display = 'none';
-        mainChatScreen.style.display = 'flex';
+        if(radarScreen) radarScreen.style.display = 'none';
+        if(mainChatScreen) mainChatScreen.style.display = 'flex';
         
         // Bot says hi first
         await addDoc(collection(db, "chats", currentChatId, "messages"), { 
@@ -103,67 +105,80 @@ async function startMatchmaking() {
     }, 4000);
 }
 
-document.getElementById('cancel-search-btn').addEventListener('click', async () => {
+document.getElementById('cancel-search-btn')?.addEventListener('click', async () => {
     clearTimeout(searchTimeout);
-    await deleteDoc(doc(db, "matching_queue", currentUser.uid));
-    radarScreen.style.display = 'none';
-    landingPage.style.display = 'flex';
+    if(currentUser) await deleteDoc(doc(db, "matching_queue", currentUser.uid));
+    if(radarScreen) radarScreen.style.display = 'none';
+    if(landingPage) landingPage.style.display = 'flex';
 });
 
 // --- 3. SKIP BUTTON LOGIC ---
-document.getElementById('skip-btn').addEventListener('click', async () => {
+document.getElementById('skip-btn')?.addEventListener('click', async () => {
     if(confirm("Are you sure you want to skip and find someone else?")) {
-        // Delete current chat history to keep DB clean
-        if(currentChatId) {
-            // (Real app ma server thi delete thay, ahiya aapan local clear karisu)
-            chatBox.innerHTML = "";
-        }
+        if(chatBox) chatBox.innerHTML = "";
         startMatchmaking();
     }
 });
 
-// --- 4. MESSAGING SYSTEM ---
-document.getElementById('send-btn').addEventListener('click', async () => {
+// --- 4. MESSAGING SYSTEM & SMART AI BOT ---
+document.getElementById('send-btn')?.addEventListener('click', async () => {
+    if(!messageInput || !currentChatId) return;
     let message = messageInput.value.trim();
-    if(message === "" || !currentChatId) return;
+    if(message === "") return;
     messageInput.value = "";
     
-    // Add user message
+    // User no message
     await addDoc(collection(db, "chats", currentChatId, "messages"), { 
         sender: currentUser.uid, text: message, timestamp: serverTimestamp() 
     });
 
-    // AI Bot Reply Logic
+    // AI Bot Reply Logic (FIXED)
     if(currentChatPartner === "bot") {
-        typingIndicator.style.display = 'block';
+        if(typingIndicator) typingIndicator.style.display = 'block';
         const COHERE_API_KEY = "fG9m8ksuIRFb" + "YrQLmR1TJwEt" + "mbBhgmnReAOSt3It";
         try {
             const response = await fetch("https://api.cohere.ai/v2/chat", {
                 method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${COHERE_API_KEY}` },
                 body: JSON.stringify({
-                    model: "command-a-plus-05-2026", 
+                    model: "command-r-plus", // Model name fixed
                     messages: [
-                        { role: "system", content: "You are a friendly chatting partner. Reply in short and casual way." },
+                        { role: "system", content: "You are a friendly chatting partner named Priya. Reply naturally to whatever the user says. Do not repeat the same phrase." },
                         { role: "user", content: message }
                     ]
                 })
             });
             const data = await response.json();
-            let aiReply = data?.message?.content?.[0]?.text || data?.text || "Haha nice!";
             
+            let aiReply = "I'm thinking...";
+            // Proper API reading logic
+            if (data?.message?.content) {
+                if (typeof data.message.content === "string") aiReply = data.message.content; 
+                else if (Array.isArray(data.message.content)) {
+                    let textItem = data.message.content.find(item => item.type === "text");
+                    if (textItem && textItem.text) aiReply = textItem.text;
+                }
+            } else if (data?.text) {
+                aiReply = data.text;
+            }
+
             setTimeout(async () => {
-                typingIndicator.style.display = 'none';
+                if(typingIndicator) typingIndicator.style.display = 'none';
                 await addDoc(collection(db, "chats", currentChatId, "messages"), { sender: "bot", text: aiReply, timestamp: serverTimestamp() });
             }, 1000);
-        } catch(error) { typingIndicator.style.display = 'none'; }
+        } catch(error) { 
+            if(typingIndicator) typingIndicator.style.display = 'none'; 
+            await addDoc(collection(db, "chats", currentChatId, "messages"), { sender: "bot", text: "Oops! My brain (API) is disconnected right now.", timestamp: serverTimestamp() });
+        }
     }
 });
 
+// Load Chat
 function loadMessages() {
     if(unsubscribeMessages) unsubscribeMessages(); 
     const q = query(collection(db, "chats", currentChatId, "messages"), orderBy("timestamp", "asc"));
     
     unsubscribeMessages = onSnapshot(q, (snapshot) => {
+        if(!chatBox) return;
         chatBox.innerHTML = "";
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
@@ -172,6 +187,7 @@ function loadMessages() {
             const msgDiv = document.createElement('div');
             msgDiv.style.padding = "10px 15px"; msgDiv.style.maxWidth = "75%"; msgDiv.style.borderRadius = "20px"; msgDiv.style.marginBottom = "10px"; msgDiv.style.fontSize = "15px";
             msgDiv.style.boxShadow = "0 2px 5px rgba(0,0,0,0.05)";
+            msgDiv.style.wordBreak = "break-word";
             
             if(isMe) {
                 msgDiv.style.background = "#8b5cf6"; msgDiv.style.color = "white"; 
@@ -186,3 +202,11 @@ function loadMessages() {
         chatBox.scrollTop = chatBox.scrollHeight;
     });
 }
+
+// Enter Key thi Message Send Karva Mate (Extra Feature)
+document.getElementById('message-input')?.addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('send-btn').click();
+    }
+});
