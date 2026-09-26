@@ -53,6 +53,13 @@ document.querySelectorAll('.gender-btn').forEach(btn => {
 });
 
 document.getElementById('start-guest-chat-btn')?.addEventListener('click', async () => {
+    // 18+ ચેકબોક્સ ચેક કરો
+    const ageAgree = document.getElementById('age-agree');
+    if (ageAgree && !ageAgree.checked) {
+        alert("You must be 18+ to use this app!");
+        return;
+    }
+
     const btn = document.getElementById('start-guest-chat-btn');
     btn.innerHTML = "Connecting...";
     try {
@@ -60,7 +67,18 @@ document.getElementById('start-guest-chat-btn')?.addEventListener('click', async
         currentUser = result.user;
         
         let name = document.getElementById('guest-name-input').value.trim() || "Guest" + Math.floor(Math.random() * 9999);
-        await setDoc(doc(db, "users", currentUser.uid), { uid: currentUser.uid, name: name, gender: selectedGender, isOnline: true });
+        let age = document.getElementById('guest-age-input')?.value || "18";
+        let country = document.getElementById('guest-country-input')?.value.trim() || "India";
+
+        // નવો ડેટા (Age, Country) Firebase માં સેવ થશે
+        await setDoc(doc(db, "users", currentUser.uid), { 
+            uid: currentUser.uid, 
+            name: name, 
+            gender: selectedGender, 
+            age: age,
+            country: country,
+            isOnline: true 
+        });
         
         if(onboardModal) onboardModal.style.display = 'none';
         if(landingPage) landingPage.style.display = 'none';
