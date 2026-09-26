@@ -84,21 +84,78 @@
         </div>
     </div>
 
-    <!-- LOGIN PAGE -->
-    <div id="auth-page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5;">
-        <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; text-align: center;">
-            <h2 style="color: #0084ff; margin-bottom: 20px;"><i class="fa-solid fa-comments"></i> Batchit</h2>
-            <input type="email" id="email-input" placeholder="Email Address" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
-            <input type="password" id="password-input" placeholder="Password" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
-            <select id="gender-input" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; background: white;">
-                <option value="" disabled selected>Select Gender</option>
-                <option value="Male">Male 👦</option>
-                <option value="Female">Female 👧</option>
-            </select>
-            <button id="login-btn" style="width: 100%; padding: 10px; background: #0084ff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 10px; font-weight: bold;">Login</button>
-            <button id="register-btn" style="width: 100%; padding: 10px; background: #25D366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Create New Account</button>
+  <!-- NEW PREMIUM LANDING PAGE (Replaces Old Login) -->
+    <div id="landing-page" style="display: flex; flex-direction: column; min-height: 100vh; background-color: #f4f7fd; font-family: 'Inter', sans-serif;">
+        <nav style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <div style="font-size: 22px; font-weight: 700; color: #6366f1; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-masks-theater"></i> Batchit
+            </div>
+            <button style="background: none; border: none; font-size: 24px; color: #333; cursor: pointer;"><i class="fa-solid fa-bars"></i></button>
+        </nav>
+
+        <div style="padding: 40px 20px; text-align: left; max-width: 600px; margin: 0 auto; flex: 1;">
+            <h1 style="font-size: 40px; font-weight: 800; color: #111827; line-height: 1.2; margin-bottom: 10px;">Talk to Strangers Online - Free Anonymous Random Chat</h1>
+            <h2 style="font-size: 20px; color: #6366f1; font-weight: 600; margin-bottom: 20px;">Make real friends, free.</h2>
+            <p style="font-size: 16px; color: #4b5563; line-height: 1.6; margin-bottom: 30px;">
+                Free anonymous random chat with real people worldwide. Text, voice, and image sharing - no email sign-up needed.
+            </p>
+            <button id="open-onboard-btn" style="background: #8b5cf6; color: white; border: none; padding: 16px 32px; font-size: 18px; font-weight: 700; border-radius: 12px; cursor: pointer; width: 100%; max-width: 300px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
+                Start Chatting <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <p style="font-size: 12px; color: #9ca3af; margin-top: 15px;">No sign-up · No bots · 100% anonymous</p>
         </div>
     </div>
+
+    <!-- NEW ONBOARDING POPUP MODAL -->
+    <div id="onboard-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: flex-end; font-family: 'Inter', sans-serif;">
+        <div style="background: white; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 30px 20px; box-sizing: border-box; animation: slideUp 0.3s ease-out;">
+            <h2 style="margin-top: 0; margin-bottom: 20px; color: #111827; font-size: 24px;">Before you start</h2>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">Your display name</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="guest-name-input" placeholder="Enter your name" style="flex: 1; padding: 12px 15px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; background: #f9fafb; outline: none;">
+                    <button id="random-name-btn" style="background: #8b5cf6; color: white; border: none; padding: 0 15px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 14px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Random</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">Your gender</label>
+                <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;" id="gender-selection">
+                    <div class="gender-btn active" data-gender="Male" style="border: 2px solid #8b5cf6; color: #8b5cf6; background: #f5f3ff; padding: 10px 15px; border-radius: 10px; text-align: center; cursor: pointer; min-width: 60px; font-weight: 600; font-size: 12px;">
+                        <i class="fa-solid fa-mars" style="font-size: 20px; display: block; margin-bottom: 5px;"></i> Male
+                    </div>
+                    <div class="gender-btn" data-gender="Female" style="border: 1px solid #e5e7eb; color: #6b7280; padding: 10px 15px; border-radius: 10px; text-align: center; cursor: pointer; min-width: 60px; font-weight: 600; font-size: 12px;">
+                        <i class="fa-solid fa-venus" style="font-size: 20px; display: block; margin-bottom: 5px;"></i> Female
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">Your age</label>
+                    <input type="number" id="guest-age-input" placeholder="Select age" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: #f9fafb;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">Your country</label>
+                    <input type="text" id="guest-country-input" placeholder="India" value="India" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: #f9fafb;">
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; font-size: 12px; color: #6b7280;">
+                <input type="checkbox" id="age-agree" style="margin-top: 3px; accent-color: #8b5cf6;" checked>
+                <label for="age-agree">I'm at least <strong style="color: #8b5cf6;">18 years old</strong> and agree to the Terms of Service and Privacy Policy</label>
+            </div>
+
+            <button id="start-guest-chat-btn" style="background: #c4b5fd; color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s;">Continue</button>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        /* Add Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    </style>
 
     <!-- MAIN APP -->
     <div id="main-app" style="display: none;">
