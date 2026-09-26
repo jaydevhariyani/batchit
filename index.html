@@ -3,236 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Batchit - A free private and global online chatting app.">
-    <meta name="keywords" content="global chat, private chat, online chatting, AI chat">
-    <meta name="author" content="Batchit Chat">
-    <meta name="robots" content="index, follow">
-    <title>Batchit - Private & Global Chatting App</title>
+    <title>Batchit - Random Stranger Chat</title>
     
-    <!-- PWA & App Icons -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0084ff">
+    <meta name="theme-color" content="#8b5cf6">
     <link rel="apple-touch-icon" href="icon.png">
-
+    
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
     
     <style>
-        .online-dot { width: 10px; height: 10px; background-color: #25D366; border-radius: 50%; border: 2px solid white; position: absolute; bottom: 0; right: 0; }
-        .offline-dot { background-color: #ccc; }
-        .ad-container { background: #f8f9fa; border: 1px dashed #ccc; text-align: center; color: #888; display: flex; align-items: center; justify-content: center;}
-        .top-ad { width: 100%; height: 60px; margin-bottom: 10px; }
-        .sidebar-ad { width: 100%; height: 250px; margin-top: 15px; }
-        .tab-btn { padding: 10px; border: none; cursor: pointer; flex: 1; font-weight: bold; }
-        .tab-active { background: #0084ff; color: white; }
-        .tab-inactive { background: #e9ecef; color: #333; }
-
-        /* DARK MODE CSS */
-        body.dark-mode { background: #18191a; color: #e4e6eb; }
-        body.dark-mode #auth-page { background: #18191a; }
-        body.dark-mode #auth-page > div { background: #242526; color: #e4e6eb; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        body.dark-mode .top-header, 
-        body.dark-mode #chat-header-container, 
-        body.dark-mode #input-area, 
-        body.dark-mode .sidebar { background: #242526 !important; border-color: #3e4042 !important; }
-        body.dark-mode .chat-area { background: #18191a !important; }
-        body.dark-mode .message-other { background: #3a3b3c !important; color: #e4e6eb !important; border-color: #3e4042 !important; }
-        body.dark-mode input, body.dark-mode select { background: #3a3b3c !important; color: white !important; border-color: #555 !important; }
-        body.dark-mode .sidebar-tabs { border-color: #3e4042 !important; }
-        body.dark-mode .tab-inactive { background: #3a3b3c !important; color: #e4e6eb !important; }
-        body.dark-mode #chat-header-title { color: #e4e6eb !important; }
-        body.dark-mode .ad-container { background: #3a3b3c; border-color: #555; color: #aaa; }
-        body.dark-mode #all-users-list > div { border-color: #3e4042 !important; }
-        body.dark-mode strong { color: #e4e6eb !important; }
-        body.dark-mode .modal-content { background: #242526 !important; color: #e4e6eb !important; border: 1px solid #3e4042; }
-        body.dark-mode #upload-profile-img-btn { background: #3a3b3c !important; color: white !important; border-color: #555 !important; }
-        body.dark-mode #close-profile, body.dark-mode #mic-btn { color: white !important; }
-        body.dark-mode #back-btn-mobile { color: #e4e6eb; }
-
-        /* PROFESSIONAL MOBILE UI CSS */
-        @media (max-width: 768px) {
-            .main-container { position: relative; overflow: hidden; }
-            .sidebar { width: 100% !important; border: none !important; height: calc(100vh - 60px) !important; }
-            /* Chat area ne default hide rakhiye chiye */
-            .chat-area { display: none; position: absolute; top: 0; left: 0; width: 100% !important; height: calc(100vh - 60px) !important; z-index: 100; background: #e9ecef; }
-            
-            /* Jyare chat active hoy tyare aavu thase */
-            .chat-active-mobile .sidebar { display: none !important; }
-            .chat-active-mobile .chat-area { display: flex !important; flex-direction: column !important; }
-            
-            #back-btn-mobile { display: inline-block !important; }
-            .ad-container { display: none; }
-        }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: #f4f7fd; overflow-x: hidden; }
         
-        #back-btn-mobile { display: none; background: none; border: none; font-size: 20px; margin-right: 15px; cursor: pointer; color: #333; }
+        /* RADAR ANIMATION CSS */
+        .radar-container { position: relative; width: 250px; height: 250px; margin: 60px auto; display: flex; align-items: center; justify-content: center; }
+        .radar-core { width: 80px; height: 80px; background: #8b5cf6; border-radius: 50%; z-index: 10; display: flex; align-items: center; justify-content: center; color: white; font-size: 35px; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+        .radar-ripple { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px solid #8b5cf6; animation: ripple 2s infinite ease-out; }
+        .radar-ripple:nth-child(2) { animation-delay: 0.5s; }
+        .radar-ripple:nth-child(3) { animation-delay: 1s; }
+        @keyframes ripple { 0% { transform: scale(0.3); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+
+        /* CHAT UI CSS */
+        .chat-header { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .skip-btn { background: #ff4757; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3); }
+        
+        #chat-box::-webkit-scrollbar { width: 5px; }
+        #chat-box::-webkit-scrollbar-thumb { background: #ccc; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-    <!-- PROFILE MODAL -->
-    <div id="profile-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="modal-content" style="background: white; padding: 20px; border-radius: 10px; width: 300px; text-align: center; position: relative;">
-            <button id="close-profile" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; cursor: pointer; color: #333;">&times;</button>
-            <h3 style="margin-top: 0;">My Profile</h3>
-            <img id="profile-preview" src="" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; background: #eee; border: 2px solid #0084ff;">
-            <br>
-            <input type="file" id="profile-image-input" accept="image/*" style="display: none;">
-            <button id="upload-profile-img-btn" style="background: #e9ecef; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-bottom: 15px;"><i class="fa-solid fa-camera"></i> Change Photo</button>
-            <br>
-            <input type="text" id="bio-input" placeholder="Write a short bio (e.g. Available, Busy)..." style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
-            <button id="save-profile-btn" style="background: #0084ff; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold;">Save Profile</button>
-        </div>
-    </div>
-
-  <!-- NEW PREMIUM LANDING PAGE (Replaces Old Login) -->
-    <div id="landing-page" style="display: flex; flex-direction: column; min-height: 100vh; background-color: #f4f7fd; font-family: 'Inter', sans-serif;">
-        <nav style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <!-- 1. LANDING PAGE -->
+    <div id="landing-page" style="display: flex; flex-direction: column; min-height: 100vh;">
+        <nav style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: white;">
             <div style="font-size: 22px; font-weight: 700; color: #6366f1; display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-masks-theater"></i> Batchit
             </div>
-            <button style="background: none; border: none; font-size: 24px; color: #333; cursor: pointer;"><i class="fa-solid fa-bars"></i></button>
+            <button id="install-app-btn" style="display: none; background: #f3f4f6; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;"><i class="fa-solid fa-download"></i> Install App</button>
         </nav>
 
-        <div style="padding: 40px 20px; text-align: left; max-width: 600px; margin: 0 auto; flex: 1;">
-            <h1 style="font-size: 40px; font-weight: 800; color: #111827; line-height: 1.2; margin-bottom: 10px;">Talk to Strangers Online - Free Anonymous Random Chat</h1>
-            <h2 style="font-size: 20px; color: #6366f1; font-weight: 600; margin-bottom: 20px;">Make real friends, free.</h2>
-            <p style="font-size: 16px; color: #4b5563; line-height: 1.6; margin-bottom: 30px;">
-                Free anonymous random chat with real people worldwide. Text, voice, and image sharing - no email sign-up needed.
-            </p>
-            <button id="open-onboard-btn" style="background: #8b5cf6; color: white; border: none; padding: 16px 32px; font-size: 18px; font-weight: 700; border-radius: 12px; cursor: pointer; width: 100%; max-width: 300px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
-                Start Chatting <i class="fa-solid fa-arrow-right"></i>
+        <div style="padding: 40px 20px; text-align: center; max-width: 600px; margin: auto;">
+            <h1 style="font-size: 42px; font-weight: 800; color: #111827; margin-bottom: 15px;">Talk to Strangers Online</h1>
+            <p style="font-size: 18px; color: #4b5563; margin-bottom: 40px;">Free anonymous random chat. Text, voice & images - no sign-up needed.</p>
+            <button id="open-onboard-btn" style="background: #8b5cf6; color: white; border: none; padding: 18px 40px; font-size: 20px; font-weight: 700; border-radius: 15px; cursor: pointer; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4); width: 100%; max-width: 350px;">
+                Start Chatting <i class="fa-solid fa-arrow-right" style="margin-left: 10px;"></i>
             </button>
-            <p style="font-size: 12px; color: #9ca3af; margin-top: 15px;">No sign-up · No bots · 100% anonymous</p>
         </div>
     </div>
 
-    <!-- NEW ONBOARDING POPUP MODAL -->
-    <div id="onboard-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: flex-end; font-family: 'Inter', sans-serif;">
-        <div style="background: white; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 30px 20px; box-sizing: border-box; animation: slideUp 0.3s ease-out;">
-            <h2 style="margin-top: 0; margin-bottom: 20px; color: #111827; font-size: 24px;">Before you start</h2>
+    <!-- 2. ONBOARDING MODAL -->
+    <div id="onboard-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: flex-end;">
+        <div style="background: white; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 30px 20px; box-sizing: border-box;">
+            <h2 style="margin-top: 0; margin-bottom: 20px; color: #111827;">Before you start</h2>
             
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">Your display name</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="guest-name-input" placeholder="Enter your name" style="flex: 1; padding: 12px 15px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; background: #f9fafb; outline: none;">
-                    <button id="random-name-btn" style="background: #8b5cf6; color: white; border: none; padding: 0 15px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 14px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Random</button>
-                </div>
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Your display name</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="guest-name-input" placeholder="Enter your name" style="flex: 1; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px;">
+                <button id="random-name-btn" style="background: #8b5cf6; color: white; border: none; padding: 0 15px; border-radius: 10px; font-weight: bold; cursor: pointer;">Random</button>
             </div>
 
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">Your gender</label>
-                <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;" id="gender-selection">
-                    <div class="gender-btn active" data-gender="Male" style="border: 2px solid #8b5cf6; color: #8b5cf6; background: #f5f3ff; padding: 10px 15px; border-radius: 10px; text-align: center; cursor: pointer; min-width: 60px; font-weight: 600; font-size: 12px;">
-                        <i class="fa-solid fa-mars" style="font-size: 20px; display: block; margin-bottom: 5px;"></i> Male
-                    </div>
-                    <div class="gender-btn" data-gender="Female" style="border: 1px solid #e5e7eb; color: #6b7280; padding: 10px 15px; border-radius: 10px; text-align: center; cursor: pointer; min-width: 60px; font-weight: 600; font-size: 12px;">
-                        <i class="fa-solid fa-venus" style="font-size: 20px; display: block; margin-bottom: 5px;"></i> Female
-                    </div>
-                </div>
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Your gender</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <div class="gender-btn active" data-gender="Male" style="flex: 1; border: 2px solid #8b5cf6; color: #8b5cf6; background: #f5f3ff; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-mars"></i> Male</div>
+                <div class="gender-btn" data-gender="Female" style="flex: 1; border: 1px solid #e5e7eb; color: #6b7280; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-venus"></i> Female</div>
             </div>
 
-            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                <div style="flex: 1;">
-                    <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">Your age</label>
-                    <input type="number" id="guest-age-input" placeholder="Select age" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: #f9fafb;">
-                </div>
-                <div style="flex: 1;">
-                    <label style="display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">Your country</label>
-                    <input type="text" id="guest-country-input" placeholder="India" value="India" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: #f9fafb;">
-                </div>
-            </div>
-
-            <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; font-size: 12px; color: #6b7280;">
-                <input type="checkbox" id="age-agree" style="margin-top: 3px; accent-color: #8b5cf6;" checked>
-                <label for="age-agree">I'm at least <strong style="color: #8b5cf6;">18 years old</strong> and agree to the Terms of Service and Privacy Policy</label>
-            </div>
-
-            <button id="start-guest-chat-btn" style="background: #c4b5fd; color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s;">Continue</button>
+            <button id="start-guest-chat-btn" style="background: #c4b5fd; color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer;">Continue</button>
         </div>
     </div>
-    
-    <style>
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        /* Add Google Font */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-    </style>
 
-    <!-- MAIN APP -->
-    <div id="main-app" style="display: none;">
-        <header class="top-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border-bottom: 1px solid #ddd;">
-            <div class="logo" style="font-weight: bold; font-size: 20px; color: #0084ff;"><i class="fa-solid fa-comments"></i> Batchit</div>
-            
-            <div style="display: flex; align-items: center;">
-                <button id="install-app-btn" style="display: none; background: #ff9800; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 15px; font-size: 13px;"><i class="fa-solid fa-download"></i> Install App</button>
-                <button id="theme-toggle" style="background: none; border: none; font-size: 20px; cursor: pointer; margin-right: 15px; color: #0084ff;" title="Toggle Dark Mode"><i class="fa-solid fa-moon"></i></button>
-                <button id="open-profile-btn" style="background: none; border: none; font-size: 20px; cursor: pointer; margin-right: 15px; color: #0084ff;" title="My Profile"><i class="fa-solid fa-circle-user"></i></button>
-                <button id="logout-btn" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    <!-- 3. RADAR SCREEN (Looking for match) -->
+    <div id="radar-screen" style="display: none; height: 100vh; flex-direction: column; align-items: center; justify-content: center; background: white;">
+        <h2 style="color: #111827; font-size: 26px;">Looking for a match...</h2>
+        <p style="color: #6b7280; margin-bottom: 30px;">Please wait while we connect you to a stranger.</p>
+        
+        <div class="radar-container">
+            <div class="radar-ripple"></div>
+            <div class="radar-ripple"></div>
+            <div class="radar-ripple"></div>
+            <div class="radar-core"><i class="fa-solid fa-user"></i></div>
+        </div>
+        
+        <button id="cancel-search-btn" style="margin-top: 50px; background: #f3f4f6; color: #4b5563; border: none; padding: 12px 30px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 16px;">Cancel</button>
+    </div>
+
+    <!-- 4. MAIN CHAT SCREEN -->
+    <div id="main-chat-screen" style="display: none; height: 100vh; flex-direction: column; background: #f4f7fd;">
+        <header class="chat-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 45px; height: 45px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;"><i class="fa-solid fa-user-secret"></i></div>
+                <div style="display: flex; flex-direction: column;">
+                    <strong id="chat-partner-name" style="font-size: 18px; color: #111827;">Stranger</strong>
+                    <span id="typing-indicator" style="font-size: 12px; color: #25D366; display: none; font-weight: bold;">typing...</span>
+                </div>
             </div>
+            <button class="skip-btn" id="skip-btn">Skip <i class="fa-solid fa-forward-step"></i></button>
         </header>
 
-        <div class="main-container" style="display: flex; height: calc(100vh - 60px);">
-            <aside class="sidebar" style="width: 300px; border-right: 1px solid #ddd; display: flex; flex-direction: column;">
-                <div class="sidebar-tabs" style="display: flex; border-bottom: 1px solid #ddd;">
-                    <button class="tab-btn tab-active" id="tab-private">Private</button>
-                    <button class="tab-btn tab-inactive" id="tab-global" style="background: #25D366; color: white;">Global Room</button>
-                </div>
-                <div class="users-list" style="overflow-y: auto; flex: 1;">
-                    <div id="all-users-list"></div>
-                </div>
-                <div class="ad-container sidebar-ad">
-                    <small>AdSense Space (300x250)</small>
-                </div>
-            </aside>
+        <div id="chat-box" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column;"></div>
 
-            <main class="chat-area" style="flex: 1; display: flex; flex-direction: column; background: #e9ecef;">
-                <div class="ad-container top-ad">
-                    <small>AdSense Leaderboard Banner (728x90)</small>
-                </div>
-
-                <div class="welcome-banner" id="chat-header-container" style="background: white; padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; align-items: center;">
-                        <!-- BACK BUTTON ADDED HERE -->
-                        <button id="back-btn-mobile"><i class="fa-solid fa-arrow-left"></i></button>
-                        <div style="display: flex; flex-direction: column;">
-                            <h2 id="chat-header-title" style="margin: 0; font-size: 18px; color: #333;">Select a user to chat</h2>
-                            <span id="typing-indicator" style="font-size: 12px; color: #25D366; display: none; font-weight: bold; margin-top: 3px;">typing...</span>
-                        </div>
-                    </div>
-                    <button id="block-user-btn" style="display: none; background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-ban"></i> Block User</button>
-                </div>
-
-                <div class="chat-box" id="chat-box" style="flex: 1; overflow-y: auto; padding: 20px;"></div>
-
-                <div class="message-input-area" id="input-area" style="display: none; padding: 15px; background: white; border-top: 1px solid #ddd; align-items: center;">
-                    <input type="file" id="image-input" accept="image/*" style="display: none;">
-                    
-                    <button id="img-btn" type="button" style="background: none; border: none; font-size: 24px; cursor: pointer; margin-right: 10px;">📎</button>
-                    <button id="mic-btn" type="button" style="background: none; border: none; font-size: 22px; cursor: pointer; margin-right: 10px; color: #555;"><i class="fa-solid fa-microphone"></i></button>
-                    
-                    <input type="text" id="message-input" placeholder="Type a message..." style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 20px; margin-right: 10px;">
-                    <button id="send-btn" style="background: #0084ff; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
-                </div>
-            </main>
+        <div style="padding: 15px; background: white; border-top: 1px solid #e5e7eb; display: flex; align-items: center; gap: 10px;">
+            <button id="mic-btn" style="background: none; border: none; font-size: 22px; color: #6b7280; cursor: pointer;"><i class="fa-solid fa-microphone"></i></button>
+            <input type="text" id="message-input" placeholder="Type a message..." style="flex: 1; padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 25px; outline: none; background: #f9fafb; font-size: 15px;">
+            <button id="send-btn" style="background: #8b5cf6; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 18px; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 
-    <!-- FOOTER FOR LEGAL PAGES -->
-    <footer style="text-align: center; padding: 15px; background: #f8f9fa; border-top: 1px solid #ddd; font-size: 12px; margin-top: auto;">
-        <a href="about.html" style="color: #555; text-decoration: none; margin: 0 10px;">About Us</a> | 
-        <a href="privacy.html" style="color: #555; text-decoration: none; margin: 0 10px;">Privacy Policy</a> | 
-        <a href="contact.html" style="color: #555; text-decoration: none; margin: 0 10px;">Contact Us</a>
-        <br><br>
-        &copy; 2026 Batchit. All rights reserved.
-    </footer>
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(() => console.log("Service Worker Registered!"));
-        }
-        let script = document.createElement('script');
-        script.type = 'module';
-        script.src = 'script.js?v=' + new Date().getTime();
-        document.body.appendChild(script);
-    </script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
