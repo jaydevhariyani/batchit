@@ -283,30 +283,127 @@ document.getElementById('menu-btn')?.addEventListener('click', () => {
     alert("Report & Block features coming soon!");
 });
 
-// --- VIDEO CALL CAMERA TEST ---
+// --- FULL WEBRTC VIDEO CALL LOGIC ---
 const videoCallBtn = document.getElementById('video-call-btn');
 const videoCallScreen = document.getElementById('video-call-screen');
 const localVideo = document.getElementById('local-video');
+const remoteVideo = document.getElementById('remote-video');
 const endCallBtn = document.getElementById('end-call-btn');
-let localStream = null;
 
+let localStream = null;
+let peerConnection = null;
+
+// ફ્રી વિડીયો કૉલિંગ માટે Google ના ફ્રી STUN સર્વર્સ
+const servers = {
+    iceServers: [
+        { urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }
+    ]
+};
+
+// ૧. કૉલ કરવાનું બટન દબાવે ત્યારે (Caller)
 if (videoCallBtn) {
     videoCallBtn.addEventListener('click', async () => {
-        try {
+        if (!currentChatId || currentChatPartner === "bot") {
+            alert("You can only video call a real person!");
+            return;
+        }
+        
+        videoCallScreen.style.display = 'flex';
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        if (localVideo) localVideo.srcObject = localStream;
+
+        peerConnection = new RTCPeerConnection(servers);
+        const remoteStream = new MediaStream();
+        if (remoteVideo) remoteVideo.srcObject = remoteStream;
+
+        // પોતાનો વિડીયો સામેવાળાને મોકલો
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+        peerConnection.ontrack = event => event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
+
+        const callDoc = doc(db, "chats", currentChatId);
+        const offerCandidates = collection(callDoc, "offerCandidates");
+        const answerCandidates = collection(callDoc, "answerCandidates");
+
+        peerConnection.onicecandidate = event => {
+            if (event.candidate) addDoc(offerCandidates, event.candidate.toJSON());
+        };
+
+        // કૉલની ઓફર બનાવો
+        const offerDescription = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offerDescription);
+        await setDoc(callDoc, { offer: { sdp: offerDescription.sdp, type: offerDescription.type } }, { merge: true });
+
+        // સામેવાળો કૉલ ઉપાડે તેની રાહ જુઓ
+        onSnapshot(callDoc, (snapshot) => {
+            const data = snapshot.data();
+            if (!peerConnection.currentRemoteDescription && data?.answer) {
+                const answerDescription = new RTCSessionDescription(data.answer);
+                peerConnection.setRemoteDescription(answerDescription);
+            }
+        });
+
+        onSnapshot(answerCandidates, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === 'added') peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+            });
+        });
+    });
+}
+
+// ૨. સામા વાળાનો કૉલ આવે ત્યારે ઓટોમેટિક ઉપાડવા માટે (Receiver)
+function listenForIncomingCall() {
+    if (!currentChatId) return;
+    onSnapshot(doc(db, "chats", currentChatId), async (snapshot) => {
+        const data = snapshot.data();
+        if (data?.offer && !peerConnection) {
+            videoCallScreen.style.display = 'flex';
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             if (localVideo) localVideo.srcObject = localStream;
-            if (videoCallScreen) videoCallScreen.style.display = 'flex';
-        } catch (error) {
-            alert("Camera access denied! Please allow camera permissions to make a video call.");
-            console.error("Camera error: ", error);
+
+            peerConnection = new RTCPeerConnection(servers);
+            const remoteStream = new MediaStream();
+            if (remoteVideo) remoteVideo.srcObject = remoteStream;
+
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            peerConnection.ontrack = event => event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
+
+            const callDoc = doc(db, "chats", currentChatId);
+            const answerCandidates = collection(callDoc, "answerCandidates");
+            const offerCandidates = collection(callDoc, "offerCandidates");
+
+            peerConnection.onicecandidate = event => {
+                if (event.candidate) addDoc(answerCandidates, event.candidate.toJSON());
+            };
+
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+            const answerDescription = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answerDescription);
+            await setDoc(callDoc, { answer: { sdp: answerDescription.sdp, type: answerDescription.type } }, { merge: true });
+
+            onSnapshot(offerCandidates, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+                });
+            });
         }
     });
 }
 
+// જ્યારે ચેટ ચાલુ થાય ત્યારે કૉલનું ધ્યાન રાખવા માટે આ ફંક્શન ચાલુ કરો
+const originalLoadMessages = loadMessages;
+loadMessages = function() {
+    originalLoadMessages();
+    listenForIncomingCall();
+};
+
+// ૩. કૉલ કાપવાનું બટન
 if (endCallBtn) {
     endCallBtn.addEventListener('click', () => {
         if (localStream) localStream.getTracks().forEach(track => track.stop());
+        if (peerConnection) peerConnection.close();
+        peerConnection = null;
         if (localVideo) localVideo.srcObject = null;
-        if (videoCallScreen) videoCallScreen.style.display = 'none';
+        if (remoteVideo) remoteVideo.srcObject = null;
+        videoCallScreen.style.display = 'none';
     });
 }
