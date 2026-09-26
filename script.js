@@ -635,36 +635,51 @@ window.addEventListener('appinstalled', () => {
     if(installAppBtn) installAppBtn.style.display = 'none';
     deferredPrompt = null;
 });
-// --- MOBILE PROFESSIONAL BACK BUTTON LOGIC (FIXED) ---
+// --- 100% WORKING MOBILE SCREEN LOGIC ---
 const backBtnMobile = document.getElementById('back-btn-mobile');
-const mainContainerDiv = document.querySelector('.main-container');
+const mySidebar = document.querySelector('.sidebar');
+const myChatArea = document.querySelector('.chat-area');
 
-// ૧. એપ ચાલુ થાય ત્યારે હંમેશા User List જ દેખાય
-if(mainContainerDiv) {
-    mainContainerDiv.classList.remove('chat-active-mobile');
+// ૧. મોબાઈલમાં એપ ખૂલે ત્યારે હંમેશા User List જ દેખાવું જોઈએ
+if(window.innerWidth <= 768) {
+    myChatArea.style.setProperty('display', 'none', 'important');
+    mySidebar.style.setProperty('display', 'flex', 'important');
 }
 
-// ૨. Back (⬅) બટન દબાવવાથી પાછું User List આવી જાય
+// ૨. Back (⬅) બટન દબાવવાથી પાછું User List આવી જશે
 if(backBtnMobile) {
     backBtnMobile.addEventListener('click', (e) => {
         e.preventDefault();
-        mainContainerDiv.classList.remove('chat-active-mobile');
+        if(window.innerWidth <= 768) {
+            myChatArea.style.setProperty('display', 'none', 'important');
+            mySidebar.style.setProperty('display', 'flex', 'important');
+        }
     });
 }
 
-// ૩. Private User પર ક્લિક થાય ત્યારે જ ચેટ ખૂલે
+// ૩. કોઈ પણ યુઝર પર ક્લિક થાય ત્યારે જ ચેટ ખૂલશે
 document.getElementById('all-users-list').addEventListener('click', () => {
-    setTimeout(() => {
-        mainContainerDiv.classList.add('chat-active-mobile');
-    }, 100);
+    if(window.innerWidth <= 768) {
+        mySidebar.style.setProperty('display', 'none', 'important');
+        myChatArea.style.setProperty('display', 'flex', 'important');
+    }
 });
 
-// ૪. Global Room પર ક્લિક થાય ત્યારે ચેટ ખૂલે
+// ૪. Global Room પર ક્લિક થાય ત્યારે ચેટ ખૂલશે
 document.getElementById('tab-global').addEventListener('click', () => {
-    mainContainerDiv.classList.add('chat-active-mobile');
+    if(window.innerWidth <= 768) {
+        mySidebar.style.setProperty('display', 'none', 'important');
+        myChatArea.style.setProperty('display', 'flex', 'important');
+    }
 });
 
-// Global chat par click thase tyare pan chat full screen thase
-document.getElementById('tab-global').addEventListener('click', () => {
-    mainContainerDiv.classList.add('chat-active-mobile');
+// ૫. સ્ક્રીન નાની-મોટી થાય (Rotate) ત્યારે ઓટોમેટિક સેટ કરવા માટે
+window.addEventListener('resize', () => {
+    if(window.innerWidth > 768) {
+        mySidebar.style.setProperty('display', 'flex', 'important');
+        myChatArea.style.setProperty('display', 'flex', 'important');
+    } else {
+        myChatArea.style.setProperty('display', 'none', 'important');
+        mySidebar.style.setProperty('display', 'flex', 'important');
+    }
 });
