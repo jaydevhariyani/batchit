@@ -292,8 +292,8 @@ const endCallBtn = document.getElementById('end-call-btn');
 
 let localStream = null;
 let peerConnection = null;
+let unsubscribeCall = null; // નવો ફેરફાર: જૂના કૉલ સાંભળવાનું બંધ કરવા
 
-// ફ્રી વિડીયો કૉલિંગ માટે Google ના ફ્રી STUN સર્વર્સ
 const servers = {
     iceServers: [
         { urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }
@@ -316,7 +316,6 @@ if (videoCallBtn) {
         const remoteStream = new MediaStream();
         if (remoteVideo) remoteVideo.srcObject = remoteStream;
 
-        // પોતાનો વિડીયો સામેવાળાને મોકલો
         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
         peerConnection.ontrack = event => event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
 
@@ -328,12 +327,10 @@ if (videoCallBtn) {
             if (event.candidate) addDoc(offerCandidates, event.candidate.toJSON());
         };
 
-        // કૉલની ઓફર બનાવો
         const offerDescription = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offerDescription);
         await setDoc(callDoc, { offer: { sdp: offerDescription.sdp, type: offerDescription.type } }, { merge: true });
 
-        // સામેવાળો કૉલ ઉપાડે તેની રાહ જુઓ
         onSnapshot(callDoc, (snapshot) => {
             const data = snapshot.data();
             if (!peerConnection.currentRemoteDescription && data?.answer) {
@@ -353,8 +350,11 @@ if (videoCallBtn) {
 // ૨. સામા વાળાનો કૉલ આવે ત્યારે ઓટોમેટિક ઉપાડવા માટે (Receiver)
 function listenForIncomingCall() {
     if (!currentChatId) return;
-    onSnapshot(doc(db, "chats", currentChatId), async (snapshot) => {
+    if (unsubscribeCall) unsubscribeCall(); // જૂનું લિસનર બંધ કરો
+
+    unsubscribeCall = onSnapshot(doc(db, "chats", currentChatId), async (snapshot) => {
         const data = snapshot.data();
+        // નવો ફેરફાર: જો offer હોય અને આપણે કનેક્ટ ના થયા હોઈએ તો જ કૉલ ઉપાડો
         if (data?.offer && !peerConnection) {
             videoCallScreen.style.display = 'flex';
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -389,21 +389,26 @@ function listenForIncomingCall() {
     });
 }
 
-// જ્યારે ચેટ ચાલુ થાય ત્યારે કૉલનું ધ્યાન રાખવા માટે આ ફંક્શન ચાલુ કરો
+// જ્યારે ચેટ ચાલુ થાય ત્યારે કૉલનું ધ્યાન રાખવા માટે
 const originalLoadMessages = loadMessages;
 loadMessages = function() {
     originalLoadMessages();
     listenForIncomingCall();
 };
 
-// ૩. કૉલ કાપવાનું બટન
+// ૩. કૉલ કાપવાનું બટન (અને ડેટાબેઝ ક્લીન કરવાનું લોજીક)
 if (endCallBtn) {
-    endCallBtn.addEventListener('click', () => {
+    endCallBtn.addEventListener('click', async () => {
         if (localStream) localStream.getTracks().forEach(track => track.stop());
         if (peerConnection) peerConnection.close();
         peerConnection = null;
         if (localVideo) localVideo.srcObject = null;
         if (remoteVideo) remoteVideo.srcObject = null;
         videoCallScreen.style.display = 'none';
+
+        // નવો ફેરફાર: કૉલ કપાય એટલે ડેટાબેઝમાંથી જૂનો કૉલ ડેટા કાઢી નાખો
+        if (currentChatId) {
+            await setDoc(doc(db, "chats", currentChatId), { offer: null, answer: null }, { merge: true });
+        }
     });
 }
