@@ -124,6 +124,54 @@
             <input type="text" id="message-input" placeholder="Type a message..." style="flex: 1; padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 25px; outline: none; background: #f9fafb; font-size: 15px;">
             <button id="send-btn" style="background: #8b5cf6; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 18px; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
+   <!-- PREMIUM / VIP UPGRADE MODAL -->
+    <div id="premium-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div style="background: white; width: 90%; max-width: 500px; border-radius: 20px; padding: 30px; position: relative; box-sizing: border-box; animation: slideUp 0.3s ease-out;">
+            <button id="close-premium-btn" style="position: absolute; top: 15px; right: 15px; background: #f3f4f6; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; color: #4b5563; font-weight: bold;">✕</button>
+            
+            <div style="text-align: center; margin-bottom: 25px;">
+                <h2 style="margin: 0; font-size: 24px; color: #111827;">Choose Your Plan</h2>
+                <p style="margin: 5px 0 0 0; color: #6b7280; font-size: 14px;">Compare what each plan includes</p>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <!-- PREMIUM PLAN -->
+                <div style="flex: 1; border: 1px solid #e5e7eb; border-radius: 15px; padding: 20px; background: white;">
+                    <h3 style="margin: 0 0 5px 0; color: #8b5cf6; font-size: 18px;">Premium</h3>
+                    <div style="font-size: 24px; font-weight: 800; color: #111827; margin-bottom: 15px;">$4.99<span style="font-size: 12px; font-weight: normal; color: #6b7280;">/mo</span></div>
+                    
+                    <ul style="list-style: none; padding: 0; margin: 0 0 20px 0; font-size: 12px; color: #4b5563; line-height: 2;">
+                        <li><i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> Gender & Age Filter</li>
+                        <li><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> Country Filter</li>
+                        <li><i class="fa-solid fa-circle-minus" style="color: #f59e0b;"></i> 300 min Audio Calls</li>
+                        <li><i class="fa-solid fa-circle-minus" style="color: #f59e0b;"></i> 300 min Video Calls</li>
+                        <li><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> Change Chat Theme</li>
+                    </ul>
+                    <button class="upgrade-pay-btn" style="width: 100%; padding: 12px; background: white; color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 10px; font-weight: bold; cursor: pointer;">Select Premium</button>
+                </div>
+
+                <!-- VIP PLAN (Best Value) -->
+                <div style="flex: 1; border: none; border-radius: 15px; padding: 20px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; position: relative; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4); transform: scale(1.05);">
+                    <div style="position: absolute; top: -10px; right: 10px; background: #fbbf24; color: #78350f; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">BEST VALUE</div>
+                    <h3 style="margin: 0 0 5px 0; color: white; font-size: 18px;">VIP <i class="fa-solid fa-crown" style="color: #fbbf24;"></i></h3>
+                    <div style="font-size: 24px; font-weight: 800; color: white; margin-bottom: 15px;">$9.99<span style="font-size: 12px; font-weight: normal; color: #e5e7eb;">/mo</span></div>
+                    
+                    <ul style="list-style: none; padding: 0; margin: 0 0 20px 0; font-size: 12px; color: #f3f4f6; line-height: 2;">
+                        <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Gender & Age Filter</li>
+                        <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Country Filter</li>
+                        <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Unlimited Audio Calls</li>
+                        <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Unlimited Video Calls</li>
+                        <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Change Chat Theme</li>
+                    </ul>
+                    <button class="upgrade-pay-btn" style="width: 100%; padding: 12px; background: white; color: #6366f1; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">Get VIP</button>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button id="not-right-now-btn" style="background: none; border: none; color: #9ca3af; font-size: 14px; cursor: pointer;">Not right now</button>
+            </div>
+        </div>
+    </div>
     </div>
 
     <script type="module" src="script.js"></script>
