@@ -178,5 +178,20 @@
     </div>
 
     <script type="module" src="script.js"></script>
+<!-- VIDEO CALL UI SCREEN -->
+    <div id="video-call-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111827; z-index: 4000; flex-direction: column;">
+        <div style="padding: 20px; color: white; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); position: absolute; width: 100%; box-sizing: border-box; z-index: 10;">
+            <h3 style="margin: 0; font-size: 18px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Call with Stranger</h3>
+            <button id="end-call-btn" style="background: #ef4444; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);"><i class="fa-solid fa-phone-slash"></i></button>
+        </div>
+        
+        <div style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; background: #000;">
+            <!-- Stranger no video (Moto) -->
+            <video id="remote-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+            
+            <!-- Tamaro potano video (Nano, niche jamni baju) -->
+            <video id="local-video" autoplay playsinline muted style="width: 110px; height: 160px; object-fit: cover; position: absolute; bottom: 30px; right: 20px; border-radius: 15px; border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.5); background: #333;"></video>
+        </div>
+    </div>
 </body>
 </html>
