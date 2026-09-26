@@ -225,3 +225,29 @@ document.getElementById('message-input')?.addEventListener('keypress', (e) => {
         document.getElementById('send-btn').click();
     }
 });
+// --- PREMIUM MODAL LOGIC ---
+const premiumModal = document.getElementById('premium-modal');
+const openPremiumBtn = document.getElementById('open-premium-btn');
+const closePremiumBtn = document.getElementById('close-premium-btn');
+const notRightNowBtn = document.getElementById('not-right-now-btn');
+const upgradePayBtns = document.querySelectorAll('.upgrade-pay-btn');
+
+if (openPremiumBtn) {
+    openPremiumBtn.addEventListener('click', () => {
+        premiumModal.style.display = 'flex';
+    });
+}
+
+if (closePremiumBtn && notRightNowBtn) {
+    const closePremium = () => premiumModal.style.display = 'none';
+    closePremiumBtn.addEventListener('click', closePremium);
+    notRightNowBtn.addEventListener('click', closePremium);
+}
+
+// ભવિષ્યમાં અહીં પેમેન્ટ ગેટવે (Razorpay/Stripe) લાગશે
+upgradePayBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        alert("Payment Gateway integration coming soon! (Razorpay / Stripe)");
+        premiumModal.style.display = 'none';
+    });
+});
