@@ -1,7 +1,6 @@
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCxl2AUWy8SjNEUauG_DtPfUcqkR_zDhVA",
@@ -100,11 +99,9 @@ async function startMatchmaking() {
     if(unsubscribeMessages) unsubscribeMessages();
     if(searchTimeout) clearTimeout(searchTimeout);
 
-    // ૧. પોતાને કતાર (Queue) માં મૂકો
     const myQueueRef = doc(db, "matching_queue", currentUser.uid);
     await setDoc(myQueueRef, { uid: currentUser.uid, timestamp: serverTimestamp(), matchedWith: null });
 
-    // ૨. કોઈ બીજો માણસ ઓનલાઈન છે કે નહીં તે ચેક કરો
     const q = query(collection(db, "matching_queue"), orderBy("timestamp", "asc"));
     const snapshot = await getDocs(q);
     let foundMatch = false;
@@ -116,7 +113,6 @@ async function startMatchmaking() {
             currentChatPartner = otherUser.uid;
             currentChatId = "chat_" + (currentUser.uid < otherUser.uid ? currentUser.uid + "_" + otherUser.uid : otherUser.uid + "_" + currentUser.uid);
             
-            // સામેવાળાને જણાવી દો કે મેચ મળી ગયો
             await setDoc(doc(db, "matching_queue", otherUser.uid), { matchedWith: currentChatId }, { merge: true });
             await deleteDoc(myQueueRef);
             
@@ -125,7 +121,6 @@ async function startMatchmaking() {
         }
     }
 
-    // ૩. જો કોઈ ના મળે, તો થોડીવાર રાહ જુઓ
     if (!foundMatch) {
         let checkInterval = setInterval(async () => {
             const myDoc = await getDoc(myQueueRef);
@@ -139,7 +134,6 @@ async function startMatchmaking() {
             }
         }, 2000);
 
-        // ૪. જો ૧૦ સેકન્ડ સુધી કોઈ માણસ ના મળે, તો જ AI બોટને બોલાવો
         searchTimeout = setTimeout(async () => {
             clearInterval(checkInterval);
             await deleteDoc(myQueueRef);
@@ -147,11 +141,10 @@ async function startMatchmaking() {
             currentChatId = "chat_" + currentUser.uid + "_bot";
             connectToChat(selectedGender === "Female" ? "Rahul (AI)" : "Priya (AI)");
             
-            // બોટનો પહેલો મેસેજ (લૂપ વગર)
             await addDoc(collection(db, "chats", currentChatId, "messages"), { 
                 sender: "bot", text: "Hi there! Couldn't find a human, so I'm here. How are you?", timestamp: serverTimestamp() 
             });
-        }, 10000); // 10 સેકન્ડનો ટાઈમ
+        }, 10000); 
     }
 }
 
@@ -184,12 +177,10 @@ document.getElementById('send-btn')?.addEventListener('click', async () => {
     if(message === "") return;
     messageInput.value = "";
     
-    // User no message
     await addDoc(collection(db, "chats", currentChatId, "messages"), { 
         sender: currentUser.uid, text: message, timestamp: serverTimestamp() 
     });
 
-    // AI Bot Reply Logic (100% FIXED & TESTED)
     if(currentChatPartner === "bot") {
         if(typingIndicator) typingIndicator.style.display = 'block';
         const COHERE_API_KEY = "fG9m8ksuIRFb" + "YrQLmR1TJwEt" + "mbBhgmnReAOSt3It";
@@ -209,11 +200,7 @@ document.getElementById('send-btn')?.addEventListener('click', async () => {
             const data = await response.json();
             
             let aiReply = data.text;
-            
-            // જો API માંથી કોઈ કારણસર જવાબ ના આવે તો આ બોલશે
-            if(!aiReply) {
-                aiReply = "I am listening! Tell me more."; 
-            }
+            if(!aiReply) aiReply = "I am listening! Tell me more."; 
 
             setTimeout(async () => {
                 if(typingIndicator) typingIndicator.style.display = 'none';
@@ -257,13 +244,13 @@ function loadMessages() {
     });
 }
 
-// Enter Key thi Message Send Karva Mate (Extra Feature)
 document.getElementById('message-input')?.addEventListener('keypress', (e) => {
     if(e.key === 'Enter') {
         e.preventDefault();
         document.getElementById('send-btn').click();
     }
 });
+
 // --- PREMIUM MODAL LOGIC ---
 const premiumModal = document.getElementById('premium-modal');
 const openPremiumBtn = document.getElementById('open-premium-btn');
@@ -271,11 +258,7 @@ const closePremiumBtn = document.getElementById('close-premium-btn');
 const notRightNowBtn = document.getElementById('not-right-now-btn');
 const upgradePayBtns = document.querySelectorAll('.upgrade-pay-btn');
 
-if (openPremiumBtn) {
-    openPremiumBtn.addEventListener('click', () => {
-        premiumModal.style.display = 'flex';
-    });
-}
+if (openPremiumBtn) openPremiumBtn.addEventListener('click', () => premiumModal.style.display = 'flex');
 
 if (closePremiumBtn && notRightNowBtn) {
     const closePremium = () => premiumModal.style.display = 'none';
@@ -283,17 +266,16 @@ if (closePremiumBtn && notRightNowBtn) {
     notRightNowBtn.addEventListener('click', closePremium);
 }
 
-// ભવિષ્યમાં અહીં પેમેન્ટ ગેટવે (Razorpay/Stripe) લાગશે
 upgradePayBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         alert("Payment Gateway integration coming soon! (Razorpay / Stripe)");
         premiumModal.style.display = 'none';
     });
 });
+
 // --- CALL BUTTONS & PREMIUM ALERT ---
 document.getElementById('audio-call-btn')?.addEventListener('click', () => {
     alert("Audio Calling is a VIP Feature! Upgrade to VIP to use this.");
-    const premiumModal = document.getElementById('premium-modal');
     if(premiumModal) premiumModal.style.display = 'flex';
 });
 
@@ -311,15 +293,9 @@ let localStream = null;
 if (videoCallBtn) {
     videoCallBtn.addEventListener('click', async () => {
         try {
-            // 1. Camera ane Mic ni permission mango
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            
-            // 2. Potano chehro nani screen ma dekhao
             if (localVideo) localVideo.srcObject = localStream;
-            
-            // 3. Video Call ni aakhi screen open karo
             if (videoCallScreen) videoCallScreen.style.display = 'flex';
-            
         } catch (error) {
             alert("Camera access denied! Please allow camera permissions to make a video call.");
             console.error("Camera error: ", error);
@@ -327,13 +303,9 @@ if (videoCallBtn) {
     });
 }
 
-// Call End Karvanu Logic
 if (endCallBtn) {
     endCallBtn.addEventListener('click', () => {
-        if (localStream) {
-            // Camera bandh karo
-            localStream.getTracks().forEach(track => track.stop());
-        }
+        if (localStream) localStream.getTracks().forEach(track => track.stop());
         if (localVideo) localVideo.srcObject = null;
         if (videoCallScreen) videoCallScreen.style.display = 'none';
     });
