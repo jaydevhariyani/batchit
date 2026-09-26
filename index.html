@@ -68,7 +68,23 @@
                 <div class="gender-btn active" data-gender="Male" style="flex: 1; border: 2px solid #8b5cf6; color: #8b5cf6; background: #f5f3ff; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-mars"></i> Male</div>
                 <div class="gender-btn" data-gender="Female" style="flex: 1; border: 1px solid #e5e7eb; color: #6b7280; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-venus"></i> Female</div>
             </div>
+<!-- NEW AGE AND COUNTRY INPUTS -->
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px;">Your age</label>
+                    <input type="number" id="guest-age-input" placeholder="Age" min="18" max="99" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px;">Your country</label>
+                    <input type="text" id="guest-country-input" placeholder="e.g. India" value="India" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                </div>
+            </div>
 
+            <!-- 18+ TERMS CHECKBOX -->
+            <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; font-size: 13px; color: #6b7280;">
+                <input type="checkbox" id="age-agree" style="margin-top: 3px; accent-color: #8b5cf6;" checked>
+                <label for="age-agree">I'm at least <strong style="color: #8b5cf6;">18 years old</strong> and agree to the Terms of Service.</label>
+            </div>
             <button id="start-guest-chat-btn" style="background: #c4b5fd; color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer;">Continue</button>
         </div>
     </div>
