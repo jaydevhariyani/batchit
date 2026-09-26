@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-// NEW: Firebase Storage for Voice Messages
+import { getAuth, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
 const firebaseConfig = {
@@ -16,17 +15,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-const storage = getStorage(app); // Storage Init
+const storage = getStorage(app);
 
-const authPage = document.getElementById('auth-page');
+// NEW UI ELEMENTS
+const landingPage = document.getElementById('landing-page');
+const onboardModal = document.getElementById('onboard-modal');
+const openOnboardBtn = document.getElementById('open-onboard-btn');
+const startGuestChatBtn = document.getElementById('start-guest-chat-btn');
+const guestNameInput = document.getElementById('guest-name-input');
+const randomNameBtn = document.getElementById('random-name-btn');
+const genderBtns = document.querySelectorAll('.gender-btn');
+const ageAgree = document.getElementById('age-agree');
+
 const mainApp = document.getElementById('main-app');
-const emailInput = document.getElementById('email-input');
-const passwordInput = document.getElementById('password-input');
-const genderInput = document.getElementById('gender-input');
-const loginBtn = document.getElementById('login-btn');
-const registerBtn = document.getElementById('register-btn');
-const logoutBtn = document.getElementById('logout-btn');
-
 const usersListDiv = document.getElementById('all-users-list');
 const chatHeaderTitle = document.getElementById('chat-header-title');
 const chatBox = document.getElementById('chat-box');
@@ -35,20 +36,12 @@ const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
 const imgBtn = document.getElementById('img-btn');
 const imageInput = document.getElementById('image-input');
-const micBtn = document.getElementById('mic-btn'); // Mic Button
+const micBtn = document.getElementById('mic-btn'); 
 const blockBtn = document.getElementById('block-user-btn');
+const logoutBtn = document.getElementById('logout-btn');
 const tabPrivate = document.getElementById('tab-private');
 const tabGlobal = document.getElementById('tab-global');
 const themeToggleBtn = document.getElementById('theme-toggle');
-
-const profileModal = document.getElementById('profile-modal');
-const openProfileBtn = document.getElementById('open-profile-btn');
-const closeProfileBtn = document.getElementById('close-profile');
-const profilePreview = document.getElementById('profile-preview');
-const uploadProfileImgBtn = document.getElementById('upload-profile-img-btn');
-const profileImageInput = document.getElementById('profile-image-input');
-const bioInput = document.getElementById('bio-input');
-const saveProfileBtn = document.getElementById('save-profile-btn');
 const typingIndicator = document.getElementById('typing-indicator');
 
 let currentUser = null;
@@ -58,23 +51,92 @@ let currentChatId = null;
 let currentMode = 'private'; 
 let unsubscribeMessages = null;
 let unsubscribeTyping = null;
-let typingTimeout = null;
-let newAvatarUrlTemp = null;
+let selectedGender = "Male";
 
-// Audio Recording Variables
-let mediaRecorder;
-let audioChunks = [];
-let isRecording = false;
+// --- NEW ONBOARDING LOGIC (Start Chatting) ---
+openOnboardBtn.addEventListener('click', () => {
+    onboardModal.style.display = 'flex';
+});
 
-// Notification Sound (Simple Ping)
-const notifSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+randomNameBtn.addEventListener('click', () => {
+    const names = ["CoolNinja", "SkyRider", "Ghost", "Star", "Leo", "Tiger", "Falcon", "Mystic"];
+    guestNameInput.value = names[Math.floor(Math.random() * names.length)] + Math.floor(Math.random() * 1000);
+});
 
+genderBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        genderBtns.forEach(b => {
+            b.classList.remove('active');
+            b.style.border = '1px solid #e5e7eb'; b.style.color = '#6b7280'; b.style.background = 'transparent';
+        });
+        btn.classList.add('active');
+        btn.style.border = '2px solid #8b5cf6'; btn.style.color = '#8b5cf6'; btn.style.background = '#f5f3ff';
+        selectedGender = btn.getAttribute('data-gender');
+    });
+});
+
+startGuestChatBtn.addEventListener('click', async () => {
+    if(!ageAgree.checked) return alert("You must be 18+ to use this app!");
+    const name = guestNameInput.value.trim() || "Guest" + Math.floor(Math.random() * 9999);
+    
+    startGuestChatBtn.innerHTML = "Connecting...";
+    try {
+        // Anonymous Login Without Email/Password
+        const result = await signInAnonymously(auth);
+        const user = result.user;
+        const fakeEmail = user.uid + "@guest.batchit"; 
+        
+        await setDoc(doc(db, "users", fakeEmail), {
+            email: fakeEmail, name: name, gender: selectedGender, isOnline: true
+        });
+        
+        onboardModal.style.display = 'none';
+        landingPage.style.display = 'none';
+    } catch (error) {
+        alert("Connection Failed: " + error.message);
+        startGuestChatBtn.innerHTML = "Continue";
+    }
+});
+
+// --- AUTH LOGIC ---
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        const userEmail = user.email || (user.uid + "@guest.batchit");
+        currentUser.customEmail = userEmail.toLowerCase();
+        
+        if (landingPage) landingPage.style.display = 'none';
+        if (onboardModal) onboardModal.style.display = 'none';
+        mainApp.style.display = 'block';
+
+        const userRef = doc(db, "users", currentUser.customEmail);
+        const userDoc = await getDoc(userRef);
+        if(userDoc.exists()) currentUserData = userDoc.data();
+        else currentUserData = { email: currentUser.customEmail, name: "Guest", gender: "Male" };
+        
+        await setDoc(userRef, { isOnline: true }, { merge: true });
+        
+        window.addEventListener('beforeunload', () => setDoc(userRef, { isOnline: false, lastSeen: serverTimestamp() }, { merge: true }));
+        loadUsersList();
+    } else {
+        currentUser = null;
+        currentUserData = null;
+        if (landingPage) landingPage.style.display = 'flex';
+        mainApp.style.display = 'none';
+    }
+});
+
+logoutBtn.addEventListener('click', async () => {
+    if(currentUser) await setDoc(doc(db, "users", currentUser.customEmail), { isOnline: false }, { merge: true });
+    signOut(auth);
+});
+
+// --- DARK MODE LOGIC ---
 if(localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-mode');
     themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
     themeToggleBtn.style.color = '#f1c40f';
 }
-
 themeToggleBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     if(document.body.classList.contains('dark-mode')) {
@@ -88,161 +150,14 @@ themeToggleBtn.addEventListener('click', () => {
     }
 });
 
-// PROFILE MODAL
-openProfileBtn.addEventListener('click', () => {
-    profileModal.style.display = 'flex';
-    newAvatarUrlTemp = currentUserData.avatarUrl || `https://ui-avatars.com/api/?name=${currentUserData.name}&background=random&color=fff&rounded=true&size=80`;
-    profilePreview.src = newAvatarUrlTemp;
-    bioInput.value = currentUserData.bio || "";
-});
-closeProfileBtn.addEventListener('click', () => { profileModal.style.display = 'none'; });
-uploadProfileImgBtn.addEventListener('click', () => profileImageInput.click());
-
-profileImageInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if(!file) return;
-    uploadProfileImgBtn.innerHTML = "⏳ Uploading...";
-    const formData = new FormData();
-    formData.append("image", file);
-    try {
-        const res = await fetch("https://api.imgbb.com/1/upload?key=7ce1a67d15e7ad03a0130dfd6f2973b0", { method: "POST", body: formData });
-        const result = await res.json();
-        if(result.success) {
-            newAvatarUrlTemp = result.data.url;
-            profilePreview.src = newAvatarUrlTemp;
-        } else alert("Image upload failed!");
-    } catch(err) { alert("Network error!"); }
-    uploadProfileImgBtn.innerHTML = '<i class="fa-solid fa-camera"></i> Change Photo';
-});
-
-saveProfileBtn.addEventListener('click', async () => {
-    saveProfileBtn.innerHTML = "Saving...";
-    await setDoc(doc(db, "users", currentUser.email.toLowerCase()), { avatarUrl: newAvatarUrlTemp, bio: bioInput.value }, { merge: true });
-    currentUserData.avatarUrl = newAvatarUrlTemp;
-    currentUserData.bio = bioInput.value;
-    saveProfileBtn.innerHTML = "Save Profile";
-    profileModal.style.display = 'none';
-});
-
-// AUTH LOGIC
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        currentUser = user;
-        authPage.style.display = 'none';
-        mainApp.style.display = 'block';
-
-        // ASK FOR NOTIFICATION PERMISSION
-        if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-            Notification.requestPermission();
-        }
-
-        const userRef = doc(db, "users", user.email.toLowerCase());
-        const userDoc = await getDoc(userRef);
-        if(userDoc.exists()) currentUserData = userDoc.data();
-        
-        await setDoc(userRef, { isOnline: true }, { merge: true });
-        window.addEventListener('beforeunload', () => setDoc(userRef, { isOnline: false, lastSeen: serverTimestamp() }, { merge: true }));
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === 'visible') setDoc(userRef, { isOnline: true }, { merge: true });
-            else setDoc(userRef, { isOnline: false, lastSeen: serverTimestamp() }, { merge: true });
-        });
-        loadUsersList();
-    } else {
-        currentUser = null;
-        currentUserData = null;
-        authPage.style.display = 'flex';
-        mainApp.style.display = 'none';
-    }
-});
-
-loginBtn.addEventListener('click', async () => {
-    const email = emailInput.value;
-    const password = passwordInput.value;
-    if(!email || !password) return alert("Please enter email and password!");
-    loginBtn.innerHTML = "Logging in...";
-    try { await signInWithEmailAndPassword(auth, email, password); } 
-    catch (error) { alert("Login Failed: Incorrect email or password."); }
-    loginBtn.innerHTML = "Login";
-});
-
-registerBtn.addEventListener('click', async () => {
-    const email = emailInput.value;
-    const password = passwordInput.value;
-    const gender = genderInput.value;
-    if(!email || !password) return alert("Please enter email and password!");
-    if(!gender) return alert("Please select your Gender!");
-    
-    registerBtn.innerHTML = "Creating Account...";
-    try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, "users", email.toLowerCase()), {
-            email: email.toLowerCase(), name: email.split('@')[0], gender: gender, isOnline: true
-        });
-        currentUserData = { email: email.toLowerCase(), name: email.split('@')[0], gender: gender };
-        loadUsersList();
-    } catch (error) { alert("Registration Failed: " + error.message); }
-    registerBtn.innerHTML = "Create New Account";
-});
-
-logoutBtn.addEventListener('click', async () => {
-    if(currentUser) await setDoc(doc(db, "users", currentUser.email.toLowerCase()), { isOnline: false }, { merge: true });
-    signOut(auth);
-});
-
-// TAB SWITCHING
-tabPrivate.addEventListener('click', () => {
-    currentMode = 'private';
-    tabPrivate.classList.replace('tab-inactive', 'tab-active');
-    tabPrivate.style.background = '#0084ff';
-    tabPrivate.style.color = 'white';
-    tabGlobal.classList.replace('tab-active', 'tab-inactive');
-    tabGlobal.style.background = 'transparent';
-    tabGlobal.style.color = 'inherit';
-    
-    usersListDiv.style.display = 'block';
-    chatBox.innerHTML = "";
-    inputArea.style.display = 'none';
-    chatHeaderTitle.innerHTML = "Select a user to chat";
-    blockBtn.style.display = 'none';
-    typingIndicator.style.display = 'none';
-    currentChatId = null;
-    currentChatUser = null;
-    if(unsubscribeMessages) unsubscribeMessages();
-    if(unsubscribeTyping) unsubscribeTyping();
-});
-
-tabGlobal.addEventListener('click', () => {
-    currentMode = 'global';
-    tabGlobal.classList.replace('tab-inactive', 'tab-active');
-    tabGlobal.style.background = '#25D366';
-    tabGlobal.style.color = 'white';
-    tabPrivate.classList.replace('tab-active', 'tab-inactive');
-    tabPrivate.style.background = 'transparent';
-    tabPrivate.style.color = 'inherit';
-    
-    usersListDiv.style.display = 'none';
-    blockBtn.style.display = 'none';
-    typingIndicator.style.display = 'none';
-    inputArea.style.display = 'flex';
-    chatHeaderTitle.innerHTML = `<i class="fa-solid fa-earth-americas"></i> Global Public Room`;
-    
-    currentChatUser = 'global';
-    currentChatId = 'global_room';
-    if(unsubscribeTyping) unsubscribeTyping();
-    loadGlobalMessages();
-});
-
-// LOAD USERS LIST
+// --- LOAD USERS LIST ---
 function loadUsersList() {
     onSnapshot(collection(db, "users"), (snapshot) => {
         usersListDiv.innerHTML = "";
-        const botDiv = document.createElement('div');
-        botDiv.style.padding = "10px";
-        botDiv.style.borderBottom = "1px solid #ddd";
-        botDiv.style.cursor = "pointer";
-        botDiv.style.display = "flex";
-        botDiv.style.alignItems = "center";
         
+        // AI BOT
+        const botDiv = document.createElement('div');
+        botDiv.style.padding = "10px"; botDiv.style.borderBottom = "1px solid #ddd"; botDiv.style.cursor = "pointer"; botDiv.style.display = "flex"; botDiv.style.alignItems = "center";
         let botName = currentUserData?.gender === "Female" ? "Rahul (AI) 👦" : "Priya (AI) 👧";
         let botAvatar = `https://ui-avatars.com/api/?name=${botName}&background=random&color=fff&rounded=true&size=35`;
         
@@ -253,27 +168,24 @@ function loadUsersList() {
                     <div class="online-dot"></div>
                 </div>
                 <div style="display: flex; flex-direction: column;">
-                    <div><strong style="color:#0084ff;">${botName}</strong><span style="margin-left: 10px; font-size: 9px; background: #25D366; color: white; padding: 2px 5px; border-radius: 10px;">BOT</span></div>
+                    <div><strong style="color:#8b5cf6;">${botName}</strong><span style="margin-left: 10px; font-size: 9px; background: #25D366; color: white; padding: 2px 5px; border-radius: 10px;">BOT</span></div>
                     <span style="font-size: 11px; color: #888;">Always here to chat!</span>
                 </div>
-            </div>
-        `;
+            </div>`;
         botDiv.addEventListener('click', () => selectUser("bot@batchit.com", botName));
         usersListDiv.appendChild(botDiv);
 
+        // REAL USERS
         snapshot.forEach((docSnap) => {
             const userData = docSnap.data();
-            if(userData.email !== currentUser.email) {
+            if(userData.email !== currentUser.customEmail) {
                 const userDiv = document.createElement('div');
-                userDiv.style.padding = "10px";
-                userDiv.style.borderBottom = "1px solid #ddd";
-                userDiv.style.cursor = "pointer";
-                userDiv.style.display = "flex";
-                userDiv.style.alignItems = "center";
+                userDiv.style.padding = "10px"; userDiv.style.borderBottom = "1px solid #ddd"; userDiv.style.cursor = "pointer"; userDiv.style.display = "flex"; userDiv.style.alignItems = "center";
                 const avatarUrl = userData.avatarUrl || `https://ui-avatars.com/api/?name=${userData.name}&background=random&color=fff&rounded=true&size=35`;
                 const bioText = userData.bio || "Available";
-                let genderIcon = userData.gender === "Male" ? "👦" : "👧";
+                let genderIcon = userData.gender === "Male" ? "👦" : (userData.gender === "Female" ? "👧" : "🏳️‍🌈");
                 let dotClass = userData.isOnline ? "online-dot" : "online-dot offline-dot";
+                
                 userDiv.innerHTML = `
                     <div style="display: flex; align-items: center;">
                         <div style="position: relative; margin-right: 12px; display: flex;">
@@ -282,10 +194,9 @@ function loadUsersList() {
                         </div>
                         <div style="display: flex; flex-direction: column;">
                             <strong style="color: inherit;">${userData.name}${genderIcon}</strong>
-                            <span style="font-size: 11px; color: #888; overflow: hidden; text-overflow: ellipsis; max-width: 150px; white-space: nowrap;">${bioText}</span>
+                            <span style="font-size: 11px; color: #888;">${bioText}</span>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 userDiv.addEventListener('click', () => selectUser(userData.email, userData.name));
                 usersListDiv.appendChild(userDiv);
             }
@@ -293,209 +204,38 @@ function loadUsersList() {
     });
 }
 
-// SELECT USER & TYPING
+// --- SELECT USER ---
 async function selectUser(userEmail, userName) {
     if(currentMode !== 'private') tabPrivate.click(); 
     currentChatUser = userEmail.toLowerCase();
-    const emails = [currentUser.email.toLowerCase(), currentChatUser].sort();
+    const emails = [currentUser.customEmail, currentChatUser].sort();
     currentChatId = `${emails[0]}_${emails[1]}`;
+    
     chatHeaderTitle.innerHTML = `<i class="fa-solid fa-user"></i> Chatting with ${userName}`;
     inputArea.style.display = 'flex';
+    blockBtn.style.display = currentChatUser !== "bot@batchit.com" ? 'block' : 'none';
     
-    if(currentChatUser !== "bot@batchit.com") {
-        blockBtn.style.display = 'block';
-        const blockDoc = await getDoc(doc(db, "users", currentUser.email.toLowerCase(), "blocked", currentChatUser));
-        if(blockDoc.exists()) {
-            blockBtn.innerHTML = `<i class="fa-solid fa-unlock"></i> Unblock`;
-            blockBtn.style.background = "#6c757d";
-        } else {
-            blockBtn.innerHTML = `<i class="fa-solid fa-ban"></i> Block User`;
-            blockBtn.style.background = "#dc3545";
-        }
-    } else { blockBtn.style.display = 'none'; }
-    
-    if(unsubscribeTyping) unsubscribeTyping();
-    if(currentChatUser !== "bot@batchit.com") {
-        unsubscribeTyping = onSnapshot(doc(db, "private_chats", currentChatId, "typing", currentChatUser), (docSnap) => {
-            if(docSnap.exists() && docSnap.data().isTyping) typingIndicator.style.display = 'block';
-            else typingIndicator.style.display = 'none';
-        });
-    } else typingIndicator.style.display = 'none';
-
+    if(window.innerWidth <= 768) {
+        document.querySelector('.sidebar').style.setProperty('display', 'none', 'important');
+        document.querySelector('.chat-area').style.setProperty('display', 'flex', 'important');
+    }
     loadPrivateMessages();
 }
 
-blockBtn.addEventListener('click', async () => {
-    const blockRef = doc(db, "users", currentUser.email.toLowerCase(), "blocked", currentChatUser);
-    const blockDoc = await getDoc(blockRef);
-    if(blockDoc.exists()) {
-        await deleteDoc(blockRef);
-        alert("User Unblocked!");
-        blockBtn.innerHTML = `<i class="fa-solid fa-ban"></i> Block User`;
-        blockBtn.style.background = "#dc3545";
-    } else {
-        if(confirm("Are you sure you want to block this user?")) {
-            await setDoc(blockRef, { blocked: true, timestamp: serverTimestamp() });
-            alert("User Blocked!");
-            blockBtn.innerHTML = `<i class="fa-solid fa-unlock"></i> Unblock`;
-            blockBtn.style.background = "#6c757d";
-        }
-    }
-});
-
-// LOAD MESSAGES (WITH NOTIFICATIONS)
-function loadPrivateMessages() {
-    if(unsubscribeMessages) unsubscribeMessages(); 
-    const q = query(collection(db, "private_chats", currentChatId, "messages"), orderBy("timestamp", "asc"));
-    
-    let isInitialLoad = true;
-    unsubscribeMessages = onSnapshot(q, (snapshot) => {
-        chatBox.innerHTML = "";
-        snapshot.forEach((docSnap) => renderMessage(docSnap));
-        chatBox.scrollTop = chatBox.scrollHeight;
-        
-        // PUSH NOTIFICATION LOGIC
-        if(!isInitialLoad) {
-            snapshot.docChanges().forEach((change) => {
-                if(change.type === "added") {
-                    const data = change.doc.data();
-                    if(data.sender !== currentUser.email.toLowerCase()) {
-                        notifSound.play().catch(e => console.log("Audio play blocked by browser"));
-                        if(Notification.permission === "granted" && document.visibilityState !== "visible") {
-                            new Notification("New message from " + (data.senderName || "User"), { body: data.text || "Voice/Image attachment" });
-                        }
-                    }
-                }
-            });
-        }
-        isInitialLoad = false;
-    });
-}
-
-function loadGlobalMessages() {
-    if(unsubscribeMessages) unsubscribeMessages(); 
-    const q = query(collection(db, "global_messages"), orderBy("timestamp", "asc"));
-    
-    let isInitialLoad = true;
-    unsubscribeMessages = onSnapshot(q, (snapshot) => {
-        chatBox.innerHTML = "";
-        snapshot.forEach((docSnap) => renderMessage(docSnap, true));
-        chatBox.scrollTop = chatBox.scrollHeight;
-        
-        // PUSH NOTIFICATION LOGIC
-        if(!isInitialLoad) {
-            snapshot.docChanges().forEach((change) => {
-                if(change.type === "added") {
-                    const data = change.doc.data();
-                    if(data.sender !== currentUser.email.toLowerCase()) {
-                        notifSound.play().catch(e => console.log("Audio blocked"));
-                        if(Notification.permission === "granted" && document.visibilityState !== "visible") {
-                            new Notification("Global Chat: " + (data.senderName || "User"), { body: data.text || "Sent an attachment" });
-                        }
-                    }
-                }
-            });
-        }
-        isInitialLoad = false;
-    });
-}
-
-function renderMessage(docSnap, isGlobal = false) {
-    const data = docSnap.data();
-    const docId = docSnap.id;
-    const isMe = data.sender === currentUser.email.toLowerCase();
-    
-    const rowDiv = document.createElement('div');
-    rowDiv.style.display = "flex";
-    rowDiv.style.gap = "8px";
-    rowDiv.style.marginBottom = "15px";
-    rowDiv.style.alignItems = "flex-end";
-    if(isMe) rowDiv.style.flexDirection = "row-reverse";
-
-    const msgDiv = document.createElement('div');
-    msgDiv.style.padding = "8px 12px";
-    msgDiv.style.maxWidth = "70%";
-    msgDiv.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
-
-    if(isMe) {
-        msgDiv.style.background = "#0084ff";
-        msgDiv.style.color = "white";
-        msgDiv.style.borderRadius = "15px 15px 2px 15px";
-    } else {
-        msgDiv.className = "message-other"; 
-        msgDiv.style.background = "white";
-        msgDiv.style.color = "black";
-        msgDiv.style.borderRadius = "15px 15px 15px 2px";
-        msgDiv.style.border = "1px solid #eee";
-    }
-
-    let timeString = "Now";
-    if(data.timestamp) timeString = data.timestamp.toDate().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-
-    let content = ``;
-    if(isGlobal && !isMe) {
-        const senderName = data.senderName || data.sender.split('@')[0];
-        content += `<div class="global-sender-name" style="font-size: 11px; font-weight: bold; color: #ff9800; margin-bottom: 3px; cursor: pointer;">~ ${senderName} (Click to Chat)</div>`;
-    }
-
-    // IMAGE RENDER
-    if(data.imageUrl) content += `<img src="${data.imageUrl}" style="max-width: 220px; border-radius: 8px; margin-bottom: 5px; display: block;"/><br>`;
-    
-    // VOICE AUDIO RENDER
-    if(data.audioUrl) content += `<audio controls src="${data.audioUrl}" style="max-width: 220px; margin-bottom: 5px; display: block;"></audio><br>`;
-    
-    if(data.text) content += `<div style="font-size: 15px;">${data.text}</div>`;
-    
-    let timeHtml = `<div style="font-size: 10px; opacity: ${isMe ? '0.9' : '0.5'}; text-align: right; margin-top: 4px; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">`;
-    if(isMe) timeHtml += `<i class="fa-solid fa-trash delete-btn" style="cursor: pointer; color: #ffcccc;" title="Delete for everyone"></i>`;
-    timeHtml += `<span>${timeString}</span></div>`;
-    content += timeHtml;
-
-    msgDiv.innerHTML = content;
-    
-    if(isGlobal && !isMe) msgDiv.querySelector('.global-sender-name')?.addEventListener('click', () => selectUser(data.sender, data.senderName || data.sender.split('@')[0]));
-    if(isMe) {
-        msgDiv.querySelector('.delete-btn')?.addEventListener('click', async () => {
-            if(confirm("Are you sure you want to delete this message for everyone?")) {
-                try {
-                    let refPath = isGlobal ? doc(db, "global_messages", docId) : doc(db, "private_chats", currentChatId, "messages", docId);
-                    await deleteDoc(refPath);
-                } catch(e) { alert("Failed to delete message."); }
-            }
-        });
-    }
-    rowDiv.appendChild(msgDiv);
-    chatBox.appendChild(rowDiv);
-}
-
-// TYPING INDICATOR WRITER
-messageInput.addEventListener('input', async () => {
-    if(currentMode !== 'private' || !currentChatId || currentChatUser === 'bot@batchit.com') return;
-    const typingRef = doc(db, "private_chats", currentChatId, "typing", currentUser.email.toLowerCase());
-    await setDoc(typingRef, { isTyping: true });
-    if(typingTimeout) clearTimeout(typingTimeout);
-    typingTimeout = setTimeout(async () => { await setDoc(typingRef, { isTyping: false }); }, 1500);
-});
-
-// SEND TEXT MESSAGE
+// --- SEND MESSAGE LOGIC ---
 sendBtn.addEventListener('click', async () => {
     let message = messageInput.value;
     if(message.trim() === "" || !currentChatId) return;
-    
-    if(currentMode === 'private' && currentChatUser !== 'bot@batchit.com') {
-        const blockDoc = await getDoc(doc(db, "users", currentUser.email.toLowerCase(), "blocked", currentChatUser));
-        if(blockDoc.exists()) return alert("You have blocked this user. Unblock to send messages.");
-        const typingRef = doc(db, "private_chats", currentChatId, "typing", currentUser.email.toLowerCase());
-        await setDoc(typingRef, { isTyping: false });
-    }
-
     messageInput.value = "";
-    const msgData = { sender: currentUser.email.toLowerCase(), senderName: currentUserData.name, text: message, timestamp: serverTimestamp() };
+    
+    const msgData = { sender: currentUser.customEmail, senderName: currentUserData.name, text: message, timestamp: serverTimestamp() };
 
     if(currentMode === 'global') {
         await addDoc(collection(db, "global_messages"), msgData);
     } else {
         await addDoc(collection(db, "private_chats", currentChatId, "messages"), msgData);
+        
+        // AI BOT LOGIC
         if(currentChatUser === "bot@batchit.com") {
             const COHERE_API_KEY = "fG9m8ksuIRFb" + "YrQLmR1TJwEt" + "mbBhgmnReAOSt3It";
             let botName = currentUserData?.gender === "Female" ? "Rahul" : "Priya";
@@ -507,179 +247,88 @@ sendBtn.addEventListener('click', async () => {
                         body: JSON.stringify({
                             model: "command-a-plus-05-2026", 
                             messages: [
-                                { role: "system", content: `You are a friendly chatting partner named ${botName}. Always reply naturally in the EXACT SAME LANGUAGE the user types in.` },
+                                { role: "system", content: `You are a chatting partner named ${botName}. Reply naturally in the EXACT SAME LANGUAGE.` },
                                 { role: "user", content: message }
                             ]
                         })
                     });
                     const data = await response.json();
-                    let aiReply = "";
-                    if (data?.message?.content) {
-                        if (typeof data.message.content === "string") aiReply = data.message.content; 
-                        else if (Array.isArray(data.message.content)) {
-                            let textItem = data.message.content.find(item => item.type === "text");
-                            if (textItem && textItem.text) aiReply = textItem.text;
-                        }
-                    } else if (data?.text) aiReply = data.text;
-                    else if (typeof data?.message === "string") aiReply = `API Error: ${data.message}`;
-                    if (!aiReply || aiReply === "undefined") aiReply = `DEBUG: ${JSON.stringify(data)}`;
-
+                    let aiReply = data?.message?.content?.[0]?.text || data?.text || "Let's chat more!";
                     typingIndicator.style.display = 'none'; 
                     await addDoc(collection(db, "private_chats", currentChatId, "messages"), { sender: "bot@batchit.com", text: String(aiReply), timestamp: serverTimestamp() });
                 }, 1000);
-            } catch(error) {
-                typingIndicator.style.display = 'none';
-                await addDoc(collection(db, "private_chats", currentChatId, "messages"), { sender: "bot@batchit.com", text: `Network Error: ${error.message}`, timestamp: serverTimestamp() });
-            }
+            } catch(error) { typingIndicator.style.display = 'none'; }
         }
     }
 });
 
-// SEND IMAGE
-imgBtn.addEventListener('click', () => {
-    if(!currentChatId) return alert("Please select a chat first!");
-    imageInput.click();
-});
-
-imageInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if(!file || !currentChatId) return;
-    imgBtn.innerHTML = "⏳";
-    const formData = new FormData();
-    formData.append("image", file);
-    try {
-        const res = await fetch("https://api.imgbb.com/1/upload?key=7ce1a67d15e7ad03a0130dfd6f2973b0", { method: "POST", body: formData });
-        const result = await res.json();
-        if(result.success) {
-            const msgData = { sender: currentUser.email.toLowerCase(), senderName: currentUserData.name, text: "", imageUrl: result.data.url, timestamp: serverTimestamp() };
-            if(currentMode === 'global') await addDoc(collection(db, "global_messages"), msgData);
-            else {
-                await addDoc(collection(db, "private_chats", currentChatId, "messages"), msgData);
-                if(currentChatUser === "bot@batchit.com") setTimeout(async () => {
-                    await addDoc(collection(db, "private_chats", currentChatId, "messages"), { sender: "bot@batchit.com", text: "Wow! Nice picture! 😍", timestamp: serverTimestamp() });
-                }, 1500);
-            }
-        } else alert("Image upload failed!");
-    } catch(err) { alert("Network error!"); }
-    imgBtn.innerHTML = '📎';
-    imageInput.value = "";
-});
-
-// VOICE MESSAGE RECORDING LOGIC
-micBtn.addEventListener('click', async () => {
-    if(!currentChatId) return alert("Please select a chat first!");
-    
-    if(!isRecording) {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            mediaRecorder.start();
-            isRecording = true;
-            
-            micBtn.innerHTML = '<i class="fa-solid fa-stop"></i>';
-            micBtn.style.color = "red";
-            
-            mediaRecorder.addEventListener("dataavailable", event => { audioChunks.push(event.data); });
-            
-            mediaRecorder.addEventListener("stop", async () => {
-                micBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>';
-                micBtn.style.color = "inherit";
-                
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                audioChunks = [];
-                
-                try {
-                    // Upload to Firebase Storage
-                    const audioRef = sRef(storage, `audio_messages/${Date.now()}.webm`);
-                    await uploadBytes(audioRef, audioBlob);
-                    const audioUrl = await getDownloadURL(audioRef);
-                    
-                    const msgData = { sender: currentUser.email.toLowerCase(), senderName: currentUserData.name, text: "", audioUrl: audioUrl, timestamp: serverTimestamp() };
-                    
-                    if(currentMode === 'global') await addDoc(collection(db, "global_messages"), msgData);
-                    else await addDoc(collection(db, "private_chats", currentChatId, "messages"), msgData);
-                    
-                } catch(err) {
-                    alert("Audio upload failed! Make sure your Firebase Storage Rules allow read/write.");
-                }
-                stream.getTracks().forEach(track => track.stop());
-            });
-        } catch(err) { alert("Microphone access denied!"); }
-    } else {
-        mediaRecorder.stop();
-        isRecording = false;
-    }
-});
-// --- APP DOWNLOAD (PWA) BUTTON LOGIC ---
-const installAppBtn = document.getElementById('install-app-btn');
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    // બ્રાઉઝરનું પોતાનું પોપ-અપ રોકીને આપણું બટન બતાવો
-    e.preventDefault();
-    deferredPrompt = e;
-    if(installAppBtn) installAppBtn.style.display = 'block';
-});
-
-if(installAppBtn) {
-    installAppBtn.addEventListener('click', async () => {
-        installAppBtn.style.display = 'none';
-        deferredPrompt.prompt(); // ઇન્સ્ટોલ કરવાનું પોપ-અપ લાવશે
-        const { outcome } = await deferredPrompt.userChoice;
-        deferredPrompt = null;
+// --- LOAD MESSAGES ---
+function loadPrivateMessages() {
+    if(unsubscribeMessages) unsubscribeMessages(); 
+    const q = query(collection(db, "private_chats", currentChatId, "messages"), orderBy("timestamp", "asc"));
+    unsubscribeMessages = onSnapshot(q, (snapshot) => {
+        chatBox.innerHTML = "";
+        snapshot.forEach((docSnap) => renderMessage(docSnap));
+        chatBox.scrollTop = chatBox.scrollHeight;
     });
 }
 
-window.addEventListener('appinstalled', () => {
-    // એપ ઇન્સ્ટોલ થઈ જાય એટલે બટન ગાયબ કરી દો
-    if(installAppBtn) installAppBtn.style.display = 'none';
-    deferredPrompt = null;
-});
-// --- 100% WORKING MOBILE SCREEN LOGIC ---
-const backBtnMobile = document.getElementById('back-btn-mobile');
-const mySidebar = document.querySelector('.sidebar');
-const myChatArea = document.querySelector('.chat-area');
+function renderMessage(docSnap, isGlobal = false) {
+    const data = docSnap.data();
+    const docId = docSnap.id;
+    const isMe = data.sender === currentUser.customEmail;
+    
+    const rowDiv = document.createElement('div');
+    rowDiv.style.display = "flex"; rowDiv.style.gap = "8px"; rowDiv.style.marginBottom = "15px"; rowDiv.style.alignItems = "flex-end";
+    if(isMe) rowDiv.style.flexDirection = "row-reverse";
 
-// ૧. મોબાઈલમાં એપ ખૂલે ત્યારે હંમેશા User List જ દેખાવું જોઈએ
-if(window.innerWidth <= 768) {
-    myChatArea.style.setProperty('display', 'none', 'important');
-    mySidebar.style.setProperty('display', 'flex', 'important');
+    const msgDiv = document.createElement('div');
+    msgDiv.style.padding = "8px 12px"; msgDiv.style.maxWidth = "70%"; msgDiv.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
+
+    if(isMe) {
+        msgDiv.style.background = "#8b5cf6"; msgDiv.style.color = "white"; msgDiv.style.borderRadius = "15px 15px 2px 15px";
+    } else {
+        msgDiv.className = "message-other"; msgDiv.style.background = "white"; msgDiv.style.color = "black"; msgDiv.style.borderRadius = "15px 15px 15px 2px"; msgDiv.style.border = "1px solid #eee";
+    }
+
+    let timeString = "Now";
+    if(data.timestamp) timeString = data.timestamp.toDate().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+
+    let content = ``;
+    if(isGlobal && !isMe) content += `<div style="font-size: 11px; font-weight: bold; color: #ff9800; margin-bottom: 3px;">~ ${data.senderName}</div>`;
+    if(data.text) content += `<div style="font-size: 15px;">${data.text}</div>`;
+    
+    let timeHtml = `<div style="font-size: 10px; opacity: ${isMe ? '0.9' : '0.5'}; text-align: right; margin-top: 4px; display: flex; justify-content: flex-end; align-items: center; gap: 10px;">`;
+    if(isMe) timeHtml += `<i class="fa-solid fa-trash delete-btn" style="cursor: pointer; color: #ffcccc;" title="Delete"></i>`;
+    timeHtml += `<span>${timeString}</span></div>`;
+    
+    msgDiv.innerHTML = content + timeHtml;
+    
+    if(isMe) {
+        msgDiv.querySelector('.delete-btn')?.addEventListener('click', async () => {
+            if(confirm("Delete this message?")) await deleteDoc(doc(db, isGlobal ? "global_messages" : `private_chats/${currentChatId}/messages`, docId));
+        });
+    }
+    rowDiv.appendChild(msgDiv); chatBox.appendChild(rowDiv);
 }
 
-// ૨. Back (⬅) બટન દબાવવાથી પાછું User List આવી જશે
+// --- MOBILE BACK BUTTON (Fix) ---
+const backBtnMobile = document.getElementById('back-btn-mobile');
 if(backBtnMobile) {
     backBtnMobile.addEventListener('click', (e) => {
         e.preventDefault();
         if(window.innerWidth <= 768) {
-            myChatArea.style.setProperty('display', 'none', 'important');
-            mySidebar.style.setProperty('display', 'flex', 'important');
+            document.querySelector('.chat-area').style.setProperty('display', 'none', 'important');
+            document.querySelector('.sidebar').style.setProperty('display', 'flex', 'important');
         }
     });
 }
-
-// ૩. કોઈ પણ યુઝર પર ક્લિક થાય ત્યારે જ ચેટ ખૂલશે
-document.getElementById('all-users-list').addEventListener('click', () => {
-    if(window.innerWidth <= 768) {
-        mySidebar.style.setProperty('display', 'none', 'important');
-        myChatArea.style.setProperty('display', 'flex', 'important');
-    }
-});
-
-// ૪. Global Room પર ક્લિક થાય ત્યારે ચેટ ખૂલશે
-document.getElementById('tab-global').addEventListener('click', () => {
-    if(window.innerWidth <= 768) {
-        mySidebar.style.setProperty('display', 'none', 'important');
-        myChatArea.style.setProperty('display', 'flex', 'important');
-    }
-});
-
-// ૫. સ્ક્રીન નાની-મોટી થાય (Rotate) ત્યારે ઓટોમેટિક સેટ કરવા માટે
 window.addEventListener('resize', () => {
     if(window.innerWidth > 768) {
-        mySidebar.style.setProperty('display', 'flex', 'important');
-        myChatArea.style.setProperty('display', 'flex', 'important');
+        document.querySelector('.sidebar').style.setProperty('display', 'flex', 'important');
+        document.querySelector('.chat-area').style.setProperty('display', 'flex', 'important');
     } else {
-        myChatArea.style.setProperty('display', 'none', 'important');
-        mySidebar.style.setProperty('display', 'flex', 'important');
+        document.querySelector('.chat-area').style.setProperty('display', 'none', 'important');
+        document.querySelector('.sidebar').style.setProperty('display', 'flex', 'important');
     }
 });
