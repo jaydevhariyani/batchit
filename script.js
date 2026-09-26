@@ -251,3 +251,51 @@ upgradePayBtns.forEach(btn => {
         premiumModal.style.display = 'none';
     });
 });
+// --- CALL BUTTONS & PREMIUM ALERT ---
+document.getElementById('audio-call-btn')?.addEventListener('click', () => {
+    alert("Audio Calling is a VIP Feature! Upgrade to VIP to use this.");
+    const premiumModal = document.getElementById('premium-modal');
+    if(premiumModal) premiumModal.style.display = 'flex';
+});
+
+document.getElementById('menu-btn')?.addEventListener('click', () => {
+    alert("Report & Block features coming soon!");
+});
+
+// --- VIDEO CALL CAMERA TEST ---
+const videoCallBtn = document.getElementById('video-call-btn');
+const videoCallScreen = document.getElementById('video-call-screen');
+const localVideo = document.getElementById('local-video');
+const endCallBtn = document.getElementById('end-call-btn');
+let localStream = null;
+
+if (videoCallBtn) {
+    videoCallBtn.addEventListener('click', async () => {
+        try {
+            // 1. Camera ane Mic ni permission mango
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            
+            // 2. Potano chehro nani screen ma dekhao
+            if (localVideo) localVideo.srcObject = localStream;
+            
+            // 3. Video Call ni aakhi screen open karo
+            if (videoCallScreen) videoCallScreen.style.display = 'flex';
+            
+        } catch (error) {
+            alert("Camera access denied! Please allow camera permissions to make a video call.");
+            console.error("Camera error: ", error);
+        }
+    });
+}
+
+// Call End Karvanu Logic
+if (endCallBtn) {
+    endCallBtn.addEventListener('click', () => {
+        if (localStream) {
+            // Camera bandh karo
+            localStream.getTracks().forEach(track => track.stop());
+        }
+        if (localVideo) localVideo.srcObject = null;
+        if (videoCallScreen) videoCallScreen.style.display = 'none';
+    });
+}
