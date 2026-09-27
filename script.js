@@ -416,3 +416,33 @@ if (endCallBtn) {
         }
     });
 }
+// --- NAVBAR LOGIC ---
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+const mobileDropdownMenu = document.getElementById('mobile-dropdown-menu');
+
+if(mobileMenuToggle && mobileDropdownMenu) {
+    mobileMenuToggle.addEventListener('click', () => {
+        mobileDropdownMenu.classList.toggle('active');
+        // આઇકોન બદલવા માટે (Bars થી Cross)
+        const icon = mobileMenuToggle.querySelector('i');
+        if (mobileDropdownMenu.classList.contains('active')) {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-xmark');
+        } else {
+            icon.classList.remove('fa-xmark');
+            icon.classList.add('fa-bars');
+        }
+    });
+}
+
+// નવા "Start Chat" બટન (હેડરમાં) થી ચેટ ચાલુ કરવા
+document.querySelectorAll('.open-onboard-trigger').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (currentUser) {
+            if(landingPage) landingPage.style.display = 'none';
+            startMatchmaking();
+        } else {
+            if(onboardModal) onboardModal.style.display = 'flex';
+        }
+    });
+});
