@@ -30,21 +30,92 @@
         
         #chat-box::-webkit-scrollbar { width: 5px; }
         #chat-box::-webkit-scrollbar-thumb { background: #ccc; border-radius: 5px; }
+   /* NEW NAVBAR CSS */
+        .main-nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background: white; border-bottom: 1px solid #e5e7eb; position: relative; z-index: 100; }
+        .logo { font-size: 24px; font-weight: 800; color: #6366f1; display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        
+        .desktop-menu { display: flex; align-items: center; gap: 30px; }
+        .nav-link { color: #4b5563; text-decoration: none; font-size: 15px; font-weight: 600; transition: color 0.2s; }
+        .nav-link:hover { color: #8b5cf6; }
+        
+        .start-chat-btn-header { background: #8b5cf6; color: white; border: none; padding: 10px 24px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); }
+        .start-chat-btn-header:hover { background: #7c3aed; transform: translateY(-1px); }
+
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 24px; color: #111827; cursor: pointer; }
+        
+        /* Mobile View (Hamburger) */
+        @media (max-width: 768px) {
+            .main-nav { padding: 15px 20px; }
+            .desktop-menu, .header-right-btns { display: none; }
+            .mobile-menu-btn { display: block; }
+        }
+
+        /* Mobile Dropdown Menu */
+        .mobile-dropdown { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; padding: 20px; box-sizing: border-box; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-top: 1px solid #e5e7eb; flex-direction: column; gap: 15px; }
+        .mobile-dropdown.active { display: flex; }
+        .mobile-search { padding: 12px 15px; background: #f3f4f6; border: none; border-radius: 10px; font-size: 15px; width: 100%; box-sizing: border-box; outline: none; margin-bottom: 10px; }
+        .mobile-dropdown-link { color: #4b5563; text-decoration: none; font-size: 16px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+        .language-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; margin-bottom: 20px; }
+        .lang-pill { border: 1px solid #e5e7eb; padding: 8px 15px; border-radius: 20px; font-size: 13px; color: #4b5563; text-decoration: none; }
+        .lang-pill.active { border-color: #8b5cf6; color: #8b5cf6; background: #f5f3ff; }
     </style>
 </head>
 <body>
 
     <!-- 1. LANDING PAGE -->
     <div id="landing-page" style="display: flex; flex-direction: column; min-height: 100vh;">
-        <nav style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: white;">
-            <div style="font-size: 22px; font-weight: 700; color: #6366f1; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-masks-theater"></i> Batchit
+        
+        <!-- NEW NAVBAR -->
+        <nav class="main-nav">
+            <a href="#" class="logo"><i class="fa-solid fa-masks-theater"></i> Batchit</a>
+            
+            <!-- Desktop Links -->
+            <div class="desktop-menu">
+                <a href="#" class="nav-link">Home</a>
+                <a href="#" class="nav-link">Blog</a>
+                <a href="#" class="nav-link">About</a>
+                <a href="#" class="nav-link">Pages <i class="fa-solid fa-chevron-down" style="font-size: 12px; margin-left: 3px;"></i></a>
+                <a href="#" class="nav-link"><i class="fa-solid fa-globe"></i> English <i class="fa-solid fa-chevron-down" style="font-size: 12px; margin-left: 3px;"></i></a>
+                <a href="#" class="nav-link" style="font-size: 18px;"><i class="fa-solid fa-magnifying-glass"></i></a>
             </div>
-           <div style="display: flex; align-items: center; gap: 10px;">
-                <button id="open-premium-btn" style="background: linear-gradient(45deg, #fbbf24, #f59e0b); border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; color: white; cursor: pointer;"><i class="fa-solid fa-crown"></i> Premium</button>
-                <button id="install-app-btn" style="display: none; background: #f3f4f6; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;"><i class="fa-solid fa-download"></i> Install App</button>
+
+            <!-- Right Side Button -->
+            <div class="header-right-btns" style="display: flex; gap: 10px;">
+                <!-- Premium button temporarily hidden from main nav to match Strangerline clean look, will add to menu -->
+                <button class="start-chat-btn-header open-onboard-trigger">Start Chat</button>
+            </div>
+
+            <!-- Hamburger Icon for Mobile -->
+            <button class="mobile-menu-btn" id="mobile-menu-toggle"><i class="fa-solid fa-bars"></i></button>
+
+            <!-- Mobile Dropdown Menu -->
+            <div class="mobile-dropdown" id="mobile-dropdown-menu">
+                <input type="text" class="mobile-search" placeholder="Search...">
+                
+                <a href="#" class="mobile-dropdown-link" style="color: #8b5cf6; font-weight: bold;">Home</a>
+                <a href="#" class="mobile-dropdown-link">Blog</a>
+                <a href="#" class="mobile-dropdown-link">About</a>
+                <a href="#" class="mobile-dropdown-link">Chatroulette Alternative</a>
+                <a href="#" class="mobile-dropdown-link">Emerald Chat Alternative</a>
+                <a href="#" class="mobile-dropdown-link">Video Chat With Strangers</a>
+                <a href="#" class="mobile-dropdown-link" style="color: #6366f1; font-weight: 600;">View All Pages &rarr;</a>
+                
+                <div style="font-size: 12px; color: #9ca3af; letter-spacing: 1px; margin-top: 15px;">LANGUAGE</div>
+                <div class="language-pills">
+                    <a href="#" class="lang-pill active">English</a>
+                    <a href="#" class="lang-pill">Español</a>
+                    <a href="#" class="lang-pill">Deutsch</a>
+                    <a href="#" class="lang-pill">Français</a>
+                    <a href="#" class="lang-pill">Italiano</a>
+                    <a href="#" class="lang-pill">Português</a>
+                    <a href="#" class="lang-pill">日本語</a>
+                </div>
+                
+                <button class="start-chat-btn-header open-onboard-trigger" style="width: 100%; padding: 15px;">Start Chat</button>
             </div>
         </nav>
+        
+        <!-- જૂનો Hero Section અહીંથી ચાલુ રહેશે... -->
 
         <div style="padding: 40px 20px; text-align: center; max-width: 600px; margin: auto;">
             <h1 style="font-size: 42px; font-weight: 800; color: #111827; margin-bottom: 15px;">Talk to Strangers Online</h1>
