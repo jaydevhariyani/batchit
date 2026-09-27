@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCxl2AUWy8SjNEUauG_DtPfUcqkR_zDhVA",
@@ -36,19 +36,18 @@ let searchTimeout = null;
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
-        // Firebase mathi juno data pacho lavva
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) selectedGender = userDoc.data().gender || "Male";
+        try {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists()) selectedGender = userDoc.data().gender || "Male";
+        } catch(e) { console.log("New user"); }
     }
 });
 
 document.getElementById('open-onboard-btn')?.addEventListener('click', () => {
     if (currentUser) {
-        // Jo user already login hoy, to form skip karine direct Radar chalu karo!
         if(landingPage) landingPage.style.display = 'none';
         startMatchmaking();
     } else {
-        // Naya user mate form dekhao
         if(onboardModal) onboardModal.style.display = 'flex';
     }
 });
@@ -227,8 +226,8 @@ document.getElementById('send-btn')?.addEventListener('click', async () => {
     }
 });
 
-// Load Chat
-function loadMessages() {
+// Load Chat (With Video Hook)
+let loadMessages = function() {
     if(unsubscribeMessages) unsubscribeMessages(); 
     const q = query(collection(db, "chats", currentChatId, "messages"), orderBy("timestamp", "asc"));
     
@@ -256,6 +255,9 @@ function loadMessages() {
         });
         chatBox.scrollTop = chatBox.scrollHeight;
     });
+
+    // ચેટ ચાલુ થાય એટલે કૉલ સાંભળવાનું ચાલુ કરો
+    listenForIncomingCall();
 }
 
 document.getElementById('message-input')?.addEventListener('keypress', (e) => {
@@ -306,7 +308,7 @@ const endCallBtn = document.getElementById('end-call-btn');
 
 let localStream = null;
 let peerConnection = null;
-let unsubscribeCall = null; // નવો ફેરફાર: જૂના કૉલ સાંભળવાનું બંધ કરવા
+let unsubscribeCall = null;
 
 const servers = {
     iceServers: [
@@ -314,7 +316,6 @@ const servers = {
     ]
 };
 
-// ૧. કૉલ કરવાનું બટન દબાવે ત્યારે (Caller)
 if (videoCallBtn) {
     videoCallBtn.addEventListener('click', async () => {
         if (!currentChatId || currentChatPartner === "bot") {
@@ -361,14 +362,12 @@ if (videoCallBtn) {
     });
 }
 
-// ૨. સામા વાળાનો કૉલ આવે ત્યારે ઓટોમેટિક ઉપાડવા માટે (Receiver)
 function listenForIncomingCall() {
     if (!currentChatId) return;
-    if (unsubscribeCall) unsubscribeCall(); // જૂનું લિસનર બંધ કરો
+    if (unsubscribeCall) unsubscribeCall();
 
     unsubscribeCall = onSnapshot(doc(db, "chats", currentChatId), async (snapshot) => {
         const data = snapshot.data();
-        // નવો ફેરફાર: જો offer હોય અને આપણે કનેક્ટ ના થયા હોઈએ તો જ કૉલ ઉપાડો
         if (data?.offer && !peerConnection) {
             videoCallScreen.style.display = 'flex';
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -403,14 +402,6 @@ function listenForIncomingCall() {
     });
 }
 
-// જ્યારે ચેટ ચાલુ થાય ત્યારે કૉલનું ધ્યાન રાખવા માટે
-const originalLoadMessages = loadMessages;
-loadMessages = function() {
-    originalLoadMessages();
-    listenForIncomingCall();
-};
-
-// ૩. કૉલ કાપવાનું બટન (અને ડેટાબેઝ ક્લીન કરવાનું લોજીક)
 if (endCallBtn) {
     endCallBtn.addEventListener('click', async () => {
         if (localStream) localStream.getTracks().forEach(track => track.stop());
@@ -420,7 +411,6 @@ if (endCallBtn) {
         if (remoteVideo) remoteVideo.srcObject = null;
         videoCallScreen.style.display = 'none';
 
-        // નવો ફેરફાર: કૉલ કપાય એટલે ડેટાબેઝમાંથી જૂનો કૉલ ડેટા કાઢી નાખો
         if (currentChatId) {
             await setDoc(doc(db, "chats", currentChatId), { offer: null, answer: null }, { merge: true });
         }
