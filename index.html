@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { margin: 0; font-family: 'Inter', sans-serif; background: #f4f7fd; overflow-x: hidden; }
         
         /* RADAR ANIMATION CSS */
@@ -44,6 +44,33 @@
 
         .mobile-menu-btn { display: none; background: none; border: none; font-size: 24px; color: #111827; cursor: pointer; }
         
+        /* DESKTOP DROPDOWNS */
+        .nav-item-dropdown { position: relative; display: inline-block; cursor: pointer; padding: 10px 0; }
+        .desktop-dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: white; min-width: 160px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 12px; border: 1px solid #e5e7eb; z-index: 200; flex-direction: column; padding: 10px 0; }
+        .nav-item-dropdown:hover .desktop-dropdown-menu { display: flex; animation: slideUp 0.2s ease-out; }
+        .desktop-dropdown-link { color: #4b5563; padding: 10px 20px; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .desktop-dropdown-link:hover { background: #f5f3ff; color: #8b5cf6; }
+
+        /* HERO SECTION (TWO-COLUMN) */
+        .hero-section { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 60px 40px; gap: 40px; min-height: calc(100vh - 80px); }
+        .hero-left { flex: 1; max-width: 600px; }
+        .hero-right { flex: 1; display: flex; justify-content: center; }
+        .hero-image { max-width: 100%; height: auto; border-radius: 20px; box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15); }
+        
+        .hero-title { font-size: 56px; font-weight: 800; color: #111827; margin: 0 0 20px 0; line-height: 1.1; letter-spacing: -1px; }
+        .hero-subtitle { font-size: 24px; font-weight: 700; color: #6366f1; margin: 0 0 25px 0; }
+        .hero-desc { font-size: 18px; color: #4b5563; margin: 0 0 40px 0; line-height: 1.6; }
+        
+        .hero-btn { background: linear-gradient(135deg, #8b5cf6, #a855f7); color: white; border: none; padding: 18px 45px; font-size: 18px; font-weight: 700; border-radius: 12px; cursor: pointer; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4); display: inline-flex; align-items: center; gap: 10px; transition: transform 0.2s; }
+        .hero-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(139, 92, 246, 0.5); }
+        .hero-trust-text { font-size: 13px; color: #9ca3af; margin-top: 25px; font-weight: 500; }
+
+        @media (max-width: 992px) {
+            .hero-section { flex-direction: column; text-align: center; padding: 40px 20px; }
+            .hero-title { font-size: 42px; }
+            .hero-left { display: flex; flex-direction: column; align-items: center; }
+        }
+
         /* Mobile View (Hamburger) */
         @media (max-width: 768px) {
             .main-nav { padding: 15px 20px; }
@@ -72,32 +99,6 @@
         .lang-pill.active { border-color: #8b5cf6; color: #8b5cf6; background: #f5f3ff; font-weight: 600; }
         
         .mobile-start-chat-btn { background: #8b5cf6; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 18px; width: 100%; cursor: pointer; text-align: center; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); }
-   /* DESKTOP DROPDOWNS */
-        .nav-item-dropdown { position: relative; display: inline-block; cursor: pointer; padding: 10px 0; }
-        .desktop-dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: white; min-width: 160px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 12px; border: 1px solid #e5e7eb; z-index: 200; flex-direction: column; padding: 10px 0; }
-        .nav-item-dropdown:hover .desktop-dropdown-menu { display: flex; animation: slideUp 0.2s ease-out; }
-        .desktop-dropdown-link { color: #4b5563; padding: 10px 20px; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
-        .desktop-dropdown-link:hover { background: #f5f3ff; color: #8b5cf6; }
-
-        /* HERO SECTION (TWO-COLUMN) */
-        .hero-section { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 60px 40px; gap: 40px; min-height: calc(100vh - 80px); }
-        .hero-left { flex: 1; max-width: 600px; }
-        .hero-right { flex: 1; display: flex; justify-content: center; }
-        .hero-image { max-width: 100%; height: auto; border-radius: 20px; box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15); }
-        
-        .hero-title { font-size: 56px; font-weight: 800; color: #111827; margin: 0 0 20px 0; line-height: 1.1; letter-spacing: -1px; }
-        .hero-subtitle { font-size: 24px; font-weight: 700; color: #6366f1; margin: 0 0 25px 0; }
-        .hero-desc { font-size: 18px; color: #4b5563; margin: 0 0 40px 0; line-height: 1.6; }
-        
-        .hero-btn { background: linear-gradient(135deg, #8b5cf6, #a855f7); color: white; border: none; padding: 18px 45px; font-size: 18px; font-weight: 700; border-radius: 12px; cursor: pointer; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4); display: inline-flex; align-items: center; gap: 10px; transition: transform 0.2s; }
-        .hero-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(139, 92, 246, 0.5); }
-        .hero-trust-text { font-size: 13px; color: #9ca3af; margin-top: 25px; font-weight: 500; }
-
-        @media (max-width: 992px) {
-            .hero-section { flex-direction: column; text-align: center; padding: 40px 20px; }
-            .hero-title { font-size: 42px; }
-            .hero-left { display: flex; flex-direction: column; align-items: center; }
-        }
     </style>
 </head>
 <body>
@@ -109,7 +110,7 @@
         <nav class="main-nav">
             <a href="#" class="logo"><i class="fa-solid fa-masks-theater"></i> Batchit</a>
             
-           <!-- Desktop Links -->
+            <!-- Desktop Links -->
             <div class="desktop-menu">
                 <a href="#" class="nav-link">Home</a>
                 <a href="#" class="nav-link">Blog</a>
@@ -141,7 +142,7 @@
 
             <!-- Right Side Button -->
             <div class="header-right-btns" style="display: flex; gap: 10px;">
-                <button class="start-chat-btn-header open-onboard-trigger">Start Chat</button>
+                <button id="open-onboard-btn" class="start-chat-btn-header open-onboard-trigger">Start Chat</button>
             </div>
 
             <!-- Hamburger Icon for Mobile -->
@@ -188,7 +189,7 @@
                 <h2 class="hero-subtitle">Make real friends, free.</h2>
                 <p class="hero-desc">Free anonymous random chat with real people worldwide. Text, voice, and video - no sign-up needed.</p>
                 
-                <button class="hero-btn open-onboard-trigger">
+                <button id="open-onboard-btn" class="hero-btn open-onboard-trigger">
                     Start Chatting <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
                 </button>
                 
@@ -198,10 +199,10 @@
             </div>
             
             <div class="hero-right">
-                <!-- ગ્રાફિક ઇમેજ અહીં મૂકીશું -->
                 <img src="https://strangerline.io/wp-content/uploads/2023/12/hero-img.webp" alt="Stranger Chat Demo" class="hero-image">
             </div>
         </div>
+    </div>
 
     <!-- 2. ONBOARDING MODAL -->
     <div id="onboard-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: flex-end;">
