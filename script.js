@@ -32,9 +32,25 @@ let unsubscribeMessages = null;
 let selectedGender = "Male";
 let searchTimeout = null;
 
-// --- 1. ONBOARDING & START ---
+// --- 1. AUTO-LOGIN & ONBOARDING ---
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        // Firebase mathi juno data pacho lavva
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) selectedGender = userDoc.data().gender || "Male";
+    }
+});
+
 document.getElementById('open-onboard-btn')?.addEventListener('click', () => {
-    if(onboardModal) onboardModal.style.display = 'flex';
+    if (currentUser) {
+        // Jo user already login hoy, to form skip karine direct Radar chalu karo!
+        if(landingPage) landingPage.style.display = 'none';
+        startMatchmaking();
+    } else {
+        // Naya user mate form dekhao
+        if(onboardModal) onboardModal.style.display = 'flex';
+    }
 });
 
 document.getElementById('random-name-btn')?.addEventListener('click', () => {
@@ -53,7 +69,6 @@ document.querySelectorAll('.gender-btn').forEach(btn => {
 });
 
 document.getElementById('start-guest-chat-btn')?.addEventListener('click', async () => {
-    // 18+ ચેકબોક્સ ચેક કરો
     const ageAgree = document.getElementById('age-agree');
     if (ageAgree && !ageAgree.checked) {
         alert("You must be 18+ to use this app!");
@@ -70,7 +85,6 @@ document.getElementById('start-guest-chat-btn')?.addEventListener('click', async
         let age = document.getElementById('guest-age-input')?.value || "18";
         let country = document.getElementById('guest-country-input')?.value.trim() || "India";
 
-        // નવો ડેટા (Age, Country) Firebase માં સેવ થશે
         await setDoc(doc(db, "users", currentUser.uid), { 
             uid: currentUser.uid, 
             name: name, 
