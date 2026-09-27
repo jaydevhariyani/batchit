@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" href="icon.png">
     
     <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
@@ -30,7 +30,8 @@
         
         #chat-box::-webkit-scrollbar { width: 5px; }
         #chat-box::-webkit-scrollbar-thumb { background: #ccc; border-radius: 5px; }
-   /* NEW NAVBAR CSS */
+
+        /* NEW NAVBAR CSS */
         .main-nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background: white; border-bottom: 1px solid #e5e7eb; position: relative; z-index: 100; }
         .logo { font-size: 24px; font-weight: 800; color: #6366f1; display: flex; align-items: center; gap: 10px; text-decoration: none; }
         
@@ -50,14 +51,27 @@
             .mobile-menu-btn { display: block; }
         }
 
-        /* Mobile Dropdown Menu */
-        .mobile-dropdown { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; padding: 20px; box-sizing: border-box; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-top: 1px solid #e5e7eb; flex-direction: column; gap: 15px; }
+        /* Exact Strangerline Mobile Menu CSS */
+        .mobile-dropdown { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; padding: 20px; box-sizing: border-box; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-top: 1px solid #e5e7eb; flex-direction: column; z-index: 1000; height: calc(100vh - 70px); overflow-y: auto; }
         .mobile-dropdown.active { display: flex; }
-        .mobile-search { padding: 12px 15px; background: #f3f4f6; border: none; border-radius: 10px; font-size: 15px; width: 100%; box-sizing: border-box; outline: none; margin-bottom: 10px; }
-        .mobile-dropdown-link { color: #4b5563; text-decoration: none; font-size: 16px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
-        .language-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; margin-bottom: 20px; }
-        .lang-pill { border: 1px solid #e5e7eb; padding: 8px 15px; border-radius: 20px; font-size: 13px; color: #4b5563; text-decoration: none; }
-        .lang-pill.active { border-color: #8b5cf6; color: #8b5cf6; background: #f5f3ff; }
+        
+        .mobile-search-container { position: relative; margin-bottom: 20px; }
+        .mobile-search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #6b7280; font-size: 16px; }
+        .mobile-search { padding: 14px 15px 14px 45px; background: white; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; width: 100%; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        .mobile-search:focus { border-color: #8b5cf6; }
+
+        .mobile-link-list { display: flex; flex-direction: column; }
+        .mobile-dropdown-link { color: #4b5563; text-decoration: none; font-size: 16px; padding: 15px 0; border-bottom: 1px solid #f3f4f6; transition: color 0.2s; }
+        .mobile-dropdown-link:hover { color: #8b5cf6; }
+        .mobile-dropdown-link.active-link { color: #8b5cf6; font-weight: 600; }
+        .mobile-dropdown-link.view-all { color: #8b5cf6; font-weight: 600; border-bottom: none; margin-bottom: 20px; margin-top: 5px; }
+
+        .lang-label { font-size: 11px; color: #9ca3af; letter-spacing: 1px; margin-bottom: 15px; text-transform: uppercase; font-weight: 600; }
+        .language-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
+        .lang-pill { border: 1px solid #e5e7eb; padding: 10px 18px; border-radius: 25px; font-size: 14px; color: #4b5563; text-decoration: none; transition: all 0.2s; }
+        .lang-pill.active { border-color: #8b5cf6; color: #8b5cf6; background: #f5f3ff; font-weight: 600; }
+        
+        .mobile-start-chat-btn { background: #8b5cf6; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 18px; width: 100%; cursor: pointer; text-align: center; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); }
     </style>
 </head>
 <body>
@@ -81,7 +95,6 @@
 
             <!-- Right Side Button -->
             <div class="header-right-btns" style="display: flex; gap: 10px;">
-                <!-- Premium button temporarily hidden from main nav to match Strangerline clean look, will add to menu -->
                 <button class="start-chat-btn-header open-onboard-trigger">Start Chat</button>
             </div>
 
@@ -90,37 +103,42 @@
 
             <!-- Mobile Dropdown Menu -->
             <div class="mobile-dropdown" id="mobile-dropdown-menu">
-                <input type="text" class="mobile-search" placeholder="Search...">
+                <div class="mobile-search-container">
+                    <i class="fa-solid fa-magnifying-glass mobile-search-icon"></i>
+                    <input type="text" class="mobile-search" placeholder="Search">
+                </div>
                 
-                <a href="#" class="mobile-dropdown-link" style="color: #8b5cf6; font-weight: bold;">Home</a>
-                <a href="#" class="mobile-dropdown-link">Blog</a>
-                <a href="#" class="mobile-dropdown-link">About</a>
-                <a href="#" class="mobile-dropdown-link">Chatroulette Alternative</a>
-                <a href="#" class="mobile-dropdown-link">Emerald Chat Alternative</a>
-                <a href="#" class="mobile-dropdown-link">Video Chat With Strangers</a>
-                <a href="#" class="mobile-dropdown-link" style="color: #6366f1; font-weight: 600;">View All Pages &rarr;</a>
+                <div class="mobile-link-list">
+                    <a href="#" class="mobile-dropdown-link active-link">Home</a>
+                    <a href="#" class="mobile-dropdown-link">Blog</a>
+                    <a href="#" class="mobile-dropdown-link">About</a>
+                    <a href="#" class="mobile-dropdown-link">Chatroulette Alternative</a>
+                    <a href="#" class="mobile-dropdown-link">Emerald Chat Alternative</a>
+                    <a href="#" class="mobile-dropdown-link">Video Chat With Strangers</a>
+                    <a href="#" class="mobile-dropdown-link">Text Chat With Strangers</a>
+                    <a href="#" class="mobile-dropdown-link">Voice Chat With Strangers</a>
+                    <a href="#" class="mobile-dropdown-link view-all">View All Pages &rarr;</a>
+                </div>
                 
-                <div style="font-size: 12px; color: #9ca3af; letter-spacing: 1px; margin-top: 15px;">LANGUAGE</div>
+                <div class="lang-label">LANGUAGE</div>
                 <div class="language-pills">
                     <a href="#" class="lang-pill active">English</a>
                     <a href="#" class="lang-pill">Español</a>
                     <a href="#" class="lang-pill">Deutsch</a>
                     <a href="#" class="lang-pill">Français</a>
                     <a href="#" class="lang-pill">Italiano</a>
-                    <a href="#" class="lang-pill">Português</a>
+                    <a href="#" class="lang-pill">Português (BR)</a>
                     <a href="#" class="lang-pill">日本語</a>
                 </div>
                 
-                <button class="start-chat-btn-header open-onboard-trigger" style="width: 100%; padding: 15px;">Start Chat</button>
+                <button class="mobile-start-chat-btn open-onboard-trigger">Start Chat</button>
             </div>
         </nav>
-        
-        <!-- જૂનો Hero Section અહીંથી ચાલુ રહેશે... -->
 
         <div style="padding: 40px 20px; text-align: center; max-width: 600px; margin: auto;">
             <h1 style="font-size: 42px; font-weight: 800; color: #111827; margin-bottom: 15px;">Talk to Strangers Online</h1>
             <p style="font-size: 18px; color: #4b5563; margin-bottom: 40px;">Free anonymous random chat. Text, voice & images - no sign-up needed.</p>
-            <button id="open-onboard-btn" style="background: #8b5cf6; color: white; border: none; padding: 18px 40px; font-size: 20px; font-weight: 700; border-radius: 15px; cursor: pointer; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4); width: 100%; max-width: 350px;">
+            <button id="open-onboard-btn" class="open-onboard-trigger" style="background: #8b5cf6; color: white; border: none; padding: 18px 40px; font-size: 20px; font-weight: 700; border-radius: 15px; cursor: pointer; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4); width: 100%; max-width: 350px;">
                 Start Chatting <i class="fa-solid fa-arrow-right" style="margin-left: 10px;"></i>
             </button>
         </div>
@@ -142,7 +160,8 @@
                 <div class="gender-btn active" data-gender="Male" style="flex: 1; border: 2px solid #8b5cf6; color: #8b5cf6; background: #f5f3ff; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-mars"></i> Male</div>
                 <div class="gender-btn" data-gender="Female" style="flex: 1; border: 1px solid #e5e7eb; color: #6b7280; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-venus"></i> Female</div>
             </div>
-<!-- NEW AGE AND COUNTRY INPUTS -->
+
+            <!-- NEW AGE AND COUNTRY INPUTS -->
             <div style="display: flex; gap: 15px; margin-bottom: 20px;">
                 <div style="flex: 1;">
                     <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px;">Your age</label>
@@ -159,11 +178,12 @@
                 <input type="checkbox" id="age-agree" style="margin-top: 3px; accent-color: #8b5cf6;" checked>
                 <label for="age-agree">I'm at least <strong style="color: #8b5cf6;">18 years old</strong> and agree to the Terms of Service.</label>
             </div>
+            
             <button id="start-guest-chat-btn" style="background: #c4b5fd; color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer;">Continue</button>
         </div>
     </div>
 
-    <!-- 3. RADAR SCREEN (Looking for match) -->
+    <!-- 3. RADAR SCREEN -->
     <div id="radar-screen" style="display: none; height: 100vh; flex-direction: column; align-items: center; justify-content: center; background: white;">
         <h2 style="color: #111827; font-size: 26px;">Looking for a match...</h2>
         <p style="color: #6b7280; margin-bottom: 30px;">Please wait while we connect you to a stranger.</p>
@@ -189,7 +209,6 @@
                 </div>
             </div>
             
-            <!-- CALL & MENU BUTTONS -->
             <div style="display: flex; align-items: center; gap: 15px;">
                 <button id="audio-call-btn" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;" title="Audio Call"><i class="fa-solid fa-phone"></i></button>
                 <button id="video-call-btn" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;" title="Video Call"><i class="fa-solid fa-video"></i></button>
@@ -205,7 +224,9 @@
             <input type="text" id="message-input" placeholder="Type a message..." style="flex: 1; padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 25px; outline: none; background: #f9fafb; font-size: 15px;">
             <button id="send-btn" style="background: #8b5cf6; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 18px; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
-   <!-- PREMIUM / VIP UPGRADE MODAL -->
+    </div>
+
+    <!-- PREMIUM / VIP UPGRADE MODAL -->
     <div id="premium-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
         <div style="background: white; width: 90%; max-width: 500px; border-radius: 20px; padding: 30px; position: relative; box-sizing: border-box; animation: slideUp 0.3s ease-out;">
             <button id="close-premium-btn" style="position: absolute; top: 15px; right: 15px; background: #f3f4f6; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; color: #4b5563; font-weight: bold;">✕</button>
@@ -216,30 +237,26 @@
             </div>
 
             <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                <!-- PREMIUM PLAN -->
                 <div style="flex: 1; border: 1px solid #e5e7eb; border-radius: 15px; padding: 20px; background: white;">
                     <h3 style="margin: 0 0 5px 0; color: #8b5cf6; font-size: 18px;">Premium</h3>
-                    <div style="font-size: 24px; font-weight: 800; color: #111827; margin-bottom: 15px;">$4.99<span style="font-size: 12px; font-weight: normal; color: #6b7280;">/mo</span></div>
+                    <div style="font-size: 24px; font-weight: 800; color: #111827; margin-bottom: 15px;">$0.99<span style="font-size: 12px; font-weight: normal; color: #6b7280;">/mo</span></div>
                     
                     <ul style="list-style: none; padding: 0; margin: 0 0 20px 0; font-size: 12px; color: #4b5563; line-height: 2;">
                         <li><i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> Gender & Age Filter</li>
                         <li><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> Country Filter</li>
                         <li><i class="fa-solid fa-circle-minus" style="color: #f59e0b;"></i> 300 min Audio Calls</li>
                         <li><i class="fa-solid fa-circle-minus" style="color: #f59e0b;"></i> 300 min Video Calls</li>
-                        <li><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> Change Chat Theme</li>
                     </ul>
                     <button class="upgrade-pay-btn" style="width: 100%; padding: 12px; background: white; color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 10px; font-weight: bold; cursor: pointer;">Select Premium</button>
                 </div>
 
-                <!-- VIP PLAN (Best Value) -->
                 <div style="flex: 1; border: none; border-radius: 15px; padding: 20px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; position: relative; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4); transform: scale(1.05);">
                     <div style="position: absolute; top: -10px; right: 10px; background: #fbbf24; color: #78350f; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">BEST VALUE</div>
                     <h3 style="margin: 0 0 5px 0; color: white; font-size: 18px;">VIP <i class="fa-solid fa-crown" style="color: #fbbf24;"></i></h3>
-                    <div style="font-size: 24px; font-weight: 800; color: white; margin-bottom: 15px;">$9.99<span style="font-size: 12px; font-weight: normal; color: #e5e7eb;">/mo</span></div>
+                    <div style="font-size: 24px; font-weight: 800; color: white; margin-bottom: 15px;">$1.99<span style="font-size: 12px; font-weight: normal; color: #e5e7eb;">/mo</span></div>
                     
                     <ul style="list-style: none; padding: 0; margin: 0 0 20px 0; font-size: 12px; color: #f3f4f6; line-height: 2;">
-                        <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Gender & Age Filter</li>
-                        <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Country Filter</li>
+                        <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> All Filters</li>
                         <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Unlimited Audio Calls</li>
                         <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Unlimited Video Calls</li>
                         <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Change Chat Theme</li>
@@ -253,10 +270,8 @@
             </div>
         </div>
     </div>
-    </div>
 
-    <script type="module" src="script.js"></script>
-<!-- VIDEO CALL UI SCREEN -->
+    <!-- VIDEO CALL UI SCREEN -->
     <div id="video-call-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111827; z-index: 4000; flex-direction: column;">
         <div style="padding: 20px; color: white; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); position: absolute; width: 100%; box-sizing: border-box; z-index: 10;">
             <h3 style="margin: 0; font-size: 18px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Call with Stranger</h3>
@@ -264,12 +279,11 @@
         </div>
         
         <div style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; background: #000;">
-            <!-- Stranger no video (Moto) -->
             <video id="remote-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
-            
-            <!-- Tamaro potano video (Nano, niche jamni baju) -->
             <video id="local-video" autoplay playsinline muted style="width: 110px; height: 160px; object-fit: cover; position: absolute; bottom: 30px; right: 20px; border-radius: 15px; border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.5); background: #333;"></video>
         </div>
     </div>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
