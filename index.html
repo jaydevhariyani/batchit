@@ -136,6 +136,23 @@
 
         .check-icon { color: #22c55e; font-size: 18px; font-weight: 900; }
         .cross-icon { color: #ef4444; font-size: 18px; font-weight: 900; opacity: 0.6; }
+    /* REASONS SECTION */
+        .reasons-section { max-width: 1200px; margin: 80px auto; padding: 0 20px; text-align: center; }
+        .reasons-label { font-size: 12px; font-weight: 700; color: #8b5cf6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
+        .reasons-title { font-size: 36px; font-weight: 800; color: #111827; margin: 0 0 15px 0; }
+        .reasons-desc { font-size: 18px; color: #6b7280; margin: 0 0 50px 0; }
+        
+        .reasons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; text-align: left; }
+        .reason-card { background: #f9fafb; border-radius: 20px; padding: 40px; border: 1px solid #e5e7eb; transition: transform 0.3s; }
+        .reason-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .reason-title { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 10px 0; }
+        .reason-text { font-size: 15px; color: #4b5563; margin: 0 0 25px 0; line-height: 1.6; }
+        .reason-quote { border-left: 3px solid #8b5cf6; padding-left: 15px; font-style: italic; color: #6b7280; font-size: 15px; margin: 0; line-height: 1.5; }
+        
+        @media (max-width: 768px) {
+            .reasons-grid { grid-template-columns: 1fr; }
+            .reason-card { padding: 30px 20px; }
+        }
     </style>
 </head>
 <body>
@@ -362,6 +379,35 @@
             </div>
         </div>
     </div>
+    <!-- REASONS SECTION -->
+        <div class="reasons-section">
+            <div class="reasons-label">REAL REASONS</div>
+            <h2 class="reasons-title">Why people talk to strangers online</h2>
+            <p class="reasons-desc">Real reasons - not marketing. The conversations that actually happen here.</p>
+            
+            <div class="reasons-grid">
+                <div class="reason-card">
+                    <h3 class="reason-title">Practice a language</h3>
+                    <p class="reason-text">Real conversations with native speakers - no scripts, no pressure.</p>
+                    <p class="reason-quote">"I practise Spanish every day now with strangers on here. My conversational skills went from zero to fluent in 6 months."</p>
+                </div>
+                <div class="reason-card">
+                    <h3 class="reason-title">Talk without judgment</h3>
+                    <p class="reason-text">A stranger who doesn't know you listens differently. No history, no agenda.</p>
+                    <p class="reason-quote">"Sometimes you need to say something out loud to someone who has zero context. That's exactly what this is."</p>
+                </div>
+                <div class="reason-card">
+                    <h3 class="reason-title">Beat loneliness</h3>
+                    <p class="reason-text">A real person reacting in real time - not an algorithm, not a feed.</p>
+                    <p class="reason-quote">"Night shifts used to feel unbearable. Now I just open Batchit and there's always someone awake somewhere."</p>
+                </div>
+                <div class="reason-card">
+                    <h3 class="reason-title">Actually make a friend</h3>
+                    <p class="reason-text">Save chats, send friend requests, message after disconnect. Good conversations don't have to end.</p>
+                    <p class="reason-quote">"I've made three actual friends on Batchit. We still talk every week."</p>
+                </div>
+            </div>
+        </div>
 
     <!-- 2. ONBOARDING MODAL -->
     <div id="onboard-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: flex-end;">
