@@ -3,18 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - Batchit</title>
-    <link rel="stylesheet" href="style.css">
-    <style> body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 20px; color: #333; } .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } h1 { color: #0084ff; } a { color: #0084ff; text-decoration: none; font-weight: bold; } </style>
+    <title>Contact Us - Batchit Support</title>
+    <meta name="description" content="Get in touch with the Batchit team for support, business inquiries, or feedback regarding our random stranger chat platform.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { margin: 0; font-family: 'Inter', sans-serif; background: #f4f7fd; color: #111827; }
+        .navbar { background: white; padding: 15px 40px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: 800; color: #6366f1; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .back-btn { background: #f3f4f6; color: #4b5563; padding: 10px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; transition: 0.2s; }
+        .back-btn:hover { background: #e5e7eb; }
+        .container { max-width: 800px; margin: 60px auto; background: white; padding: 50px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; }
+        .page-title { font-size: 42px; font-weight: 800; color: #111827; margin-bottom: 15px; }
+        .subtitle { font-size: 18px; color: #6b7280; margin-bottom: 40px; }
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; text-align: left; margin-bottom: 40px; }
+        .contact-card { background: #f9fafb; padding: 30px; border-radius: 16px; border: 1px solid #e5e7eb; }
+        .contact-icon { font-size: 30px; color: #8b5cf6; margin-bottom: 15px; }
+        .contact-card h3 { margin: 0 0 10px 0; color: #1f2937; }
+        .contact-card p { color: #4b5563; margin: 0 0 15px 0; font-size: 14px; line-height: 1.6; }
+        .email-link { color: #8b5cf6; font-weight: bold; text-decoration: none; font-size: 16px; }
+        @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body>
+    <nav class="navbar">
+        <a href="index.html" class="logo"><i class="fa-solid fa-masks-theater"></i> Batchit</a>
+        <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back</a>
+    </nav>
     <div class="container">
-        <h1>Contact Us</h1>
-        <p>We would love to hear from you! Whether you have a question about features, trials, pricing, need a demo, or anything else, our team is ready to answer all your questions.</p>
-        <p><strong>Email:</strong> support@batchit.site</p>
-        <p><strong>Business Inquiries:</strong> admin@batchit.site</p>
-        <p>Please allow up to 24-48 hours for a response from our team.</p>
-        <p><a href="index.html">⬅ Back to Home</a></p>
+        <h1 class="page-title">Get in Touch</h1>
+        <p class="subtitle">We'd love to hear from you. Our team is always here to help you out.</p>
+        
+        <div class="contact-grid">
+            <div class="contact-card">
+                <i class="fa-solid fa-headset contact-icon"></i>
+                <h3>User Support</h3>
+                <p>Having trouble connecting? Need to report a bug on our random video chat? Our support team is available 24/7 to assist you with account and technical issues.</p>
+                <a href="mailto:support@batchit.site" class="email-link">support@batchit.site</a>
+            </div>
+            <div class="contact-card">
+                <i class="fa-solid fa-briefcase contact-icon"></i>
+                <h3>Business Inquiries</h3>
+                <p>Interested in partnerships, advertising, or integrating Batchit's powerful matchmaking API? Reach out to our business development team.</p>
+                <a href="mailto:admin@batchit.site" class="email-link">admin@batchit.site</a>
+            </div>
+        </div>
+        
+        <p style="color: #9ca3af; font-size: 14px;">Please allow up to 24-48 hours for a response from our human moderation and support team.</p>
     </div>
 </body>
 </html>
