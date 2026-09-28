@@ -99,6 +99,23 @@
         .lang-pill.active { border-color: #8b5cf6; color: #8b5cf6; background: #f5f3ff; font-weight: 600; }
         
         .mobile-start-chat-btn { background: #8b5cf6; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 18px; width: 100%; cursor: pointer; text-align: center; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); }
+   /* STATS SECTION */
+        .stats-section { display: flex; flex-wrap: wrap; justify-content: space-evenly; padding: 60px 20px; background: white; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
+        .stat-item { text-align: center; margin: 10px 20px; }
+        .stat-number { font-size: 42px; font-weight: 800; color: #6366f1; margin-bottom: 5px; }
+        .stat-text { font-size: 15px; color: #6b7280; font-weight: 500; }
+
+        /* FEATURES GRID SECTION */
+        .features-section { max-width: 1200px; margin: 80px auto; padding: 0 20px; text-align: center; }
+        .features-label { font-size: 12px; font-weight: 700; color: #8b5cf6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
+        .features-title { font-size: 36px; font-weight: 800; color: #111827; margin: 0 0 50px 0; }
+        
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .feature-card { background: #f8fafc; border-radius: 20px; padding: 30px; text-align: left; transition: transform 0.3s; border: 1px solid transparent; }
+        .feature-card:hover { transform: translateY(-5px); border-color: #e5e7eb; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .feature-icon { font-size: 24px; color: #8b5cf6; margin-bottom: 20px; }
+        .feature-card-title { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 10px 0; }
+        .feature-card-desc { font-size: 15px; color: #4b5563; line-height: 1.6; margin: 0; }
     </style>
 </head>
 <body>
@@ -200,6 +217,65 @@
             
             <div class="hero-right">
                 <img src="https://strangerline.io/wp-content/uploads/2023/12/hero-img.webp" alt="Stranger Chat Demo" class="hero-image">
+            </div>
+        </div>
+    <!-- STATS SECTION -->
+        <div class="stats-section">
+            <div class="stat-item">
+                <div class="stat-number">5M+</div>
+                <div class="stat-text">Conversations</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">190+</div>
+                <div class="stat-text">Countries</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">&lt;3s</div>
+                <div class="stat-text">Match time</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-text">Moderation</div>
+            </div>
+        </div>
+
+        <!-- FEATURES SECTION -->
+        <div class="features-section">
+            <div class="features-label">WHAT YOU GET</div>
+            <h2 class="features-title">The best site to chat with strangers online</h2>
+            <p style="color: #4b5563; font-size: 18px; max-width: 700px; margin: -30px auto 50px; line-height: 1.6;">Most random chat sites look the same. Batchit is the only one built so conversations can go wherever they naturally want to go.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fa-regular fa-comment-dots feature-icon"></i>
+                    <h3 class="feature-card-title">Text chat with strangers</h3>
+                    <p class="feature-card-desc">Anonymous, instant, and free. No camera required. Just type and connect.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-video feature-icon"></i>
+                    <h3 class="feature-card-title">Random video chat</h3>
+                    <p class="feature-card-desc">Face-to-face with a real stranger. No bots, no fake profiles, real people.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-microphone feature-icon"></i>
+                    <h3 class="feature-card-title">Voice chat and voice notes</h3>
+                    <p class="feature-card-desc">Live voice calls or recorded voice messages - choose how you want to be heard.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-user-plus feature-icon"></i>
+                    <h3 class="feature-card-title">Friends and chat history</h3>
+                    <p class="feature-card-desc">Save your favorite chats. Send friend requests and keep the connection alive.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-clock-rotate-left feature-icon"></i>
+                    <h3 class="feature-card-title">Message disconnected strangers</h3>
+                    <p class="feature-card-desc">Skipped by accident? Reconnect and send messages even after the chat ends.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-shield-halved feature-icon"></i>
+                    <h3 class="feature-card-title">Safety and moderation</h3>
+                    <p class="feature-card-desc">Strict moderation and easy report/block tools to keep the community safe.</p>
+                </div>
             </div>
         </div>
     </div>
