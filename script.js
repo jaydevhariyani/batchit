@@ -15,7 +15,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// DOM Elements
 const landingPage = document.getElementById('landing-page');
 const dashboardScreen = document.getElementById('dashboard-screen');
 const radarScreen = document.getElementById('radar-screen');
@@ -30,9 +29,10 @@ let currentChatId = null;
 let currentChatPartner = null; 
 let unsubscribeMessages = null;
 let selectedGender = "Male";
+let preferredGender = "Any"; // નવું ફિલ્ટર વેરીએબલ
 let searchTimeout = null;
 
-// --- 1. AUTO-LOGIN & NAVIGATION ---
+// --- 1. NAVIGATION & LOGIN ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
@@ -43,7 +43,6 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// લેન્ડિંગ પેજ પરથી ડેશબોર્ડ ખોલવા માટે (Strangerline Style)
 document.querySelectorAll('.open-onboard-trigger').forEach(btn => {
     btn.addEventListener('click', () => {
         if(landingPage) landingPage.style.display = 'none';
@@ -51,6 +50,7 @@ document.querySelectorAll('.open-onboard-trigger').forEach(btn => {
     });
 });
 
+// પોતાનું જેન્ડર સિલેક્ટ કરવા
 document.querySelectorAll('.gender-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.gender-btn').forEach(b => {
@@ -61,13 +61,20 @@ document.querySelectorAll('.gender-btn').forEach(btn => {
     });
 });
 
-// ડેશબોર્ડમાંથી રિયલ સર્ચ ચાલુ કરવા માટે
+// કોની સાથે વાત કરવી છે એ (Preference) સિલેક્ટ કરવા
+document.querySelectorAll('.pref-gender-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.pref-gender-btn').forEach(b => {
+            b.classList.remove('active'); b.style.border = '1px solid #e5e7eb'; b.style.color = '#6b7280'; b.style.background = 'white';
+        });
+        btn.classList.add('active'); btn.style.border = '2px solid #22c55e'; btn.style.color = '#22c55e'; btn.style.background = '#dcfce7';
+        preferredGender = btn.getAttribute('data-pref');
+    });
+});
+
 document.getElementById('start-guest-chat-btn')?.addEventListener('click', async () => {
     const ageAgree = document.getElementById('age-agree');
-    if (ageAgree && !ageAgree.checked) {
-        alert("You must be 18+ to use this app!");
-        return;
-    }
+    if (ageAgree && !ageAgree.checked) { alert("You must be 18+ to use this app!"); return; }
 
     const btn = document.getElementById('start-guest-chat-btn');
     btn.innerHTML = "Connecting...";
@@ -91,7 +98,7 @@ document.getElementById('start-guest-chat-btn')?.addEventListener('click', async
     }
 });
 
-// --- 2. MATCHMAKING LOGIC ---
+// --- 2. SMART FILTER MATCHMAKING LOGIC ---
 async function startMatchmaking() {
     if(mainChatScreen) mainChatScreen.style.display = 'none';
     if(radarScreen) radarScreen.style.display = 'flex';
@@ -101,8 +108,21 @@ async function startMatchmaking() {
     if(unsubscribeMessages) unsubscribeMessages();
     if(searchTimeout) clearTimeout(searchTimeout);
 
+    let myCountryVal = document.getElementById('guest-country-input').value.trim().toLowerCase() || "india";
+    let prefCountryVal = document.getElementById('pref-country-input')?.value.trim().toLowerCase() || "";
+
     const myQueueRef = doc(db, "matching_queue", currentUser.uid);
-    await setDoc(myQueueRef, { uid: currentUser.uid, timestamp: serverTimestamp(), matchedWith: null, partnerUid: null });
+    // કતારમાં ફિલ્ટરની બધી માહિતી સેવ કરો
+    await setDoc(myQueueRef, { 
+        uid: currentUser.uid, 
+        timestamp: serverTimestamp(), 
+        matchedWith: null, 
+        partnerUid: null,
+        myGender: selectedGender,
+        myCountry: myCountryVal,
+        prefGender: preferredGender,
+        prefCountry: prefCountryVal
+    });
 
     const q = query(collection(db, "matching_queue"), orderBy("timestamp", "asc"));
     const snapshot = await getDocs(q);
@@ -111,18 +131,31 @@ async function startMatchmaking() {
     for (const docSnap of snapshot.docs) {
         const otherUser = docSnap.data();
         if (otherUser.uid !== currentUser.uid && !otherUser.matchedWith) {
-            foundMatch = true;
-            currentChatPartner = otherUser.uid;
-            currentChatId = "chat_" + (currentUser.uid < otherUser.uid ? currentUser.uid + "_" + otherUser.uid : otherUser.uid + "_" + currentUser.uid);
             
-            await setDoc(doc(db, "matching_queue", otherUser.uid), { matchedWith: currentChatId, partnerUid: currentUser.uid }, { merge: true });
-            await deleteDoc(myQueueRef);
+            let isMatch = true;
             
-            const partnerDoc = await getDoc(doc(db, "users", otherUser.uid));
-            const partnerName = partnerDoc.exists() ? partnerDoc.data().name : "Stranger";
+            // 1. શું સામેવાળો *મારી* પસંદગી મુજબનો છે?
+            if (preferredGender !== "Any" && otherUser.myGender !== preferredGender) isMatch = false;
+            if (prefCountryVal !== "" && otherUser.myCountry !== prefCountryVal) isMatch = false;
             
-            connectToChat(partnerName);
-            break;
+            // 2. શું હું *સામેવાળાની* પસંદગી મુજબનો છું?
+            if (otherUser.prefGender !== "Any" && otherUser.prefGender !== selectedGender) isMatch = false;
+            if (otherUser.prefCountry !== "" && otherUser.prefCountry !== myCountryVal) isMatch = false;
+
+            if (isMatch) {
+                foundMatch = true;
+                currentChatPartner = otherUser.uid;
+                currentChatId = "chat_" + (currentUser.uid < otherUser.uid ? currentUser.uid + "_" + otherUser.uid : otherUser.uid + "_" + currentUser.uid);
+                
+                await setDoc(doc(db, "matching_queue", otherUser.uid), { matchedWith: currentChatId, partnerUid: currentUser.uid }, { merge: true });
+                await deleteDoc(myQueueRef);
+                
+                const partnerDoc = await getDoc(doc(db, "users", otherUser.uid));
+                const partnerName = partnerDoc.exists() ? partnerDoc.data().name : "Stranger";
+                
+                connectToChat(partnerName);
+                break;
+            }
         }
     }
 
@@ -150,12 +183,18 @@ async function startMatchmaking() {
             await deleteDoc(myQueueRef);
             currentChatPartner = "bot";
             currentChatId = "chat_" + currentUser.uid + "_bot";
-            connectToChat(selectedGender === "Female" ? "Rahul (AI)" : "Priya (AI)");
             
+            // જો Female ફિલ્ટર કર્યું હોય તો AI બોટ પણ Female જ આવશે!
+            let botName = "Stranger (AI)";
+            if(preferredGender === "Female") botName = "Priya (AI)";
+            else if(preferredGender === "Male") botName = "Rahul (AI)";
+            else botName = selectedGender === "Female" ? "Rahul (AI)" : "Priya (AI)";
+
+            connectToChat(botName);
             await addDoc(collection(db, "chats", currentChatId, "messages"), { 
-                sender: "bot", text: "Hi there! Couldn't find a human, so I'm here. How are you?", timestamp: serverTimestamp() 
+                sender: "bot", text: "Hi there! Real users matching your filters are busy. I'm here to chat!", timestamp: serverTimestamp() 
             });
-        }, 10000); 
+        }, 12000); // 12 સેકન્ડ સુધી અસલી માણસ શોધશે
     }
 }
 
@@ -164,7 +203,6 @@ function connectToChat(partnerName) {
     if(radarScreen) radarScreen.style.display = 'none';
     if(mainChatScreen) mainChatScreen.style.display = 'flex';
     
-    // પેલા બટનને પાછું નોર્મલ કરવા
     const btn = document.getElementById('start-guest-chat-btn');
     if(btn) btn.innerHTML = 'Start New Chat <i class="fa-solid fa-arrow-right"></i>';
 
@@ -175,11 +213,11 @@ document.getElementById('cancel-search-btn')?.addEventListener('click', async ()
     clearTimeout(searchTimeout);
     if(currentUser) await deleteDoc(doc(db, "matching_queue", currentUser.uid));
     if(radarScreen) radarScreen.style.display = 'none';
-    if(dashboardScreen) dashboardScreen.style.display = 'flex'; // કેન્સલ કરવા પર ડેશબોર્ડમાં પાછું જશે
+    if(dashboardScreen) dashboardScreen.style.display = 'flex'; 
 });
 
 document.getElementById('skip-btn')?.addEventListener('click', async () => {
-    if(confirm("Are you sure you want to skip and find someone else?")) {
+    if(confirm("Skip and find someone else with the same filters?")) {
         if(chatBox) chatBox.innerHTML = "";
         startMatchmaking();
     }
@@ -202,7 +240,7 @@ document.getElementById('send-btn')?.addEventListener('click', async () => {
         try {
             const response = await fetch("https://api.cohere.ai/v1/chat", {
                 method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${COHERE_API_KEY}` },
-                body: JSON.stringify({ message: message, preamble: "You are a friendly Indian chatting partner named Priya.", temperature: 0.7 })
+                body: JSON.stringify({ message: message, preamble: "You are a friendly chatting partner.", temperature: 0.7 })
             });
             const data = await response.json();
             let aiReply = data.text || "I am listening! Tell me more."; 
@@ -253,21 +291,7 @@ document.getElementById('message-input')?.addEventListener('keypress', (e) => {
     if(e.key === 'Enter') { e.preventDefault(); document.getElementById('send-btn').click(); }
 });
 
-// --- 4. PREMIUM MODAL LOGIC ---
-const premiumModal = document.getElementById('premium-modal');
-if (document.getElementById('close-premium-btn')) document.getElementById('close-premium-btn').addEventListener('click', () => premiumModal.style.display = 'none');
-if (document.getElementById('not-right-now-btn')) document.getElementById('not-right-now-btn').addEventListener('click', () => premiumModal.style.display = 'none');
-
-document.querySelectorAll('.upgrade-pay-btn').forEach(btn => {
-    btn.addEventListener('click', () => { alert("Payment Gateway integration coming soon!"); premiumModal.style.display = 'none'; });
-});
-
-document.getElementById('audio-call-btn')?.addEventListener('click', () => {
-    alert("Audio Calling is a VIP Feature! Upgrade to VIP to use this.");
-    if(premiumModal) premiumModal.style.display = 'flex';
-});
-
-// --- 5. WEBRTC VIDEO CALL LOGIC ---
+// --- 4. VIDEO CALL LOGIC ---
 const videoCallBtn = document.getElementById('video-call-btn');
 const videoCallScreen = document.getElementById('video-call-screen');
 const localVideo = document.getElementById('local-video');
@@ -362,18 +386,17 @@ if (endCallBtn) {
         if (currentChatId) await setDoc(doc(db, "chats", currentChatId), { offer: null, answer: null }, { merge: true });
     });
 }
-// --- 6. IN-CHAT MENU (ADD FRIEND / REPORT / BLOCK) ---
+
+// --- 5. IN-CHAT MENU (ADD FRIEND / REPORT / BLOCK) ---
 const inChatMenuModal = document.getElementById('in-chat-menu-modal');
 
 document.getElementById('menu-btn')?.addEventListener('click', () => {
     if(!inChatMenuModal) return;
     
-    // સામેવાળાનું સાચું નામ અને પહેલો અક્ષર ખેંચો
     let partnerNameStr = document.getElementById('chat-partner-name')?.innerText || "Stranger";
     document.getElementById('menu-partner-name').innerText = partnerNameStr;
     document.getElementById('menu-avatar').innerText = partnerNameStr.charAt(0).toUpperCase();
     
-    // યુનિક આઈડી બનાવો
     let displayId = currentChatPartner && currentChatPartner !== 'bot' ? currentChatPartner.substring(0,8) : Math.floor(Math.random()*999999);
     document.getElementById('menu-partner-id').innerText = "Guest_" + displayId;
     
@@ -384,23 +407,20 @@ document.getElementById('close-chat-menu-btn')?.addEventListener('click', () => 
     inChatMenuModal.style.display = 'none';
 });
 
-// Add Friend બટન
 document.getElementById('add-friend-btn')?.addEventListener('click', () => {
     let pname = document.getElementById('menu-partner-name').innerText;
     alert("Friend request sent to " + pname + "!");
     inChatMenuModal.style.display = 'none';
 });
 
-// Block બટન
 document.getElementById('block-btn')?.addEventListener('click', () => {
     if(confirm("Are you sure you want to block this user? You won't match with them again.")) {
         alert("User blocked successfully.");
         inChatMenuModal.style.display = 'none';
-        document.getElementById('skip-btn').click(); // બ્લોક કર્યા પછી સીધું ઓટોમેટિક સ્કીપ થઈ જશે
+        document.getElementById('skip-btn').click(); 
     }
 });
 
-// Report બટન
 document.getElementById('report-btn')?.addEventListener('click', () => {
     alert("Report sent to moderators. Thank you for keeping the community safe!");
     inChatMenuModal.style.display = 'none';
