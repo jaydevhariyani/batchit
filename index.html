@@ -145,6 +145,23 @@
             .footer-links { gap: 40px; }
             .footer-container { flex-direction: column; }
         }
+    /* IN-CHAT MENU (ADD FRIEND / BLOCK) */
+        #in-chat-menu-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 5500; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
+        .chat-menu-card { background: #1f2937; color: white; width: 90%; max-width: 350px; border-radius: 16px; padding: 25px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); font-family: 'Inter', sans-serif; }
+        .chat-menu-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #9ca3af; font-size: 18px; cursor: pointer; transition: 0.2s; }
+        .chat-menu-close:hover { color: white; }
+        .chat-menu-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .chat-menu-avatar { width: 50px; height: 50px; background: #e879f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: white; }
+        .chat-menu-name { font-size: 20px; font-weight: 700; margin: 0 0 3px 0; }
+        .chat-menu-id { font-size: 13px; color: #9ca3af; margin: 0; }
+        .chat-menu-tagline { font-size: 14px; color: #d1d5db; margin-bottom: 25px; font-weight: 500; }
+        .chat-menu-actions { display: flex; gap: 10px; }
+        .add-friend-btn { flex: 1; background: #3730a3; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .add-friend-btn:hover { background: #312e81; }
+        .block-btn { flex: 1; background: #dc2626; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .block-btn:hover { background: #b91c1c; }
+        .report-btn { width: 100%; background: transparent; color: #9ca3af; border: 1px solid #4b5563; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; transition: 0.2s; }
+        .report-btn:hover { background: rgba(255,255,255,0.05); color: white; }
     </style>
 </head>
 <body>
@@ -425,6 +442,25 @@
                 </div>
             </div>
             <div style="text-align: center;"><button id="not-right-now-btn" style="background: none; border: none; color: #9ca3af; cursor: pointer;">Not right now</button></div>
+        </div>
+    </div>
+    <!-- IN-CHAT MENU MODAL (ADD FRIEND / BLOCK) -->
+    <div id="in-chat-menu-modal">
+        <div class="chat-menu-card">
+            <button class="chat-menu-close" id="close-chat-menu-btn"><i class="fa-solid fa-xmark"></i></button>
+            <div class="chat-menu-header">
+                <div class="chat-menu-avatar" id="menu-avatar">S</div>
+                <div>
+                    <h3 class="chat-menu-name" id="menu-partner-name">Stranger</h3>
+                    <p class="chat-menu-id">ID: <span id="menu-partner-id">Guest_1234</span></p>
+                </div>
+            </div>
+            <p class="chat-menu-tagline">Trying to know Strangers better 😊</p>
+            <div class="chat-menu-actions">
+                <button class="add-friend-btn" id="add-friend-btn"><i class="fa-solid fa-user-plus"></i> Add Friend</button>
+                <button class="block-btn" id="block-btn"><i class="fa-solid fa-ban"></i> Block</button>
+            </div>
+            <button class="report-btn" id="report-btn"><i class="fa-solid fa-flag"></i> Report User</button>
         </div>
     </div>
 
