@@ -4,235 +4,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Batchit - Random Stranger Chat</title>
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b5cf6">
-    <link rel="apple-touch-icon" href="icon.png">
-    
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { margin: 0; font-family: 'Inter', sans-serif; background: #f4f7fd; overflow-x: hidden; }
         
-        /* RADAR ANIMATION CSS */
+        /* GENERAL UI */
         .radar-container { position: relative; width: 250px; height: 250px; margin: 60px auto; display: flex; align-items: center; justify-content: center; }
-        .radar-core { width: 80px; height: 80px; background: #8b5cf6; border-radius: 50%; z-index: 10; display: flex; align-items: center; justify-content: center; color: white; font-size: 35px; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+        .radar-core { width: 80px; height: 80px; background: #8b5cf6; border-radius: 50%; z-index: 10; display: flex; align-items: center; justify-content: center; color: white; font-size: 35px; }
         .radar-ripple { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px solid #8b5cf6; animation: ripple 2s infinite ease-out; }
         .radar-ripple:nth-child(2) { animation-delay: 0.5s; }
         .radar-ripple:nth-child(3) { animation-delay: 1s; }
         @keyframes ripple { 0% { transform: scale(0.3); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
 
-        /* CHAT UI CSS */
         .chat-header { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .skip-btn { background: #ff4757; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3); }
+        .skip-btn { background: #ff4757; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; }
         
         #chat-box::-webkit-scrollbar { width: 5px; }
         #chat-box::-webkit-scrollbar-thumb { background: #ccc; border-radius: 5px; }
 
-        /* NEW NAVBAR CSS */
+        /* NAVBAR & HERO */
         .main-nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background: white; border-bottom: 1px solid #e5e7eb; position: relative; z-index: 100; }
         .logo { font-size: 24px; font-weight: 800; color: #6366f1; display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        
         .desktop-menu { display: flex; align-items: center; gap: 30px; }
-        .nav-link { color: #4b5563; text-decoration: none; font-size: 15px; font-weight: 600; transition: color 0.2s; }
-        .nav-link:hover { color: #8b5cf6; }
-        
-        .start-chat-btn-header { background: #8b5cf6; color: white; border: none; padding: 10px 24px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); }
-        .start-chat-btn-header:hover { background: #7c3aed; transform: translateY(-1px); }
-
+        .nav-link { color: #4b5563; text-decoration: none; font-size: 15px; font-weight: 600; }
+        .start-chat-btn-header { background: #8b5cf6; color: white; border: none; padding: 10px 24px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; }
         .mobile-menu-btn { display: none; background: none; border: none; font-size: 24px; color: #111827; cursor: pointer; }
         
-        /* DESKTOP DROPDOWNS */
         .nav-item-dropdown { position: relative; display: inline-block; cursor: pointer; padding: 10px 0; }
         .desktop-dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: white; min-width: 160px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 12px; border: 1px solid #e5e7eb; z-index: 200; flex-direction: column; padding: 10px 0; }
-        .nav-item-dropdown:hover .desktop-dropdown-menu { display: flex; animation: slideUp 0.2s ease-out; }
-        .desktop-dropdown-link { color: #4b5563; padding: 10px 20px; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
-        .desktop-dropdown-link:hover { background: #f5f3ff; color: #8b5cf6; }
-
-        /* HERO SECTION (TWO-COLUMN) */
+        .nav-item-dropdown:hover .desktop-dropdown-menu { display: flex; }
+        .desktop-dropdown-link { color: #4b5563; padding: 10px 20px; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; justify-content: space-between; }
+        
         .hero-section { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 60px 40px; gap: 40px; min-height: calc(100vh - 80px); }
         .hero-left { flex: 1; max-width: 600px; }
         .hero-right { flex: 1; display: flex; justify-content: center; }
         .hero-image { max-width: 100%; height: auto; border-radius: 20px; box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15); }
-        
         .hero-title { font-size: 56px; font-weight: 800; color: #111827; margin: 0 0 20px 0; line-height: 1.1; letter-spacing: -1px; }
         .hero-subtitle { font-size: 24px; font-weight: 700; color: #6366f1; margin: 0 0 25px 0; }
         .hero-desc { font-size: 18px; color: #4b5563; margin: 0 0 40px 0; line-height: 1.6; }
-        
-        .hero-btn { background: linear-gradient(135deg, #8b5cf6, #a855f7); color: white; border: none; padding: 18px 45px; font-size: 18px; font-weight: 700; border-radius: 12px; cursor: pointer; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4); display: inline-flex; align-items: center; gap: 10px; transition: transform 0.2s; }
-        .hero-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(139, 92, 246, 0.5); }
+        .hero-btn { background: linear-gradient(135deg, #8b5cf6, #a855f7); color: white; border: none; padding: 18px 45px; font-size: 18px; font-weight: 700; border-radius: 12px; cursor: pointer; }
         .hero-trust-text { font-size: 13px; color: #9ca3af; margin-top: 25px; font-weight: 500; }
 
         @media (max-width: 992px) {
             .hero-section { flex-direction: column; text-align: center; padding: 40px 20px; }
             .hero-title { font-size: 42px; }
             .hero-left { display: flex; flex-direction: column; align-items: center; }
-        }
-
-        /* Mobile View (Hamburger) */
-        @media (max-width: 768px) {
             .main-nav { padding: 15px 20px; }
             .desktop-menu, .header-right-btns { display: none; }
             .mobile-menu-btn { display: block; }
         }
 
-        /* Exact Strangerline Mobile Menu CSS */
-        .mobile-dropdown { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; padding: 20px; box-sizing: border-box; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-top: 1px solid #e5e7eb; flex-direction: column; z-index: 1000; height: calc(100vh - 70px); overflow-y: auto; }
+        /* MOBILE MENU */
+        .mobile-dropdown { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; padding: 20px; box-sizing: border-box; border-top: 1px solid #e5e7eb; flex-direction: column; z-index: 1000; height: calc(100vh - 70px); overflow-y: auto; }
         .mobile-dropdown.active { display: flex; }
-        
-        .mobile-search-container { position: relative; margin-bottom: 20px; }
-        .mobile-search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #6b7280; font-size: 16px; }
-        .mobile-search { padding: 14px 15px 14px 45px; background: white; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; width: 100%; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
-        .mobile-search:focus { border-color: #8b5cf6; }
-
+        .mobile-search { padding: 14px 15px 14px 45px; background: white; border: 1px solid #d1d5db; border-radius: 8px; width: 100%; box-sizing: border-box; }
         .mobile-link-list { display: flex; flex-direction: column; }
-        .mobile-dropdown-link { color: #4b5563; text-decoration: none; font-size: 16px; padding: 15px 0; border-bottom: 1px solid #f3f4f6; transition: color 0.2s; }
-        .mobile-dropdown-link:hover { color: #8b5cf6; }
-        .mobile-dropdown-link.active-link { color: #8b5cf6; font-weight: 600; }
-        .mobile-dropdown-link.view-all { color: #8b5cf6; font-weight: 600; border-bottom: none; margin-bottom: 20px; margin-top: 5px; }
-
-        .lang-label { font-size: 11px; color: #9ca3af; letter-spacing: 1px; margin-bottom: 15px; text-transform: uppercase; font-weight: 600; }
-        .language-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
-        .lang-pill { border: 1px solid #e5e7eb; padding: 10px 18px; border-radius: 25px; font-size: 14px; color: #4b5563; text-decoration: none; transition: all 0.2s; }
-        .lang-pill.active { border-color: #8b5cf6; color: #8b5cf6; background: #f5f3ff; font-weight: 600; }
+        .mobile-dropdown-link { color: #4b5563; text-decoration: none; padding: 15px 0; border-bottom: 1px solid #f3f4f6; }
+        .lang-pill { border: 1px solid #e5e7eb; padding: 10px 18px; border-radius: 25px; font-size: 14px; color: #4b5563; text-decoration: none; }
+        .lang-pill.active { border-color: #8b5cf6; color: #8b5cf6; background: #f5f3ff; }
         
-        .mobile-start-chat-btn { background: #8b5cf6; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 18px; width: 100%; cursor: pointer; text-align: center; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); }
-   
-        /* STATS SECTION */
-        .stats-section { display: flex; flex-wrap: wrap; justify-content: space-evenly; padding: 60px 20px; background: white; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
-        .stat-item { text-align: center; margin: 10px 20px; }
-        .stat-number { font-size: 42px; font-weight: 800; color: #6366f1; margin-bottom: 5px; }
-        .stat-text { font-size: 15px; color: #6b7280; font-weight: 500; }
-
-        /* FEATURES GRID SECTION */
-        .features-section { max-width: 1200px; margin: 80px auto; padding: 0 20px; text-align: center; }
-        .features-label { font-size: 12px; font-weight: 700; color: #8b5cf6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
-        .features-title { font-size: 36px; font-weight: 800; color: #111827; margin: 0 0 50px 0; }
-        
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .feature-card { background: #f8fafc; border-radius: 20px; padding: 30px; text-align: left; transition: transform 0.3s; border: 1px solid transparent; }
-        .feature-card:hover { transform: translateY(-5px); border-color: #e5e7eb; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .feature-icon { font-size: 24px; color: #8b5cf6; margin-bottom: 20px; }
-        .feature-card-title { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 10px 0; }
-        .feature-card-desc { font-size: 15px; color: #4b5563; line-height: 1.6; margin: 0; }
-    
-        /* COMPARISON TABLE SECTION */
-        .compare-section { max-width: 1000px; margin: 80px auto; padding: 0 20px; text-align: center; }
-        .compare-label { font-size: 12px; font-weight: 700; color: #8b5cf6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
-        .compare-title { font-size: 36px; font-weight: 800; color: #111827; margin: 0 0 20px 0; }
-        .compare-desc { font-size: 18px; color: #6b7280; max-width: 700px; margin: 0 auto 50px auto; line-height: 1.6; }
-
-        .compare-table-wrapper { background: white; border-radius: 20px; padding: 0; box-shadow: 0 10px 40px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e5e7eb; overflow-x: auto; }
-        .compare-table { width: 100%; border-collapse: collapse; text-align: center; min-width: 600px; }
-        .compare-table th, .compare-table td { padding: 20px 15px; border-bottom: 1px solid #f3f4f6; }
-        .compare-table th { font-size: 14px; font-weight: 600; color: #4b5563; background: #f9fafb; border-bottom: 2px solid #e5e7eb; }
-        
-        .compare-table td:first-child, .compare-table th:first-child { text-align: left; padding-left: 30px; font-weight: 600; color: #111827; }
-        
-        /* The Purple Highlighted Column (Batchit) */
-        .compare-table th.highlight-col { background: #8b5cf6; color: white; border-bottom: none; font-size: 16px; border-radius: 10px 10px 0 0; position: relative; }
-        .compare-table td.highlight-col { background: #f5f3ff; border-left: 2px solid #8b5cf6; border-right: 2px solid #8b5cf6; }
-        .compare-table tr:last-child td.highlight-col { border-bottom: 2px solid #8b5cf6; border-radius: 0 0 10px 10px; }
-
-        .check-icon { color: #22c55e; font-size: 18px; font-weight: 900; }
-        .cross-icon { color: #ef4444; font-size: 18px; font-weight: 900; opacity: 0.6; }
-    
-        /* REASONS SECTION */
-        .reasons-section { max-width: 1200px; margin: 80px auto; padding: 0 20px; text-align: center; }
-        .reasons-label { font-size: 12px; font-weight: 700; color: #8b5cf6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
-        .reasons-title { font-size: 36px; font-weight: 800; color: #111827; margin: 0 0 15px 0; }
-        .reasons-desc { font-size: 18px; color: #6b7280; margin: 0 0 50px 0; }
-        
-        .reasons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; text-align: left; }
-        .reason-card { background: #f9fafb; border-radius: 20px; padding: 40px; border: 1px solid #e5e7eb; transition: transform 0.3s; }
-        .reason-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .reason-title { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 10px 0; }
-        .reason-text { font-size: 15px; color: #4b5563; margin: 0 0 25px 0; line-height: 1.6; }
-        .reason-quote { border-left: 3px solid #8b5cf6; padding-left: 15px; font-style: italic; color: #6b7280; font-size: 15px; margin: 0; line-height: 1.5; }
+        /* NEW DASHBOARD CSS */
+        .dashboard-container { display: flex; flex: 1; overflow: hidden; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .dash-sidebar { width: 280px; padding: 25px; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; gap: 20px; background: white; overflow-y: auto; }
+        .dash-main { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        .dash-card { background: white; border-radius: 15px; padding: 25px; width: 100%; max-width: 600px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
+        .premium-card { background: #f0fdf4; border: 1px solid #bbf7d0; cursor: pointer; transition: 0.2s; }
+        .premium-card:hover { border-color: #22c55e; }
         
         @media (max-width: 768px) {
-            .reasons-grid { grid-template-columns: 1fr; }
-            .reason-card { padding: 30px 20px; }
+            .dashboard-container { flex-direction: column; overflow-y: auto; }
+            .dash-sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e5e7eb; }
+            .dash-main { padding: 20px; }
         }
+
+        /* SECTIONS CSS */
+        .stats-section { display: flex; flex-wrap: wrap; justify-content: space-evenly; padding: 60px 20px; background: white; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
+        .stat-number { font-size: 42px; font-weight: 800; color: #6366f1; margin-bottom: 5px; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 50px auto; padding: 0 20px; }
+        .feature-card { background: #f8fafc; border-radius: 20px; padding: 30px; border: 1px solid transparent; }
+        .compare-table { width: 100%; border-collapse: collapse; text-align: center; min-width: 600px; }
+        .compare-table td.highlight-col { background: #f5f3ff; border-left: 2px solid #8b5cf6; border-right: 2px solid #8b5cf6; }
+        .reasons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; max-width: 1200px; margin: 50px auto; padding: 0 20px; }
+        .reason-card { background: #f9fafb; border-radius: 20px; padding: 40px; border: 1px solid #e5e7eb; }
     </style>
 </head>
 <body>
 
-    <!-- 1. LANDING PAGE (અહીં display: block; કર્યું છે જેથી ઓવરલેપ ના થાય) -->
+    <!-- 1. LANDING PAGE -->
     <div id="landing-page" style="display: block; min-height: 100vh;">
-        
-        <!-- NEW NAVBAR -->
         <nav class="main-nav">
             <a href="#" class="logo"><i class="fa-solid fa-masks-theater"></i> Batchit</a>
-            
             <div class="desktop-menu">
                 <a href="#" class="nav-link">Home</a>
                 <a href="#" class="nav-link">Blog</a>
-                <a href="#" class="nav-link">About</a>
-                
                 <div class="nav-item-dropdown">
-                    <span class="nav-link">Pages <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i></span>
+                    <span class="nav-link">Pages <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i></span>
                     <div class="desktop-dropdown-menu">
-                        <a href="#" class="desktop-dropdown-link">Chatroulette Alternative</a>
-                        <a href="#" class="desktop-dropdown-link">Emerald Chat Alternative</a>
                         <a href="#" class="desktop-dropdown-link">Video Chat</a>
                         <a href="#" class="desktop-dropdown-link">Text Chat</a>
                     </div>
                 </div>
-
                 <div class="nav-item-dropdown">
-                    <span class="nav-link"><i class="fa-solid fa-globe"></i> English <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 3px;"></i></span>
-                    <div class="desktop-dropdown-menu">
-                        <a href="#" class="desktop-dropdown-link" style="color: #8b5cf6; background: #f5f3ff;">English <i class="fa-solid fa-check"></i></a>
-                        <a href="#" class="desktop-dropdown-link">Español</a>
-                        <a href="#" class="desktop-dropdown-link">Deutsch</a>
-                        <a href="#" class="desktop-dropdown-link">Français</a>
-                        <a href="#" class="desktop-dropdown-link">Italiano</a>
-                    </div>
+                    <span class="nav-link"><i class="fa-solid fa-globe"></i> English <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i></span>
                 </div>
-                
-                <a href="#" class="nav-link" style="font-size: 18px;"><i class="fa-solid fa-magnifying-glass"></i></a>
             </div>
-
             <div class="header-right-btns" style="display: flex; gap: 10px;">
-                <button id="open-onboard-btn-header" class="start-chat-btn-header open-onboard-trigger">Start Chat</button>
+                <button class="start-chat-btn-header open-onboard-trigger">Start Chat</button>
             </div>
-
             <button class="mobile-menu-btn" id="mobile-menu-toggle"><i class="fa-solid fa-bars"></i></button>
-
-            <div class="mobile-dropdown" id="mobile-dropdown-menu">
-                <div class="mobile-search-container">
-                    <i class="fa-solid fa-magnifying-glass mobile-search-icon"></i>
-                    <input type="text" class="mobile-search" placeholder="Search">
-                </div>
-                
-                <div class="mobile-link-list">
-                    <a href="#" class="mobile-dropdown-link active-link">Home</a>
-                    <a href="#" class="mobile-dropdown-link">Blog</a>
-                    <a href="#" class="mobile-dropdown-link">About</a>
-                    <a href="#" class="mobile-dropdown-link">Chatroulette Alternative</a>
-                    <a href="#" class="mobile-dropdown-link">Emerald Chat Alternative</a>
-                    <a href="#" class="mobile-dropdown-link">Video Chat With Strangers</a>
-                    <a href="#" class="mobile-dropdown-link">Text Chat With Strangers</a>
-                    <a href="#" class="mobile-dropdown-link">Voice Chat With Strangers</a>
-                    <a href="#" class="mobile-dropdown-link view-all">View All Pages &rarr;</a>
-                </div>
-                
-                <div class="lang-label">LANGUAGE</div>
-                <div class="language-pills">
-                    <a href="#" class="lang-pill active">English</a>
-                    <a href="#" class="lang-pill">Español</a>
-                    <a href="#" class="lang-pill">Deutsch</a>
-                    <a href="#" class="lang-pill">Français</a>
-                    <a href="#" class="lang-pill">Italiano</a>
-                    <a href="#" class="lang-pill">Português (BR)</a>
-                    <a href="#" class="lang-pill">日本語</a>
-                </div>
-                
-                <button class="mobile-start-chat-btn open-onboard-trigger">Start Chat</button>
-            </div>
         </nav>
 
         <div class="hero-section">
@@ -240,312 +123,157 @@
                 <h1 class="hero-title">Talk to Strangers Online - Free Anonymous Random Chat</h1>
                 <h2 class="hero-subtitle">Make real friends, free.</h2>
                 <p class="hero-desc">Free anonymous random chat with real people worldwide. Text, voice, and video - no sign-up needed.</p>
-                
-                <button id="open-onboard-btn-main" class="hero-btn open-onboard-trigger">
-                    Start Chatting <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-                </button>
-                
-                <div class="hero-trust-text">
-                    No sign-up &middot; No bots &middot; 190+ countries &middot; 100% anonymous
-                </div>
+                <button class="hero-btn open-onboard-trigger">Start Chatting <i class="fa-solid fa-chevron-right"></i></button>
             </div>
-            
-            <div class="hero-right">
-                <img src="https://strangerline.io/wp-content/uploads/2023/12/hero-img.webp" alt="Stranger Chat Demo" class="hero-image">
-            </div>
+            <div class="hero-right"><img src="https://strangerline.io/wp-content/uploads/2023/12/hero-img.webp" class="hero-image"></div>
         </div>
 
-        <!-- STATS SECTION -->
         <div class="stats-section">
-            <div class="stat-item">
-                <div class="stat-number">5M+</div>
-                <div class="stat-text">Conversations</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">190+</div>
-                <div class="stat-text">Countries</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">&lt;3s</div>
-                <div class="stat-text">Match time</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">24/7</div>
-                <div class="stat-text">Moderation</div>
-            </div>
+            <div style="text-align: center;"><div class="stat-number">5M+</div><div style="color: #6b7280;">Conversations</div></div>
+            <div style="text-align: center;"><div class="stat-number">190+</div><div style="color: #6b7280;">Countries</div></div>
         </div>
+    </div>
 
-        <!-- FEATURES SECTION -->
-        <div class="features-section">
-            <div class="features-label">WHAT YOU GET</div>
-            <h2 class="features-title">The best site to chat with strangers online</h2>
-            <p style="color: #4b5563; font-size: 18px; max-width: 700px; margin: -30px auto 50px; line-height: 1.6;">Most random chat sites look the same. Batchit is the only one built so conversations can go wherever they naturally want to go.</p>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <i class="fa-regular fa-comment-dots feature-icon"></i>
-                    <h3 class="feature-card-title">Text chat with strangers</h3>
-                    <p class="feature-card-desc">Anonymous, instant, and free. No camera required. Just type and connect.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fa-solid fa-video feature-icon"></i>
-                    <h3 class="feature-card-title">Random video chat</h3>
-                    <p class="feature-card-desc">Face-to-face with a real stranger. No bots, no fake profiles, real people.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fa-solid fa-microphone feature-icon"></i>
-                    <h3 class="feature-card-title">Voice chat and voice notes</h3>
-                    <p class="feature-card-desc">Live voice calls or recorded voice messages - choose how you want to be heard.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fa-solid fa-user-plus feature-icon"></i>
-                    <h3 class="feature-card-title">Friends and chat history</h3>
-                    <p class="feature-card-desc">Save your favorite chats. Send friend requests and keep the connection alive.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fa-solid fa-clock-rotate-left feature-icon"></i>
-                    <h3 class="feature-card-title">Message disconnected strangers</h3>
-                    <p class="feature-card-desc">Skipped by accident? Reconnect and send messages even after the chat ends.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fa-solid fa-shield-halved feature-icon"></i>
-                    <h3 class="feature-card-title">Safety and moderation</h3>
-                    <p class="feature-card-desc">Strict moderation and easy report/block tools to keep the community safe.</p>
-                </div>
+    <!-- 2. DASHBOARD / PRE-CHAT SCREEN -->
+    <div id="dashboard-screen" style="display: none; height: 100vh; background: #f4f7fd; flex-direction: column;">
+        <nav style="background: white; padding: 15px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+            <a href="#" class="logo" style="font-size: 20px;"><i class="fa-solid fa-masks-theater"></i> Batchit</a>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="background: #f3f4f6; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 14px;"><i class="fa-solid fa-user"></i> Guest Account</div>
+                <button style="background: linear-gradient(45deg, #fbbf24, #f59e0b); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="document.getElementById('premium-modal').style.display='flex'"><i class="fa-solid fa-crown"></i> Get VIP</button>
             </div>
-        </div>
+        </nav>
 
-        <!-- COMPARISON SECTION -->
-        <div class="compare-section">
-            <div class="compare-label">HOW WE COMPARE</div>
-            <h2 class="compare-title">The #1 Omegle alternative - with everything Omegle never had</h2>
-            <p class="compare-desc">Omegle shut down in November 2023. Millions of people moved to OmeTV, Chatroulette, Chitchat.gg, Emerald Chat, and Knotchat. Batchit was built to go further than all of them.</p>
-            
-            <div class="compare-table-wrapper">
-                <table class="compare-table">
-                    <thead>
-                        <tr>
-                            <th>Feature</th>
-                            <th class="highlight-col">Batchit <i class="fa-solid fa-star" style="font-size: 12px; margin-left: 5px; color: #fbbf24;"></i></th>
-                            <th>OmeTV</th>
-                            <th>Chitchat.gg</th>
-                            <th>Emerald Chat</th>
-                            <th>Chatroulette</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Text chat</td>
-                            <td class="highlight-col"><i class="fa-solid fa-check check-icon"></i></td>
-                            <td><i class="fa-solid fa-check check-icon"></i></td>
-                            <td><i class="fa-solid fa-check check-icon"></i></td>
-                            <td><i class="fa-solid fa-check check-icon"></i></td>
-                            <td><i class="fa-solid fa-check check-icon"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Video chat</td>
-                            <td class="highlight-col"><i class="fa-solid fa-check check-icon"></i></td>
-                            <td><i class="fa-solid fa-check check-icon"></i></td>
-                            <td><i class="fa-solid fa-check check-icon"></i></td>
-                            <td><i class="fa-solid fa-check check-icon"></i></td>
-                            <td><i class="fa-solid fa-check check-icon"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Voice chat</td>
-                            <td class="highlight-col"><i class="fa-solid fa-check check-icon"></i></td>
-                            <td><i class="fa-solid fa-xmark cross-icon"></i></td>
-                            <td><i class="fa-solid fa-check check-icon"></i></td>
-                            <td><i class="fa-solid fa-xmark cross-icon"></i></td>
-                            <td><i class="fa-solid fa-xmark cross-icon"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Voice notes</td>
-                            <td class="highlight-col"><i class="fa-solid fa-check check-icon"></i></td>
-                            <td><i class="fa-solid fa-xmark cross-icon"></i></td>
-                            <td><i class="fa-solid fa-xmark cross-icon"></i></td>
-                            <td><i class="fa-solid fa-xmark cross-icon"></i></td>
-                            <td><i class="fa-solid fa-xmark cross-icon"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Message disconnected strangers</td>
-                            <td class="highlight-col"><i class="fa-solid fa-check check-icon"></i></td>
-                            <td><i class="fa-solid fa-xmark cross-icon"></i></td>
-                            <td><i class="fa-solid fa-xmark cross-icon"></i></td>
-                            <td><i class="fa-solid fa-xmark cross-icon"></i></td>
-                            <td><i class="fa-solid fa-xmark cross-icon"></i></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- REASONS SECTION (હવે આ બોક્સ landing-page ની અંદર આવી ગયું છે) -->
-        <div class="reasons-section">
-            <div class="reasons-label">REAL REASONS</div>
-            <h2 class="reasons-title">Why people talk to strangers online</h2>
-            <p class="reasons-desc">Real reasons - not marketing. The conversations that actually happen here.</p>
-            
-            <div class="reasons-grid">
-                <div class="reason-card">
-                    <h3 class="reason-title">Practice a language</h3>
-                    <p class="reason-text">Real conversations with native speakers - no scripts, no pressure.</p>
-                    <p class="reason-quote">"I practise Spanish every day now with strangers on here. My conversational skills went from zero to fluent in 6 months."</p>
+        <div class="dashboard-container">
+            <!-- Sidebar for Profile Setup -->
+            <div class="dash-sidebar">
+                <h3 style="margin: 0; color: #111827;">Profile Setup</h3>
+                <div>
+                    <label style="font-weight: 600; font-size: 14px;">Display Name</label>
+                    <input type="text" id="guest-name-input" placeholder="Guest" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 5px; box-sizing: border-box;">
                 </div>
-                <div class="reason-card">
-                    <h3 class="reason-title">Talk without judgment</h3>
-                    <p class="reason-text">A stranger who doesn't know you listens differently. No history, no agenda.</p>
-                    <p class="reason-quote">"Sometimes you need to say something out loud to someone who has zero context. That's exactly what this is."</p>
+                <div>
+                    <label style="font-weight: 600; font-size: 14px;">Your Gender</label>
+                    <div style="display: flex; gap: 5px; margin-top: 5px;">
+                        <div class="gender-btn active" data-gender="Male" style="flex: 1; border: 2px solid #8b5cf6; color: #8b5cf6; background: #f5f3ff; padding: 8px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold;">Male</div>
+                        <div class="gender-btn" data-gender="Female" style="flex: 1; border: 1px solid #e5e7eb; color: #6b7280; padding: 8px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold;">Female</div>
+                    </div>
                 </div>
-                <div class="reason-card">
-                    <h3 class="reason-title">Beat loneliness</h3>
-                    <p class="reason-text">A real person reacting in real time - not an algorithm, not a feed.</p>
-                    <p class="reason-quote">"Night shifts used to feel unbearable. Now I just open Batchit and there's always someone awake somewhere."</p>
+                <div>
+                    <label style="font-weight: 600; font-size: 14px;">Age</label>
+                    <input type="number" id="guest-age-input" placeholder="18+" min="18" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 5px; box-sizing: border-box;">
                 </div>
-                <div class="reason-card">
-                    <h3 class="reason-title">Actually make a friend</h3>
-                    <p class="reason-text">Save chats, send friend requests, message after disconnect. Good conversations don't have to end.</p>
-                    <p class="reason-quote">"I've made three actual friends on Batchit. We still talk every week."</p>
+                <div>
+                    <label style="font-weight: 600; font-size: 14px;">Country</label>
+                    <input type="text" id="guest-country-input" placeholder="e.g. India" value="India" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 5px; box-sizing: border-box;">
                 </div>
-            </div>
-        </div>
-
-    </div> <!-- અહિયાં LANDING PAGE પૂરું થાય છે -->
-
-    <!-- 2. ONBOARDING MODAL -->
-    <div id="onboard-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: flex-end;">
-        <div style="background: white; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 30px 20px; box-sizing: border-box;">
-            <h2 style="margin-top: 0; margin-bottom: 20px; color: #111827;">Before you start</h2>
-            
-            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Your display name</label>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <input type="text" id="guest-name-input" placeholder="Enter your name" style="flex: 1; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px;">
-                <button id="random-name-btn" style="background: #8b5cf6; color: white; border: none; padding: 0 15px; border-radius: 10px; font-weight: bold; cursor: pointer;">Random</button>
-            </div>
-
-            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Your gender</label>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <div class="gender-btn active" data-gender="Male" style="flex: 1; border: 2px solid #8b5cf6; color: #8b5cf6; background: #f5f3ff; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-mars"></i> Male</div>
-                <div class="gender-btn" data-gender="Female" style="flex: 1; border: 1px solid #e5e7eb; color: #6b7280; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-venus"></i> Female</div>
-            </div>
-
-            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                <div style="flex: 1;">
-                    <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px;">Your age</label>
-                    <input type="number" id="guest-age-input" placeholder="Age" min="18" max="99" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
-                </div>
-                <div style="flex: 1;">
-                    <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px;">Your country</label>
-                    <input type="text" id="guest-country-input" placeholder="e.g. India" value="India" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                <div style="font-size: 12px; color: #6b7280; margin-top: auto;">
+                    <input type="checkbox" id="age-agree" checked> I agree to 18+ Terms of Service.
                 </div>
             </div>
 
-            <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; font-size: 13px; color: #6b7280;">
-                <input type="checkbox" id="age-agree" style="margin-top: 3px; accent-color: #8b5cf6;" checked>
-                <label for="age-agree">I'm at least <strong style="color: #8b5cf6;">18 years old</strong> and agree to the Terms of Service.</label>
+            <!-- Main Dashboard Area (Filters) -->
+            <div class="dash-main">
+                <p style="color: #6b7280; margin: 0; font-weight: 500;">Chat with random people worldwide - Be Respectful and have fun</p>
+
+                <div class="dash-card">
+                    <h3 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;"><i class="fa-regular fa-file-lines" style="color: #8b5cf6;"></i> Type your interests</h3>
+                    <input type="text" placeholder="Add an interest (Coming Soon)" disabled style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; box-sizing: border-box;">
+                </div>
+
+                <div class="dash-card premium-card" onclick="document.getElementById('premium-modal').style.display='flex'">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="margin: 0 0 5px 0; color: #166534; display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-venus-mars"></i> Gender & Age Filter <i class="fa-solid fa-crown" style="color: #fbbf24;"></i>
+                            </h3>
+                            <p style="margin: 0; color: #15803d; font-size: 14px;">Find people matching your preferences</p>
+                        </div>
+                        <i class="fa-solid fa-arrow-right" style="color: #22c55e; font-size: 20px;"></i>
+                    </div>
+                </div>
+
+                <div class="dash-card" style="background: #eff6ff; border-color: #bfdbfe; cursor: pointer;" onclick="document.getElementById('premium-modal').style.display='flex'">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="margin: 0 0 5px 0; color: #1e40af; display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-earth-americas"></i> Filter by Country <i class="fa-solid fa-crown" style="color: #fbbf24;"></i>
+                            </h3>
+                            <p style="margin: 0; color: #1d4ed8; font-size: 14px;">Select the specific country you want</p>
+                        </div>
+                        <i class="fa-solid fa-arrow-right" style="color: #3b82f6; font-size: 20px;"></i>
+                    </div>
+                </div>
+
+                <button id="start-guest-chat-btn" style="background: #8b5cf6; color: white; border: none; padding: 18px 40px; border-radius: 30px; font-size: 20px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 25px rgba(139,92,246,0.4); margin-top: 20px; display: flex; align-items: center; gap: 10px;">
+                    Start New Chat <i class="fa-solid fa-arrow-right"></i>
+                </button>
             </div>
-            
-            <button id="start-guest-chat-btn" style="background: #c4b5fd; color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer;">Continue</button>
         </div>
     </div>
 
     <!-- 3. RADAR SCREEN -->
     <div id="radar-screen" style="display: none; height: 100vh; flex-direction: column; align-items: center; justify-content: center; background: white;">
         <h2 style="color: #111827; font-size: 26px;">Looking for a match...</h2>
-        <p style="color: #6b7280; margin-bottom: 30px;">Please wait while we connect you to a stranger.</p>
-        
-        <div class="radar-container">
-            <div class="radar-ripple"></div>
-            <div class="radar-ripple"></div>
-            <div class="radar-ripple"></div>
-            <div class="radar-core"><i class="fa-solid fa-user"></i></div>
-        </div>
-        
-        <button id="cancel-search-btn" style="margin-top: 50px; background: #f3f4f6; color: #4b5563; border: none; padding: 12px 30px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 16px;">Cancel</button>
+        <div class="radar-container"><div class="radar-ripple"></div><div class="radar-ripple"></div><div class="radar-ripple"></div><div class="radar-core"><i class="fa-solid fa-user"></i></div></div>
+        <button id="cancel-search-btn" style="margin-top: 50px; background: #f3f4f6; color: #4b5563; border: none; padding: 12px 30px; border-radius: 20px; font-weight: bold; cursor: pointer;">Cancel</button>
     </div>
 
     <!-- 4. MAIN CHAT SCREEN -->
     <div id="main-chat-screen" style="display: none; height: 100vh; flex-direction: column; background: #f4f7fd;">
         <header class="chat-header">
             <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 45px; height: 45px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;"><i class="fa-solid fa-user-secret"></i></div>
+                <div style="width: 45px; height: 45px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;"><i class="fa-solid fa-user-secret"></i></div>
                 <div style="display: flex; flex-direction: column;">
                     <strong id="chat-partner-name" style="font-size: 18px; color: #111827;">Stranger</strong>
                     <span id="typing-indicator" style="font-size: 12px; color: #25D366; display: none; font-weight: bold;">typing...</span>
                 </div>
             </div>
-            
             <div style="display: flex; align-items: center; gap: 15px;">
-                <button id="audio-call-btn" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;" title="Audio Call"><i class="fa-solid fa-phone"></i></button>
-                <button id="video-call-btn" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;" title="Video Call"><i class="fa-solid fa-video"></i></button>
-                <button id="menu-btn" style="background: none; border: none; font-size: 18px; color: #6b7280; cursor: pointer;" title="More Options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                <button id="audio-call-btn" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;"><i class="fa-solid fa-phone"></i></button>
+                <button id="video-call-btn" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;"><i class="fa-solid fa-video"></i></button>
+                <button id="menu-btn" style="background: none; border: none; font-size: 18px; color: #6b7280; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                 <button class="skip-btn" id="skip-btn">Skip <i class="fa-solid fa-forward-step"></i></button>
             </div>
         </header>
-
         <div id="chat-box" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column;"></div>
-
         <div style="padding: 15px; background: white; border-top: 1px solid #e5e7eb; display: flex; align-items: center; gap: 10px;">
-            <button id="mic-btn" style="background: none; border: none; font-size: 22px; color: #6b7280; cursor: pointer;"><i class="fa-solid fa-microphone"></i></button>
-            <input type="text" id="message-input" placeholder="Type a message..." style="flex: 1; padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 25px; outline: none; background: #f9fafb; font-size: 15px;">
-            <button id="send-btn" style="background: #8b5cf6; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 18px; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);"><i class="fa-solid fa-paper-plane"></i></button>
+            <button style="background: none; border: none; font-size: 22px; color: #6b7280;"><i class="fa-solid fa-microphone"></i></button>
+            <input type="text" id="message-input" placeholder="Type a message..." style="flex: 1; padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 25px; outline: none;">
+            <button id="send-btn" style="background: #8b5cf6; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 
-    <!-- PREMIUM / VIP UPGRADE MODAL -->
-    <div id="premium-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
-        <div style="background: white; width: 90%; max-width: 500px; border-radius: 20px; padding: 30px; position: relative; box-sizing: border-box; animation: slideUp 0.3s ease-out;">
-            <button id="close-premium-btn" style="position: absolute; top: 15px; right: 15px; background: #f3f4f6; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; color: #4b5563; font-weight: bold;">✕</button>
-            
-            <div style="text-align: center; margin-bottom: 25px;">
-                <h2 style="margin: 0; font-size: 24px; color: #111827;">Choose Your Plan</h2>
-                <p style="margin: 5px 0 0 0; color: #6b7280; font-size: 14px;">Compare what each plan includes</p>
-            </div>
-
+    <!-- PREMIUM MODAL -->
+    <div id="premium-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 5000; justify-content: center; align-items: center;">
+        <div style="background: white; width: 90%; max-width: 500px; border-radius: 20px; padding: 30px; position: relative;">
+            <button id="close-premium-btn" style="position: absolute; top: 15px; right: 15px; background: #f3f4f6; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold;">✕</button>
+            <div style="text-align: center; margin-bottom: 25px;"><h2>Choose Your Plan</h2></div>
             <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                <div style="flex: 1; border: 1px solid #e5e7eb; border-radius: 15px; padding: 20px; background: white;">
-                    <h3 style="margin: 0 0 5px 0; color: #8b5cf6; font-size: 18px;">Premium</h3>
-                    <div style="font-size: 24px; font-weight: 800; color: #111827; margin-bottom: 15px;">$0.99<span style="font-size: 12px; font-weight: normal; color: #6b7280;">/mo</span></div>
-                    
-                    <ul style="list-style: none; padding: 0; margin: 0 0 20px 0; font-size: 12px; color: #4b5563; line-height: 2;">
-                        <li><i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> Gender & Age Filter</li>
-                        <li><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> Country Filter</li>
-                        <li><i class="fa-solid fa-circle-minus" style="color: #f59e0b;"></i> 300 min Audio Calls</li>
-                        <li><i class="fa-solid fa-circle-minus" style="color: #f59e0b;"></i> 300 min Video Calls</li>
-                    </ul>
-                    <button class="upgrade-pay-btn" style="width: 100%; padding: 12px; background: white; color: #8b5cf6; border: 1px solid #8b5cf6; border-radius: 10px; font-weight: bold; cursor: pointer;">Select Premium</button>
+                <div style="flex: 1; border: 1px solid #e5e7eb; border-radius: 15px; padding: 20px;">
+                    <h3>Premium</h3>
+                    <div style="font-size: 24px; font-weight: 800;">$0.99</div>
+                    <button class="upgrade-pay-btn" style="width: 100%; padding: 12px; border-radius: 10px; margin-top: 20px;">Select</button>
                 </div>
-
-                <div style="flex: 1; border: none; border-radius: 15px; padding: 20px; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; position: relative; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4); transform: scale(1.05);">
-                    <div style="position: absolute; top: -10px; right: 10px; background: #fbbf24; color: #78350f; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">BEST VALUE</div>
-                    <h3 style="margin: 0 0 5px 0; color: white; font-size: 18px;">VIP <i class="fa-solid fa-crown" style="color: #fbbf24;"></i></h3>
-                    <div style="font-size: 24px; font-weight: 800; color: white; margin-bottom: 15px;">$1.99<span style="font-size: 12px; font-weight: normal; color: #e5e7eb;">/mo</span></div>
-                    
-                    <ul style="list-style: none; padding: 0; margin: 0 0 20px 0; font-size: 12px; color: #f3f4f6; line-height: 2;">
-                        <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> All Filters</li>
-                        <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Unlimited Audio Calls</li>
-                        <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Unlimited Video Calls</li>
-                        <li><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Change Chat Theme</li>
-                    </ul>
-                    <button class="upgrade-pay-btn" style="width: 100%; padding: 12px; background: white; color: #6366f1; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">Get VIP</button>
+                <div style="flex: 1; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; border-radius: 15px; padding: 20px;">
+                    <h3>VIP <i class="fa-solid fa-crown"></i></h3>
+                    <div style="font-size: 24px; font-weight: 800;">$1.99</div>
+                    <button class="upgrade-pay-btn" style="width: 100%; padding: 12px; background: white; color: #8b5cf6; border: none; border-radius: 10px; margin-top: 20px;">Get VIP</button>
                 </div>
             </div>
-            
-            <div style="text-align: center;">
-                <button id="not-right-now-btn" style="background: none; border: none; color: #9ca3af; font-size: 14px; cursor: pointer;">Not right now</button>
-            </div>
+            <div style="text-align: center;"><button id="not-right-now-btn" style="background: none; border: none; color: #9ca3af; cursor: pointer;">Not right now</button></div>
         </div>
     </div>
 
-    <!-- VIDEO CALL UI SCREEN -->
-    <div id="video-call-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111827; z-index: 4000; flex-direction: column;">
-        <div style="padding: 20px; color: white; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); position: absolute; width: 100%; box-sizing: border-box; z-index: 10;">
-            <h3 style="margin: 0; font-size: 18px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Call with Stranger</h3>
-            <button id="end-call-btn" style="background: #ef4444; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);"><i class="fa-solid fa-phone-slash"></i></button>
+    <!-- VIDEO CALL UI -->
+    <div id="video-call-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111827; z-index: 6000; flex-direction: column;">
+        <div style="padding: 20px; color: white; display: flex; justify-content: space-between; align-items: center; position: absolute; width: 100%; z-index: 10;">
+            <h3>Call with Stranger</h3>
+            <button id="end-call-btn" style="background: #ef4444; color: white; border: none; width: 45px; height: 45px; border-radius: 50%;"><i class="fa-solid fa-phone-slash"></i></button>
         </div>
-        
         <div style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; background: #000;">
             <video id="remote-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
-            <video id="local-video" autoplay playsinline muted style="width: 110px; height: 160px; object-fit: cover; position: absolute; bottom: 30px; right: 20px; border-radius: 15px; border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.5); background: #333;"></video>
+            <video id="local-video" autoplay playsinline muted style="width: 110px; height: 160px; object-fit: cover; position: absolute; bottom: 30px; right: 20px; border-radius: 15px; border: 3px solid white;"></video>
         </div>
     </div>
 
