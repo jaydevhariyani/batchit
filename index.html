@@ -99,7 +99,8 @@
         .lang-pill.active { border-color: #8b5cf6; color: #8b5cf6; background: #f5f3ff; font-weight: 600; }
         
         .mobile-start-chat-btn { background: #8b5cf6; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 18px; width: 100%; cursor: pointer; text-align: center; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); }
-   /* STATS SECTION */
+   
+        /* STATS SECTION */
         .stats-section { display: flex; flex-wrap: wrap; justify-content: space-evenly; padding: 60px 20px; background: white; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
         .stat-item { text-align: center; margin: 10px 20px; }
         .stat-number { font-size: 42px; font-weight: 800; color: #6366f1; margin-bottom: 5px; }
@@ -116,7 +117,8 @@
         .feature-icon { font-size: 24px; color: #8b5cf6; margin-bottom: 20px; }
         .feature-card-title { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 10px 0; }
         .feature-card-desc { font-size: 15px; color: #4b5563; line-height: 1.6; margin: 0; }
-    /* COMPARISON TABLE SECTION */
+    
+        /* COMPARISON TABLE SECTION */
         .compare-section { max-width: 1000px; margin: 80px auto; padding: 0 20px; text-align: center; }
         .compare-label { font-size: 12px; font-weight: 700; color: #8b5cf6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
         .compare-title { font-size: 36px; font-weight: 800; color: #111827; margin: 0 0 20px 0; }
@@ -136,7 +138,8 @@
 
         .check-icon { color: #22c55e; font-size: 18px; font-weight: 900; }
         .cross-icon { color: #ef4444; font-size: 18px; font-weight: 900; opacity: 0.6; }
-    /* REASONS SECTION */
+    
+        /* REASONS SECTION */
         .reasons-section { max-width: 1200px; margin: 80px auto; padding: 0 20px; text-align: center; }
         .reasons-label { font-size: 12px; font-weight: 700; color: #8b5cf6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
         .reasons-title { font-size: 36px; font-weight: 800; color: #111827; margin: 0 0 15px 0; }
@@ -157,14 +160,13 @@
 </head>
 <body>
 
-    <!-- 1. LANDING PAGE -->
+    <!-- 1. LANDING PAGE (અહીં display: block; કર્યું છે જેથી ઓવરલેપ ના થાય) -->
     <div id="landing-page" style="display: block; min-height: 100vh;">
         
         <!-- NEW NAVBAR -->
         <nav class="main-nav">
             <a href="#" class="logo"><i class="fa-solid fa-masks-theater"></i> Batchit</a>
             
-            <!-- Desktop Links -->
             <div class="desktop-menu">
                 <a href="#" class="nav-link">Home</a>
                 <a href="#" class="nav-link">Blog</a>
@@ -194,15 +196,12 @@
                 <a href="#" class="nav-link" style="font-size: 18px;"><i class="fa-solid fa-magnifying-glass"></i></a>
             </div>
 
-            <!-- Right Side Button -->
             <div class="header-right-btns" style="display: flex; gap: 10px;">
-                <button id="open-onboard-btn" class="start-chat-btn-header open-onboard-trigger">Start Chat</button>
+                <button id="open-onboard-btn-header" class="start-chat-btn-header open-onboard-trigger">Start Chat</button>
             </div>
 
-            <!-- Hamburger Icon for Mobile -->
             <button class="mobile-menu-btn" id="mobile-menu-toggle"><i class="fa-solid fa-bars"></i></button>
 
-            <!-- Mobile Dropdown Menu -->
             <div class="mobile-dropdown" id="mobile-dropdown-menu">
                 <div class="mobile-search-container">
                     <i class="fa-solid fa-magnifying-glass mobile-search-icon"></i>
@@ -236,14 +235,13 @@
             </div>
         </nav>
 
-        <!-- NEW TWO-COLUMN HERO SECTION -->
         <div class="hero-section">
             <div class="hero-left">
                 <h1 class="hero-title">Talk to Strangers Online - Free Anonymous Random Chat</h1>
                 <h2 class="hero-subtitle">Make real friends, free.</h2>
                 <p class="hero-desc">Free anonymous random chat with real people worldwide. Text, voice, and video - no sign-up needed.</p>
                 
-                <button id="open-onboard-btn" class="hero-btn open-onboard-trigger">
+                <button id="open-onboard-btn-main" class="hero-btn open-onboard-trigger">
                     Start Chatting <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
                 </button>
                 
@@ -256,7 +254,8 @@
                 <img src="https://strangerline.io/wp-content/uploads/2023/12/hero-img.webp" alt="Stranger Chat Demo" class="hero-image">
             </div>
         </div>
-    <!-- STATS SECTION -->
+
+        <!-- STATS SECTION -->
         <div class="stats-section">
             <div class="stat-item">
                 <div class="stat-number">5M+</div>
@@ -315,7 +314,8 @@
                 </div>
             </div>
         </div>
-    <!-- COMPARISON SECTION -->
+
+        <!-- COMPARISON SECTION -->
         <div class="compare-section">
             <div class="compare-label">HOW WE COMPARE</div>
             <h2 class="compare-title">The #1 Omegle alternative - with everything Omegle never had</h2>
@@ -378,8 +378,8 @@
                 </table>
             </div>
         </div>
-    </div>
-    <!-- REASONS SECTION -->
+
+        <!-- REASONS SECTION (હવે આ બોક્સ landing-page ની અંદર આવી ગયું છે) -->
         <div class="reasons-section">
             <div class="reasons-label">REAL REASONS</div>
             <h2 class="reasons-title">Why people talk to strangers online</h2>
@@ -409,6 +409,8 @@
             </div>
         </div>
 
+    </div> <!-- અહિયાં LANDING PAGE પૂરું થાય છે -->
+
     <!-- 2. ONBOARDING MODAL -->
     <div id="onboard-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: flex-end;">
         <div style="background: white; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 30px 20px; box-sizing: border-box;">
@@ -426,7 +428,6 @@
                 <div class="gender-btn" data-gender="Female" style="flex: 1; border: 1px solid #e5e7eb; color: #6b7280; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-venus"></i> Female</div>
             </div>
 
-            <!-- NEW AGE AND COUNTRY INPUTS -->
             <div style="display: flex; gap: 15px; margin-bottom: 20px;">
                 <div style="flex: 1;">
                     <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px;">Your age</label>
@@ -438,7 +439,6 @@
                 </div>
             </div>
 
-            <!-- 18+ TERMS CHECKBOX -->
             <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; font-size: 13px; color: #6b7280;">
                 <input type="checkbox" id="age-agree" style="margin-top: 3px; accent-color: #8b5cf6;" checked>
                 <label for="age-agree">I'm at least <strong style="color: #8b5cf6;">18 years old</strong> and agree to the Terms of Service.</label>
