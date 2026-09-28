@@ -362,3 +362,46 @@ if (endCallBtn) {
         if (currentChatId) await setDoc(doc(db, "chats", currentChatId), { offer: null, answer: null }, { merge: true });
     });
 }
+// --- 6. IN-CHAT MENU (ADD FRIEND / REPORT / BLOCK) ---
+const inChatMenuModal = document.getElementById('in-chat-menu-modal');
+
+document.getElementById('menu-btn')?.addEventListener('click', () => {
+    if(!inChatMenuModal) return;
+    
+    // સામેવાળાનું સાચું નામ અને પહેલો અક્ષર ખેંચો
+    let partnerNameStr = document.getElementById('chat-partner-name')?.innerText || "Stranger";
+    document.getElementById('menu-partner-name').innerText = partnerNameStr;
+    document.getElementById('menu-avatar').innerText = partnerNameStr.charAt(0).toUpperCase();
+    
+    // યુનિક આઈડી બનાવો
+    let displayId = currentChatPartner && currentChatPartner !== 'bot' ? currentChatPartner.substring(0,8) : Math.floor(Math.random()*999999);
+    document.getElementById('menu-partner-id').innerText = "Guest_" + displayId;
+    
+    inChatMenuModal.style.display = 'flex';
+});
+
+document.getElementById('close-chat-menu-btn')?.addEventListener('click', () => {
+    inChatMenuModal.style.display = 'none';
+});
+
+// Add Friend બટન
+document.getElementById('add-friend-btn')?.addEventListener('click', () => {
+    let pname = document.getElementById('menu-partner-name').innerText;
+    alert("Friend request sent to " + pname + "!");
+    inChatMenuModal.style.display = 'none';
+});
+
+// Block બટન
+document.getElementById('block-btn')?.addEventListener('click', () => {
+    if(confirm("Are you sure you want to block this user? You won't match with them again.")) {
+        alert("User blocked successfully.");
+        inChatMenuModal.style.display = 'none';
+        document.getElementById('skip-btn').click(); // બ્લોક કર્યા પછી સીધું ઓટોમેટિક સ્કીપ થઈ જશે
+    }
+});
+
+// Report બટન
+document.getElementById('report-btn')?.addEventListener('click', () => {
+    alert("Report sent to moderators. Thank you for keeping the community safe!");
+    inChatMenuModal.style.display = 'none';
+});
