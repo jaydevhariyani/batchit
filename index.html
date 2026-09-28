@@ -122,6 +122,29 @@
         .reason-title { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 10px 0; }
         .reason-text { font-size: 15px; color: #4b5563; margin: 0 0 25px 0; line-height: 1.6; }
         .reason-quote { border-left: 3px solid #8b5cf6; padding-left: 15px; font-style: italic; color: #6b7280; font-size: 15px; margin: 0; line-height: 1.5; }
+    /* FOOTER CSS */
+        .footer-banner { background: #8b5cf6; color: white; text-align: center; padding: 25px 20px; font-size: 14px; font-weight: 500; }
+        .main-footer { background: #111827; color: white; padding: 60px 20px 20px; font-family: 'Inter', sans-serif; }
+        .footer-container { max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px; margin-bottom: 40px; }
+        .footer-brand { max-width: 300px; }
+        .footer-logo { font-size: 24px; font-weight: 800; color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .footer-desc { color: #9ca3af; font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
+        .social-icons { display: flex; gap: 10px; }
+        .social-icons a { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: background 0.3s; }
+        .social-icons a:hover { background: #8b5cf6; }
+        
+        .footer-links { display: flex; gap: 80px; flex-wrap: wrap; }
+        .link-column { display: flex; flex-direction: column; gap: 15px; text-align: left; }
+        .link-column h4 { color: #9ca3af; font-size: 12px; font-weight: 700; letter-spacing: 2px; margin: 0 0 5px 0; text-transform: uppercase; }
+        .link-column a { color: #d1d5db; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .link-column a:hover { color: white; }
+        
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center; color: #6b7280; font-size: 13px; max-width: 1200px; margin: 0 auto; }
+        
+        @media (max-width: 768px) {
+            .footer-links { gap: 40px; }
+            .footer-container { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
@@ -231,6 +254,47 @@
                 <div class="reason-card"><h3 class="reason-title">Actually make a friend</h3><p class="reason-text">Save chats, send friend requests, message after disconnect. Good conversations don't have to end.</p><p class="reason-quote">"I've made three actual friends on Batchit. We still talk every week."</p></div>
             </div>
         </div>
+    <!-- FOOTER SECTION -->
+        <div class="footer-banner">
+            Free forever &middot; No registration &middot; 190+ countries &middot; Text, voice and video chat &middot; No bots
+        </div>
+        <footer class="main-footer">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <a href="#" class="footer-logo"><i class="fa-solid fa-masks-theater"></i> Batchit</a>
+                    <p class="footer-desc">Anonymous chat platform built for privacy, real connections, and conversations that actually matter.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#"><i class="fa-brands fa-discord"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <div class="link-column">
+                        <h4>Navigation</h4>
+                        <a href="#">Home</a>
+                        <a href="#">Features</a>
+                        <a href="#">Safety</a>
+                        <a href="#">Blog</a>
+                        <a href="#">About</a>
+                        <a href="#">Support</a>
+                    </div>
+                    <div class="link-column">
+                        <h4>Legal</h4>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Community Guidelines</a>
+                        <a href="#">Cookie Policy</a>
+                        <a href="#">Contact</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                All rights reserved. Batchit &copy; 2026.
+            </div>
+        </footer>
     </div>
 
     <!-- 2. DASHBOARD / PRE-CHAT SCREEN -->
