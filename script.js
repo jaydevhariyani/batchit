@@ -17,7 +17,7 @@ const auth = getAuth(app);
 
 // DOM Elements
 const landingPage = document.getElementById('landing-page');
-const onboardModal = document.getElementById('onboard-modal');
+const dashboardScreen = document.getElementById('dashboard-screen');
 const radarScreen = document.getElementById('radar-screen');
 const mainChatScreen = document.getElementById('main-chat-screen');
 const chatBox = document.getElementById('chat-box');
@@ -32,7 +32,7 @@ let unsubscribeMessages = null;
 let selectedGender = "Male";
 let searchTimeout = null;
 
-// --- 1. AUTO-LOGIN & ONBOARDING ---
+// --- 1. AUTO-LOGIN & NAVIGATION ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
@@ -43,18 +43,12 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-document.getElementById('open-onboard-btn')?.addEventListener('click', () => {
-    if (currentUser) {
+// લેન્ડિંગ પેજ પરથી ડેશબોર્ડ ખોલવા માટે (Strangerline Style)
+document.querySelectorAll('.open-onboard-trigger').forEach(btn => {
+    btn.addEventListener('click', () => {
         if(landingPage) landingPage.style.display = 'none';
-        startMatchmaking();
-    } else {
-        if(onboardModal) onboardModal.style.display = 'flex';
-    }
-});
-
-document.getElementById('random-name-btn')?.addEventListener('click', () => {
-    const names = ["CoolNinja", "SkyRider", "Ghost", "Star", "Leo", "Tiger", "Falcon"];
-    document.getElementById('guest-name-input').value = names[Math.floor(Math.random() * names.length)] + Math.floor(Math.random() * 1000);
+        if(dashboardScreen) dashboardScreen.style.display = 'flex';
+    });
 });
 
 document.querySelectorAll('.gender-btn').forEach(btn => {
@@ -67,6 +61,7 @@ document.querySelectorAll('.gender-btn').forEach(btn => {
     });
 });
 
+// ડેશબોર્ડમાંથી રિયલ સર્ચ ચાલુ કરવા માટે
 document.getElementById('start-guest-chat-btn')?.addEventListener('click', async () => {
     const ageAgree = document.getElementById('age-agree');
     if (ageAgree && !ageAgree.checked) {
@@ -85,24 +80,18 @@ document.getElementById('start-guest-chat-btn')?.addEventListener('click', async
         let country = document.getElementById('guest-country-input')?.value.trim() || "India";
 
         await setDoc(doc(db, "users", currentUser.uid), { 
-            uid: currentUser.uid, 
-            name: name, 
-            gender: selectedGender, 
-            age: age,
-            country: country,
-            isOnline: true 
+            uid: currentUser.uid, name: name, gender: selectedGender, age: age, country: country, isOnline: true 
         });
         
-        if(onboardModal) onboardModal.style.display = 'none';
-        if(landingPage) landingPage.style.display = 'none';
+        if(dashboardScreen) dashboardScreen.style.display = 'none';
         startMatchmaking(); 
     } catch(err) {
-        alert("Error: Please enable 'Anonymous' sign-in in Firebase Auth.");
-        btn.innerHTML = "Continue";
+        alert("Error connecting. Please try again.");
+        btn.innerHTML = 'Start New Chat <i class="fa-solid fa-arrow-right"></i>';
     }
 });
 
-// --- 2. REAL MATCHMAKING LOGIC ---
+// --- 2. MATCHMAKING LOGIC ---
 async function startMatchmaking() {
     if(mainChatScreen) mainChatScreen.style.display = 'none';
     if(radarScreen) radarScreen.style.display = 'flex';
@@ -113,7 +102,7 @@ async function startMatchmaking() {
     if(searchTimeout) clearTimeout(searchTimeout);
 
     const myQueueRef = doc(db, "matching_queue", currentUser.uid);
-    await setDoc(myQueueRef, { uid: currentUser.uid, timestamp: serverTimestamp(), matchedWith: null });
+    await setDoc(myQueueRef, { uid: currentUser.uid, timestamp: serverTimestamp(), matchedWith: null, partnerUid: null });
 
     const q = query(collection(db, "matching_queue"), orderBy("timestamp", "asc"));
     const snapshot = await getDocs(q);
@@ -126,10 +115,13 @@ async function startMatchmaking() {
             currentChatPartner = otherUser.uid;
             currentChatId = "chat_" + (currentUser.uid < otherUser.uid ? currentUser.uid + "_" + otherUser.uid : otherUser.uid + "_" + currentUser.uid);
             
-            await setDoc(doc(db, "matching_queue", otherUser.uid), { matchedWith: currentChatId }, { merge: true });
+            await setDoc(doc(db, "matching_queue", otherUser.uid), { matchedWith: currentChatId, partnerUid: currentUser.uid }, { merge: true });
             await deleteDoc(myQueueRef);
             
-            connectToChat("Stranger");
+            const partnerDoc = await getDoc(doc(db, "users", otherUser.uid));
+            const partnerName = partnerDoc.exists() ? partnerDoc.data().name : "Stranger";
+            
+            connectToChat(partnerName);
             break;
         }
     }
@@ -141,9 +133,15 @@ async function startMatchmaking() {
                 clearInterval(checkInterval);
                 clearTimeout(searchTimeout);
                 currentChatId = myDoc.data().matchedWith;
-                currentChatPartner = "real_user";
+                currentChatPartner = myDoc.data().partnerUid; 
                 await deleteDoc(myQueueRef);
-                connectToChat("Stranger");
+                
+                let partnerName = "Stranger";
+                if (currentChatPartner) {
+                    const partnerDoc = await getDoc(doc(db, "users", currentChatPartner));
+                    if (partnerDoc.exists()) partnerName = partnerDoc.data().name;
+                }
+                connectToChat(partnerName);
             }
         }, 2000);
 
@@ -165,6 +163,11 @@ function connectToChat(partnerName) {
     if(chatPartnerName) chatPartnerName.innerHTML = partnerName;
     if(radarScreen) radarScreen.style.display = 'none';
     if(mainChatScreen) mainChatScreen.style.display = 'flex';
+    
+    // પેલા બટનને પાછું નોર્મલ કરવા
+    const btn = document.getElementById('start-guest-chat-btn');
+    if(btn) btn.innerHTML = 'Start New Chat <i class="fa-solid fa-arrow-right"></i>';
+
     loadMessages();
 }
 
@@ -172,10 +175,9 @@ document.getElementById('cancel-search-btn')?.addEventListener('click', async ()
     clearTimeout(searchTimeout);
     if(currentUser) await deleteDoc(doc(db, "matching_queue", currentUser.uid));
     if(radarScreen) radarScreen.style.display = 'none';
-    if(landingPage) landingPage.style.display = 'flex';
+    if(dashboardScreen) dashboardScreen.style.display = 'flex'; // કેન્સલ કરવા પર ડેશબોર્ડમાં પાછું જશે
 });
 
-// --- 3. SKIP BUTTON LOGIC ---
 document.getElementById('skip-btn')?.addEventListener('click', async () => {
     if(confirm("Are you sure you want to skip and find someone else?")) {
         if(chatBox) chatBox.innerHTML = "";
@@ -183,7 +185,7 @@ document.getElementById('skip-btn')?.addEventListener('click', async () => {
     }
 });
 
-// --- 4. MESSAGING SYSTEM & SMART AI BOT ---
+// --- 3. MESSAGING SYSTEM ---
 document.getElementById('send-btn')?.addEventListener('click', async () => {
     if(!messageInput || !currentChatId) return;
     let message = messageInput.value.trim();
@@ -199,22 +201,11 @@ document.getElementById('send-btn')?.addEventListener('click', async () => {
         const COHERE_API_KEY = "fG9m8ksuIRFb" + "YrQLmR1TJwEt" + "mbBhgmnReAOSt3It";
         try {
             const response = await fetch("https://api.cohere.ai/v1/chat", {
-                method: "POST", 
-                headers: { 
-                    "Content-Type": "application/json", 
-                    "Authorization": `Bearer ${COHERE_API_KEY}` 
-                },
-                body: JSON.stringify({
-                    message: message,
-                    preamble: "You are a friendly Indian chatting partner named Priya. Reply naturally, casually, and in short sentences to whatever the user says.",
-                    temperature: 0.7
-                })
+                method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${COHERE_API_KEY}` },
+                body: JSON.stringify({ message: message, preamble: "You are a friendly Indian chatting partner named Priya.", temperature: 0.7 })
             });
             const data = await response.json();
-            
-            let aiReply = data.text;
-            if(!aiReply) aiReply = "I am listening! Tell me more."; 
-
+            let aiReply = data.text || "I am listening! Tell me more."; 
             setTimeout(async () => {
                 if(typingIndicator) typingIndicator.style.display = 'none';
                 await addDoc(collection(db, "chats", currentChatId, "messages"), { sender: "bot", text: aiReply, timestamp: serverTimestamp() });
@@ -226,7 +217,6 @@ document.getElementById('send-btn')?.addEventListener('click', async () => {
     }
 });
 
-// Load Chat (With Video Hook)
 let loadMessages = function() {
     if(unsubscribeMessages) unsubscribeMessages(); 
     const q = query(collection(db, "chats", currentChatId, "messages"), orderBy("timestamp", "asc"));
@@ -256,50 +246,28 @@ let loadMessages = function() {
         chatBox.scrollTop = chatBox.scrollHeight;
     });
 
-    // ચેટ ચાલુ થાય એટલે કૉલ સાંભળવાનું ચાલુ કરો
     listenForIncomingCall();
 }
 
 document.getElementById('message-input')?.addEventListener('keypress', (e) => {
-    if(e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById('send-btn').click();
-    }
+    if(e.key === 'Enter') { e.preventDefault(); document.getElementById('send-btn').click(); }
 });
 
-// --- PREMIUM MODAL LOGIC ---
+// --- 4. PREMIUM MODAL LOGIC ---
 const premiumModal = document.getElementById('premium-modal');
-const openPremiumBtn = document.getElementById('open-premium-btn');
-const closePremiumBtn = document.getElementById('close-premium-btn');
-const notRightNowBtn = document.getElementById('not-right-now-btn');
-const upgradePayBtns = document.querySelectorAll('.upgrade-pay-btn');
+if (document.getElementById('close-premium-btn')) document.getElementById('close-premium-btn').addEventListener('click', () => premiumModal.style.display = 'none');
+if (document.getElementById('not-right-now-btn')) document.getElementById('not-right-now-btn').addEventListener('click', () => premiumModal.style.display = 'none');
 
-if (openPremiumBtn) openPremiumBtn.addEventListener('click', () => premiumModal.style.display = 'flex');
-
-if (closePremiumBtn && notRightNowBtn) {
-    const closePremium = () => premiumModal.style.display = 'none';
-    closePremiumBtn.addEventListener('click', closePremium);
-    notRightNowBtn.addEventListener('click', closePremium);
-}
-
-upgradePayBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        alert("Payment Gateway integration coming soon! (Razorpay / Stripe)");
-        premiumModal.style.display = 'none';
-    });
+document.querySelectorAll('.upgrade-pay-btn').forEach(btn => {
+    btn.addEventListener('click', () => { alert("Payment Gateway integration coming soon!"); premiumModal.style.display = 'none'; });
 });
 
-// --- CALL BUTTONS & PREMIUM ALERT ---
 document.getElementById('audio-call-btn')?.addEventListener('click', () => {
     alert("Audio Calling is a VIP Feature! Upgrade to VIP to use this.");
     if(premiumModal) premiumModal.style.display = 'flex';
 });
 
-document.getElementById('menu-btn')?.addEventListener('click', () => {
-    alert("Report & Block features coming soon!");
-});
-
-// --- FULL WEBRTC VIDEO CALL LOGIC ---
+// --- 5. WEBRTC VIDEO CALL LOGIC ---
 const videoCallBtn = document.getElementById('video-call-btn');
 const videoCallScreen = document.getElementById('video-call-screen');
 const localVideo = document.getElementById('local-video');
@@ -309,20 +277,11 @@ const endCallBtn = document.getElementById('end-call-btn');
 let localStream = null;
 let peerConnection = null;
 let unsubscribeCall = null;
-
-const servers = {
-    iceServers: [
-        { urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }
-    ]
-};
+const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
 
 if (videoCallBtn) {
     videoCallBtn.addEventListener('click', async () => {
-        if (!currentChatId || currentChatPartner === "bot") {
-            alert("You can only video call a real person!");
-            return;
-        }
-        
+        if (!currentChatId || currentChatPartner === "bot") { alert("You can only video call a real person!"); return; }
         videoCallScreen.style.display = 'flex';
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         if (localVideo) localVideo.srcObject = localStream;
@@ -335,12 +294,7 @@ if (videoCallBtn) {
         peerConnection.ontrack = event => event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
 
         const callDoc = doc(db, "chats", currentChatId);
-        const offerCandidates = collection(callDoc, "offerCandidates");
-        const answerCandidates = collection(callDoc, "answerCandidates");
-
-        peerConnection.onicecandidate = event => {
-            if (event.candidate) addDoc(offerCandidates, event.candidate.toJSON());
-        };
+        peerConnection.onicecandidate = event => { if (event.candidate) addDoc(collection(callDoc, "offerCandidates"), event.candidate.toJSON()); };
 
         const offerDescription = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offerDescription);
@@ -349,12 +303,11 @@ if (videoCallBtn) {
         onSnapshot(callDoc, (snapshot) => {
             const data = snapshot.data();
             if (!peerConnection.currentRemoteDescription && data?.answer) {
-                const answerDescription = new RTCSessionDescription(data.answer);
-                peerConnection.setRemoteDescription(answerDescription);
+                peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
             }
         });
 
-        onSnapshot(answerCandidates, (snapshot) => {
+        onSnapshot(collection(callDoc, "answerCandidates"), (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === 'added') peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));
             });
@@ -381,19 +334,14 @@ function listenForIncomingCall() {
             peerConnection.ontrack = event => event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
 
             const callDoc = doc(db, "chats", currentChatId);
-            const answerCandidates = collection(callDoc, "answerCandidates");
-            const offerCandidates = collection(callDoc, "offerCandidates");
-
-            peerConnection.onicecandidate = event => {
-                if (event.candidate) addDoc(answerCandidates, event.candidate.toJSON());
-            };
+            peerConnection.onicecandidate = event => { if (event.candidate) addDoc(collection(callDoc, "answerCandidates"), event.candidate.toJSON()); };
 
             await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
             const answerDescription = await peerConnection.createAnswer();
             await peerConnection.setLocalDescription(answerDescription);
             await setDoc(callDoc, { answer: { sdp: answerDescription.sdp, type: answerDescription.type } }, { merge: true });
 
-            onSnapshot(offerCandidates, (snapshot) => {
+            onSnapshot(collection(callDoc, "offerCandidates"), (snapshot) => {
                 snapshot.docChanges().forEach((change) => {
                     if (change.type === 'added') peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));
                 });
@@ -411,38 +359,6 @@ if (endCallBtn) {
         if (remoteVideo) remoteVideo.srcObject = null;
         videoCallScreen.style.display = 'none';
 
-        if (currentChatId) {
-            await setDoc(doc(db, "chats", currentChatId), { offer: null, answer: null }, { merge: true });
-        }
+        if (currentChatId) await setDoc(doc(db, "chats", currentChatId), { offer: null, answer: null }, { merge: true });
     });
 }
-// --- NAVBAR LOGIC ---
-const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-const mobileDropdownMenu = document.getElementById('mobile-dropdown-menu');
-
-if(mobileMenuToggle && mobileDropdownMenu) {
-    mobileMenuToggle.addEventListener('click', () => {
-        mobileDropdownMenu.classList.toggle('active');
-        // આઇકોન બદલવા માટે (Bars થી Cross)
-        const icon = mobileMenuToggle.querySelector('i');
-        if (mobileDropdownMenu.classList.contains('active')) {
-            icon.classList.remove('fa-bars');
-            icon.classList.add('fa-xmark');
-        } else {
-            icon.classList.remove('fa-xmark');
-            icon.classList.add('fa-bars');
-        }
-    });
-}
-
-// નવા "Start Chat" બટન (હેડરમાં) થી ચેટ ચાલુ કરવા
-document.querySelectorAll('.open-onboard-trigger').forEach(btn => {
-    btn.addEventListener('click', () => {
-        if (currentUser) {
-            if(landingPage) landingPage.style.display = 'none';
-            startMatchmaking();
-        } else {
-            if(onboardModal) onboardModal.style.display = 'flex';
-        }
-    });
-});
