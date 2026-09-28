@@ -81,29 +81,65 @@
             .dash-main { padding: 20px; }
         }
 
-        /* SECTIONS CSS */
+        /* SECTIONS CSS (STATS, FEATURES, COMPARE, REASONS) */
         .stats-section { display: flex; flex-wrap: wrap; justify-content: space-evenly; padding: 60px 20px; background: white; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
+        .stat-item { text-align: center; margin: 10px 20px; }
         .stat-number { font-size: 42px; font-weight: 800; color: #6366f1; margin-bottom: 5px; }
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 50px auto; padding: 0 20px; }
-        .feature-card { background: #f8fafc; border-radius: 20px; padding: 30px; border: 1px solid transparent; }
+        .stat-text { font-size: 15px; color: #6b7280; font-weight: 500; }
+
+        .features-section { max-width: 1200px; margin: 80px auto; padding: 0 20px; text-align: center; }
+        .features-label { font-size: 12px; font-weight: 700; color: #8b5cf6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
+        .features-title { font-size: 36px; font-weight: 800; color: #111827; margin: 0 0 50px 0; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .feature-card { background: #f8fafc; border-radius: 20px; padding: 30px; text-align: left; transition: transform 0.3s; border: 1px solid transparent; }
+        .feature-card:hover { transform: translateY(-5px); border-color: #e5e7eb; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .feature-icon { font-size: 24px; color: #8b5cf6; margin-bottom: 20px; }
+        .feature-card-title { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 10px 0; }
+        .feature-card-desc { font-size: 15px; color: #4b5563; line-height: 1.6; margin: 0; }
+
+        .compare-section { max-width: 1000px; margin: 80px auto; padding: 0 20px; text-align: center; }
+        .compare-label { font-size: 12px; font-weight: 700; color: #8b5cf6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
+        .compare-title { font-size: 36px; font-weight: 800; color: #111827; margin: 0 0 20px 0; }
+        .compare-desc { font-size: 18px; color: #6b7280; max-width: 700px; margin: 0 auto 50px auto; line-height: 1.6; }
+        .compare-table-wrapper { background: white; border-radius: 20px; padding: 0; box-shadow: 0 10px 40px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e5e7eb; overflow-x: auto; }
         .compare-table { width: 100%; border-collapse: collapse; text-align: center; min-width: 600px; }
+        .compare-table th, .compare-table td { padding: 20px 15px; border-bottom: 1px solid #f3f4f6; }
+        .compare-table th { font-size: 14px; font-weight: 600; color: #4b5563; background: #f9fafb; border-bottom: 2px solid #e5e7eb; }
+        .compare-table td:first-child, .compare-table th:first-child { text-align: left; padding-left: 30px; font-weight: 600; color: #111827; }
+        .compare-table th.highlight-col { background: #8b5cf6; color: white; border-bottom: none; font-size: 16px; border-radius: 10px 10px 0 0; position: relative; }
         .compare-table td.highlight-col { background: #f5f3ff; border-left: 2px solid #8b5cf6; border-right: 2px solid #8b5cf6; }
-        .reasons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; max-width: 1200px; margin: 50px auto; padding: 0 20px; }
-        .reason-card { background: #f9fafb; border-radius: 20px; padding: 40px; border: 1px solid #e5e7eb; }
+        .compare-table tr:last-child td.highlight-col { border-bottom: 2px solid #8b5cf6; border-radius: 0 0 10px 10px; }
+        .check-icon { color: #22c55e; font-size: 18px; font-weight: 900; }
+        .cross-icon { color: #ef4444; font-size: 18px; font-weight: 900; opacity: 0.6; }
+
+        .reasons-section { max-width: 1200px; margin: 80px auto; padding: 0 20px; text-align: center; }
+        .reasons-label { font-size: 12px; font-weight: 700; color: #8b5cf6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
+        .reasons-title { font-size: 36px; font-weight: 800; color: #111827; margin: 0 0 15px 0; }
+        .reasons-desc { font-size: 18px; color: #6b7280; margin: 0 0 50px 0; }
+        .reasons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; text-align: left; }
+        .reason-card { background: #f9fafb; border-radius: 20px; padding: 40px; border: 1px solid #e5e7eb; transition: transform 0.3s; }
+        .reason-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .reason-title { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 10px 0; }
+        .reason-text { font-size: 15px; color: #4b5563; margin: 0 0 25px 0; line-height: 1.6; }
+        .reason-quote { border-left: 3px solid #8b5cf6; padding-left: 15px; font-style: italic; color: #6b7280; font-size: 15px; margin: 0; line-height: 1.5; }
     </style>
 </head>
 <body>
 
-    <!-- 1. LANDING PAGE -->
+    <!-- 1. FULL LANDING PAGE -->
     <div id="landing-page" style="display: block; min-height: 100vh;">
+        <!-- Navbar -->
         <nav class="main-nav">
             <a href="#" class="logo"><i class="fa-solid fa-masks-theater"></i> Batchit</a>
             <div class="desktop-menu">
                 <a href="#" class="nav-link">Home</a>
                 <a href="#" class="nav-link">Blog</a>
+                <a href="#" class="nav-link">About</a>
                 <div class="nav-item-dropdown">
                     <span class="nav-link">Pages <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i></span>
                     <div class="desktop-dropdown-menu">
+                        <a href="#" class="desktop-dropdown-link">Chatroulette Alternative</a>
+                        <a href="#" class="desktop-dropdown-link">Emerald Chat Alternative</a>
                         <a href="#" class="desktop-dropdown-link">Video Chat</a>
                         <a href="#" class="desktop-dropdown-link">Text Chat</a>
                     </div>
@@ -118,19 +154,82 @@
             <button class="mobile-menu-btn" id="mobile-menu-toggle"><i class="fa-solid fa-bars"></i></button>
         </nav>
 
+        <!-- Hero -->
         <div class="hero-section">
             <div class="hero-left">
                 <h1 class="hero-title">Talk to Strangers Online - Free Anonymous Random Chat</h1>
                 <h2 class="hero-subtitle">Make real friends, free.</h2>
                 <p class="hero-desc">Free anonymous random chat with real people worldwide. Text, voice, and video - no sign-up needed.</p>
                 <button class="hero-btn open-onboard-trigger">Start Chatting <i class="fa-solid fa-chevron-right"></i></button>
+                <div class="hero-trust-text">No sign-up &middot; No bots &middot; 190+ countries &middot; 100% anonymous</div>
             </div>
-            <div class="hero-right"><img src="https://strangerline.io/wp-content/uploads/2023/12/hero-img.webp" class="hero-image"></div>
+            <div class="hero-right">
+                <img src="https://strangerline.io/wp-content/uploads/2023/12/hero-img.webp" class="hero-image" alt="Demo">
+            </div>
         </div>
 
+        <!-- Stats -->
         <div class="stats-section">
-            <div style="text-align: center;"><div class="stat-number">5M+</div><div style="color: #6b7280;">Conversations</div></div>
-            <div style="text-align: center;"><div class="stat-number">190+</div><div style="color: #6b7280;">Countries</div></div>
+            <div class="stat-item"><div class="stat-number">5M+</div><div class="stat-text">Conversations</div></div>
+            <div class="stat-item"><div class="stat-number">190+</div><div class="stat-text">Countries</div></div>
+            <div class="stat-item"><div class="stat-number">&lt;3s</div><div class="stat-text">Match time</div></div>
+            <div class="stat-item"><div class="stat-number">24/7</div><div class="stat-text">Moderation</div></div>
+        </div>
+
+        <!-- Features -->
+        <div class="features-section">
+            <div class="features-label">WHAT YOU GET</div>
+            <h2 class="features-title">The best site to chat with strangers online</h2>
+            <p style="color: #4b5563; font-size: 18px; max-width: 700px; margin: -30px auto 50px; line-height: 1.6;">Most random chat sites look the same. Batchit is the only one built so conversations can go wherever they naturally want to go.</p>
+            <div class="features-grid">
+                <div class="feature-card"><i class="fa-regular fa-comment-dots feature-icon"></i><h3 class="feature-card-title">Text chat with strangers</h3><p class="feature-card-desc">Anonymous, instant, and free. No camera required. Just type and connect.</p></div>
+                <div class="feature-card"><i class="fa-solid fa-video feature-icon"></i><h3 class="feature-card-title">Random video chat</h3><p class="feature-card-desc">Face-to-face with a real stranger. No bots, no fake profiles, real people.</p></div>
+                <div class="feature-card"><i class="fa-solid fa-microphone feature-icon"></i><h3 class="feature-card-title">Voice chat and voice notes</h3><p class="feature-card-desc">Live voice calls or recorded voice messages - choose how you want to be heard.</p></div>
+                <div class="feature-card"><i class="fa-solid fa-user-plus feature-icon"></i><h3 class="feature-card-title">Friends and chat history</h3><p class="feature-card-desc">Save your favorite chats. Send friend requests and keep the connection alive.</p></div>
+                <div class="feature-card"><i class="fa-solid fa-clock-rotate-left feature-icon"></i><h3 class="feature-card-title">Message disconnected strangers</h3><p class="feature-card-desc">Skipped by accident? Reconnect and send messages even after the chat ends.</p></div>
+                <div class="feature-card"><i class="fa-solid fa-shield-halved feature-icon"></i><h3 class="feature-card-title">Safety and moderation</h3><p class="feature-card-desc">Strict moderation and easy report/block tools to keep the community safe.</p></div>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="compare-section">
+            <div class="compare-label">HOW WE COMPARE</div>
+            <h2 class="compare-title">The #1 Omegle alternative - with everything Omegle never had</h2>
+            <p class="compare-desc">Omegle shut down in November 2023. Millions of people moved to other sites. Batchit was built to go further than all of them.</p>
+            <div class="compare-table-wrapper">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th class="highlight-col">Batchit <i class="fa-solid fa-star" style="font-size: 12px; margin-left: 5px; color: #fbbf24;"></i></th>
+                            <th>OmeTV</th>
+                            <th>Chitchat.gg</th>
+                            <th>Emerald Chat</th>
+                            <th>Chatroulette</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Text chat</td><td class="highlight-col"><i class="fa-solid fa-check check-icon"></i></td><td><i class="fa-solid fa-check check-icon"></i></td><td><i class="fa-solid fa-check check-icon"></i></td><td><i class="fa-solid fa-check check-icon"></i></td><td><i class="fa-solid fa-check check-icon"></i></td></tr>
+                        <tr><td>Video chat</td><td class="highlight-col"><i class="fa-solid fa-check check-icon"></i></td><td><i class="fa-solid fa-check check-icon"></i></td><td><i class="fa-solid fa-check check-icon"></i></td><td><i class="fa-solid fa-check check-icon"></i></td><td><i class="fa-solid fa-check check-icon"></i></td></tr>
+                        <tr><td>Voice chat</td><td class="highlight-col"><i class="fa-solid fa-check check-icon"></i></td><td><i class="fa-solid fa-xmark cross-icon"></i></td><td><i class="fa-solid fa-check check-icon"></i></td><td><i class="fa-solid fa-xmark cross-icon"></i></td><td><i class="fa-solid fa-xmark cross-icon"></i></td></tr>
+                        <tr><td>Voice notes</td><td class="highlight-col"><i class="fa-solid fa-check check-icon"></i></td><td><i class="fa-solid fa-xmark cross-icon"></i></td><td><i class="fa-solid fa-xmark cross-icon"></i></td><td><i class="fa-solid fa-xmark cross-icon"></i></td><td><i class="fa-solid fa-xmark cross-icon"></i></td></tr>
+                        <tr><td>Message disconnected strangers</td><td class="highlight-col"><i class="fa-solid fa-check check-icon"></i></td><td><i class="fa-solid fa-xmark cross-icon"></i></td><td><i class="fa-solid fa-xmark cross-icon"></i></td><td><i class="fa-solid fa-xmark cross-icon"></i></td><td><i class="fa-solid fa-xmark cross-icon"></i></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reasons -->
+        <div class="reasons-section">
+            <div class="reasons-label">REAL REASONS</div>
+            <h2 class="reasons-title">Why people talk to strangers online</h2>
+            <p class="reasons-desc">Real reasons - not marketing. The conversations that actually happen here.</p>
+            <div class="reasons-grid">
+                <div class="reason-card"><h3 class="reason-title">Practice a language</h3><p class="reason-text">Real conversations with native speakers - no scripts, no pressure.</p><p class="reason-quote">"I practise Spanish every day now with strangers on here. My conversational skills went from zero to fluent in 6 months."</p></div>
+                <div class="reason-card"><h3 class="reason-title">Talk without judgment</h3><p class="reason-text">A stranger who doesn't know you listens differently. No history, no agenda.</p><p class="reason-quote">"Sometimes you need to say something out loud to someone who has zero context. That's exactly what this is."</p></div>
+                <div class="reason-card"><h3 class="reason-title">Beat loneliness</h3><p class="reason-text">A real person reacting in real time - not an algorithm, not a feed.</p><p class="reason-quote">"Night shifts used to feel unbearable. Now I just open Batchit and there's always someone awake somewhere."</p></div>
+                <div class="reason-card"><h3 class="reason-title">Actually make a friend</h3><p class="reason-text">Save chats, send friend requests, message after disconnect. Good conversations don't have to end.</p><p class="reason-quote">"I've made three actual friends on Batchit. We still talk every week."</p></div>
+            </div>
         </div>
     </div>
 
