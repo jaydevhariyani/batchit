@@ -356,36 +356,29 @@
             <div class="dash-main">
                 <p style="color: #6b7280; margin: 0; font-weight: 500;">Chat with random people worldwide - Be Respectful and have fun</p>
 
-                <div class="dash-card">
-                    <h3 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;"><i class="fa-regular fa-file-lines" style="color: #8b5cf6;"></i> Type your interests</h3>
-                    <input type="text" placeholder="Add an interest (Coming Soon)" disabled style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; box-sizing: border-box;">
-                </div>
-
-                <div class="dash-card premium-card" onclick="document.getElementById('premium-modal').style.display='flex'">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h3 style="margin: 0 0 5px 0; color: #166534; display: flex; align-items: center; gap: 10px;">
-                                <i class="fa-solid fa-venus-mars"></i> Gender & Age Filter <i class="fa-solid fa-crown" style="color: #fbbf24;"></i>
-                            </h3>
-                            <p style="margin: 0; color: #15803d; font-size: 14px;">Find people matching your preferences</p>
-                        </div>
-                        <i class="fa-solid fa-arrow-right" style="color: #22c55e; font-size: 20px;"></i>
+                <!-- GENDER PREFERENCE (FREE FOR NOW) -->
+                <div class="dash-card" style="background: #f0fdf4; border-color: #bbf7d0;">
+                    <h3 style="margin: 0 0 10px 0; color: #166534; display: flex; justify-content: space-between; align-items: center;">
+                        <span><i class="fa-solid fa-venus-mars"></i> Who do you want to meet?</span>
+                        <span style="font-size: 10px; background: #22c55e; color: white; padding: 3px 8px; border-radius: 12px; font-weight: bold; box-shadow: 0 2px 5px rgba(34,197,94,0.3);">FREE FOR NOW</span>
+                    </h3>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <div class="pref-gender-btn active" data-pref="Any" style="flex: 1; border: 2px solid #22c55e; color: #22c55e; background: #dcfce7; padding: 10px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold;">Any</div>
+                        <div class="pref-gender-btn" data-pref="Male" style="flex: 1; border: 1px solid #e5e7eb; color: #6b7280; background: white; padding: 10px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold;">Male</div>
+                        <div class="pref-gender-btn" data-pref="Female" style="flex: 1; border: 1px solid #e5e7eb; color: #6b7280; background: white; padding: 10px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold;">Female</div>
                     </div>
                 </div>
 
-                <div class="dash-card" style="background: #eff6ff; border-color: #bfdbfe; cursor: pointer;" onclick="document.getElementById('premium-modal').style.display='flex'">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h3 style="margin: 0 0 5px 0; color: #1e40af; display: flex; align-items: center; gap: 10px;">
-                                <i class="fa-solid fa-earth-americas"></i> Filter by Country <i class="fa-solid fa-crown" style="color: #fbbf24;"></i>
-                            </h3>
-                            <p style="margin: 0; color: #1d4ed8; font-size: 14px;">Select the specific country you want</p>
-                        </div>
-                        <i class="fa-solid fa-arrow-right" style="color: #3b82f6; font-size: 20px;"></i>
-                    </div>
+                <!-- COUNTRY PREFERENCE (FREE FOR NOW) -->
+                <div class="dash-card" style="background: #eff6ff; border-color: #bfdbfe;">
+                    <h3 style="margin: 0 0 10px 0; color: #1e40af; display: flex; justify-content: space-between; align-items: center;">
+                        <span><i class="fa-solid fa-earth-americas"></i> Preferred Country</span>
+                        <span style="font-size: 10px; background: #3b82f6; color: white; padding: 3px 8px; border-radius: 12px; font-weight: bold; box-shadow: 0 2px 5px rgba(59,130,246,0.3);">FREE FOR NOW</span>
+                    </h3>
+                    <input type="text" id="pref-country-input" placeholder="Leave blank for any, or type e.g. India" style="width: 100%; padding: 12px; border: 1px solid #bfdbfe; border-radius: 8px; box-sizing: border-box; font-size: 15px; margin-top: 10px; outline: none;">
                 </div>
 
-                <button id="start-guest-chat-btn" style="background: #8b5cf6; color: white; border: none; padding: 18px 40px; border-radius: 30px; font-size: 20px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 25px rgba(139,92,246,0.4); margin-top: 20px; display: flex; align-items: center; gap: 10px;">
+                <button id="start-guest-chat-btn" style="background: #8b5cf6; color: white; border: none; padding: 18px 40px; border-radius: 30px; font-size: 20px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 25px rgba(139,92,246,0.4); margin-top: 10px; display: flex; align-items: center; gap: 10px;">
                     Start New Chat <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
