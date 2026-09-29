@@ -184,6 +184,16 @@
         .block-btn:hover { background: #b91c1c; }
         .report-btn { width: 100%; background: transparent; color: #9ca3af; border: 1px solid #4b5563; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; transition: 0.2s; }
         .report-btn:hover { background: rgba(255,255,255,0.05); color: white; }
+    /* CHAT SIDEBAR CSS */
+        .chat-sidebar { width: 320px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; }
+        .friend-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid #f3f4f6; cursor: pointer; transition: 0.2s; }
+        .friend-item:hover { background: #f5f3ff; }
+        .online-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid white; }
+        .msg-badge { background: #ef4444; color: white; font-size: 11px; font-weight: bold; min-width: 20px; height: 20px; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 0 5px; box-sizing: border-box; }
+        @media (max-width: 768px) {
+            .chat-sidebar { display: none !important; } /* મોબાઈલમાં સાઇડબાર છુપાવવા */
+            #main-chat-screen { flex-direction: column !important; }
+        }
     </style>
 <link rel="preconnect" href="https://batchit-6a771.firebaseapp.com" crossorigin>
     <link rel="preconnect" href="https://apis.google.com" crossorigin>
@@ -443,27 +453,78 @@
     </div>
 
     <!-- 4. MAIN CHAT SCREEN -->
-    <div id="main-chat-screen" style="display: none; height: 100vh; flex-direction: column; background: #f4f7fd;">
-        <header class="chat-header">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 45px; height: 45px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;"><i class="fa-solid fa-user-secret"></i></div>
-                <div style="display: flex; flex-direction: column;">
-                    <strong id="chat-partner-name" style="font-size: 18px; color: #111827;">Stranger</strong>
-                    <span id="typing-indicator" style="font-size: 12px; color: #25D366; display: none; font-weight: bold;">typing...</span>
+    <div id="main-chat-screen" style="display: none; height: 100vh; background: #f4f7fd; flex-direction: row;">
+        
+        <!-- નવું: ડાબી બાજુનું Friends Sidebar -->
+        <div class="chat-sidebar">
+            <div style="padding: 20px; border-bottom: 1px solid #e5e7eb; background: white;">
+                <h3 style="margin: 0; color: #111827; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fa-solid fa-user-group"></i> My Friends</span>
+                    <button style="background: none; border: none; cursor: pointer; color: #8b5cf6;"><i class="fa-solid fa-plus"></i></button>
+                </h3>
+            </div>
+            
+            <div id="sidebar-friends-list" style="flex: 1; overflow-y: auto;">
+                
+                <!-- ડેમો: ઓનલાઈન ફ્રેન્ડ (ગ્રીન ડોટ અને મેસેજ કાઉન્ટ સાથે) -->
+                <div class="friend-item">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="position: relative;">
+                            <!-- પ્રોફાઈલ ફોટો / અક્ષર -->
+                            <div style="width: 45px; height: 45px; background: linear-gradient(135deg, #22c55e, #10b981); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold;">R</div>
+                            <!-- ગ્રીન ડોટ (Online Status) -->
+                            <div class="online-dot"></div>
+                        </div>
+                        <div>
+                            <strong style="font-size: 15px; color: #111827; display: block; margin-bottom: 2px;">Rahul_99</strong>
+                            <span style="font-size: 13px; color: #22c55e; font-weight: 600;">Typing...</span>
+                        </div>
+                    </div>
+                    <!-- લાલ કલરનું મેસેજ કાઉન્ટ -->
+                    <div class="msg-badge">2</div>
                 </div>
+
+                <!-- ડેમો: ઓફલાઈન ફ્રેન્ડ -->
+                <div class="friend-item">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="position: relative;">
+                            <div style="width: 45px; height: 45px; background: #d1d5db; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold;">S</div>
+                        </div>
+                        <div>
+                            <strong style="font-size: 15px; color: #111827; display: block; margin-bottom: 2px;">Stranger_Girl</strong>
+                            <span style="font-size: 13px; color: #9ca3af;">Last seen 2h ago</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <button id="audio-call-btn" aria-label="Start Audio Call" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;"><i class="fa-solid fa-phone"></i></button>
-                <button id="video-call-btn" aria-label="Start Video Call" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;"><i class="fa-solid fa-video"></i></button>
-                <button id="menu-btn" aria-label="Chat Menu Options" style="background: none; border: none; font-size: 18px; color: #6b7280; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                <button class="skip-btn" id="skip-btn">Skip <i class="fa-solid fa-forward-step"></i></button>
+        </div>
+
+        <!-- જમણી બાજુ: તમારી જૂની ચેટ સ્ક્રીન -->
+        <div style="flex: 1; display: flex; flex-direction: column; position: relative;">
+            <header class="chat-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 45px; height: 45px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;"><i class="fa-solid fa-user-secret"></i></div>
+                    <div style="display: flex; flex-direction: column;">
+                        <strong id="chat-partner-name" style="font-size: 18px; color: #111827;">Stranger</strong>
+                        <span id="typing-indicator" style="font-size: 12px; color: #25D366; display: none; font-weight: bold;">typing...</span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button id="audio-call-btn" aria-label="Start Audio Call" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;"><i class="fa-solid fa-phone"></i></button>
+                    <button id="video-call-btn" aria-label="Start Video Call" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;"><i class="fa-solid fa-video"></i></button>
+                    <button id="menu-btn" aria-label="Chat Menu Options" style="background: none; border: none; font-size: 18px; color: #6b7280; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    <button class="skip-btn" id="skip-btn">Skip <i class="fa-solid fa-forward-step"></i></button>
+                </div>
+            </header>
+            
+            <div id="chat-box" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; background: #f4f7fd;"></div>
+            
+            <div style="padding: 15px; background: white; border-top: 1px solid #e5e7eb; display: flex; align-items: center; gap: 10px;">
+                <button aria-label="Record Voice Message" style="background: none; border: none; font-size: 22px; color: #6b7280;"><i class="fa-solid fa-microphone"></i></button>
+                <input type="text" id="message-input" placeholder="Type a message..." style="flex: 1; padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 25px; outline: none;">
+                <button id="send-btn" aria-label="Send Message" style="background: #8b5cf6; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
-        </header>
-        <div id="chat-box" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column;"></div>
-        <div style="padding: 15px; background: white; border-top: 1px solid #e5e7eb; display: flex; align-items: center; gap: 10px;">
-            <button aria-label="Record Voice Message" style="background: none; border: none; font-size: 22px; color: #6b7280;"><i class="fa-solid fa-microphone"></i></button>
-            <input type="text" id="message-input" placeholder="Type a message..." style="flex: 1; padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 25px; outline: none;">
-            <button id="send-btn" aria-label="Send Message" style="background: #8b5cf6; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 </main>
