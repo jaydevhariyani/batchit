@@ -15,7 +15,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b5cf6">
 
-    <!-- Open Graph / Facebook / WhatsApp (લિંક શેર કરવા માટે) -->
+    <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://batchit.site/">
     <meta property="og:title" content="Batchit - Best Omegle Alternative | Free Live Video Chatting">
@@ -103,7 +103,7 @@
             .dash-main { padding: 20px; }
         }
 
-        /* SECTIONS CSS (STATS, FEATURES, COMPARE, REASONS) */
+        /* SECTIONS CSS */
         .stats-section { display: flex; flex-wrap: wrap; justify-content: space-evenly; padding: 60px 20px; background: white; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
         .stat-item { text-align: center; margin: 10px 20px; }
         .stat-number { font-size: 42px; font-weight: 800; color: #6366f1; margin-bottom: 5px; }
@@ -167,7 +167,7 @@
             .footer-links { gap: 40px; }
             .footer-container { flex-direction: column; }
         }
-    /* IN-CHAT MENU (ADD FRIEND / BLOCK) */
+    /* IN-CHAT MENU */
         #in-chat-menu-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 5500; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
         .chat-menu-card { background: #1f2937; color: white; width: 90%; max-width: 350px; border-radius: 16px; padding: 25px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); font-family: 'Inter', sans-serif; }
         .chat-menu-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #9ca3af; font-size: 18px; cursor: pointer; transition: 0.2s; }
@@ -187,7 +187,8 @@
     </style>
 </head>
 <body>
-
+    
+<main id="app-main">
     <!-- 1. FULL LANDING PAGE -->
     <div id="landing-page" style="display: block; min-height: 100vh;">
         <!-- Navbar -->
@@ -216,7 +217,7 @@
             <div class="header-right-btns" style="display: flex; gap: 10px;">
                 <button class="start-chat-btn-header open-onboard-trigger">Start Chat</button>
             </div>
-            <button class="mobile-menu-btn" id="mobile-menu-toggle"><i class="fa-solid fa-bars"></i></button>
+            <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle mobile menu"><i class="fa-solid fa-bars"></i></button>
         </nav>
 
         <!-- Hero -->
@@ -306,11 +307,11 @@
                     <a href="#" class="footer-logo"><i class="fa-solid fa-masks-theater"></i> Batchit</a>
                     <p class="footer-desc">Anonymous chat platform built for privacy, real connections, and conversations that actually matter.</p>
                     <div class="social-icons">
-                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-                        <a href="#"><i class="fa-brands fa-youtube"></i></a>
-                        <a href="#"><i class="fa-brands fa-discord"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
                     </div>
                 </div>
                <div class="footer-links">
@@ -345,7 +346,7 @@
             <a href="#" class="logo" style="font-size: 20px;"><i class="fa-solid fa-masks-theater"></i> Batchit</a>
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div style="background: #f3f4f6; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 14px;"><i class="fa-solid fa-user"></i> Guest Account</div>
-                <button style="background: linear-gradient(45deg, #fbbf24, #f59e0b); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="document.getElementById('premium-modal').style.display='flex'"><i class="fa-solid fa-crown"></i> Get VIP</button>
+                <button aria-label="Get VIP" style="background: linear-gradient(45deg, #fbbf24, #f59e0b); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="document.getElementById('premium-modal').style.display='flex'"><i class="fa-solid fa-crown"></i> Get VIP</button>
             </div>
         </nav>
 
@@ -381,7 +382,7 @@
             <div class="dash-main">
                 <p style="color: #6b7280; margin: 0; font-weight: 500;">Chat with random people worldwide - Be Respectful and have fun</p>
 
-                <!-- GENDER PREFERENCE (FREE FOR NOW) -->
+                <!-- GENDER PREFERENCE -->
                 <div class="dash-card" style="background: #f0fdf4; border-color: #bbf7d0;">
                     <h3 style="margin: 0 0 10px 0; color: #166534; display: flex; justify-content: space-between; align-items: center;">
                         <span><i class="fa-solid fa-venus-mars"></i> Who do you want to meet?</span>
@@ -394,7 +395,7 @@
                     </div>
                 </div>
 
-                <!-- COUNTRY PREFERENCE (FREE FOR NOW) -->
+                <!-- COUNTRY PREFERENCE -->
                 <div class="dash-card" style="background: #eff6ff; border-color: #bfdbfe;">
                     <h3 style="margin: 0 0 10px 0; color: #1e40af; display: flex; justify-content: space-between; align-items: center;">
                         <span><i class="fa-solid fa-earth-americas"></i> Preferred Country</span>
@@ -414,7 +415,7 @@
     <div id="radar-screen" style="display: none; height: 100vh; flex-direction: column; align-items: center; justify-content: center; background: white;">
         <h2 style="color: #111827; font-size: 26px;">Looking for a match...</h2>
         <div class="radar-container"><div class="radar-ripple"></div><div class="radar-ripple"></div><div class="radar-ripple"></div><div class="radar-core"><i class="fa-solid fa-user"></i></div></div>
-        <button id="cancel-search-btn" style="margin-top: 50px; background: #f3f4f6; color: #4b5563; border: none; padding: 12px 30px; border-radius: 20px; font-weight: bold; cursor: pointer;">Cancel</button>
+        <button id="cancel-search-btn" aria-label="Cancel search" style="margin-top: 50px; background: #f3f4f6; color: #4b5563; border: none; padding: 12px 30px; border-radius: 20px; font-weight: bold; cursor: pointer;">Cancel</button>
     </div>
 
     <!-- 4. MAIN CHAT SCREEN -->
@@ -428,24 +429,25 @@
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 15px;">
-                <button id="audio-call-btn" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;"><i class="fa-solid fa-phone"></i></button>
-                <button id="video-call-btn" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;"><i class="fa-solid fa-video"></i></button>
-                <button id="menu-btn" style="background: none; border: none; font-size: 18px; color: #6b7280; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                <button id="audio-call-btn" aria-label="Start Audio Call" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;"><i class="fa-solid fa-phone"></i></button>
+                <button id="video-call-btn" aria-label="Start Video Call" style="background: none; border: none; font-size: 18px; color: #8b5cf6; cursor: pointer;"><i class="fa-solid fa-video"></i></button>
+                <button id="menu-btn" aria-label="Chat Menu Options" style="background: none; border: none; font-size: 18px; color: #6b7280; cursor: pointer;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                 <button class="skip-btn" id="skip-btn">Skip <i class="fa-solid fa-forward-step"></i></button>
             </div>
         </header>
         <div id="chat-box" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column;"></div>
         <div style="padding: 15px; background: white; border-top: 1px solid #e5e7eb; display: flex; align-items: center; gap: 10px;">
-            <button style="background: none; border: none; font-size: 22px; color: #6b7280;"><i class="fa-solid fa-microphone"></i></button>
+            <button aria-label="Record Voice Message" style="background: none; border: none; font-size: 22px; color: #6b7280;"><i class="fa-solid fa-microphone"></i></button>
             <input type="text" id="message-input" placeholder="Type a message..." style="flex: 1; padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 25px; outline: none;">
-            <button id="send-btn" style="background: #8b5cf6; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
+            <button id="send-btn" aria-label="Send Message" style="background: #8b5cf6; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
+</main>
 
     <!-- PREMIUM MODAL -->
     <div id="premium-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 5000; justify-content: center; align-items: center;">
         <div style="background: white; width: 90%; max-width: 500px; border-radius: 20px; padding: 30px; position: relative;">
-            <button id="close-premium-btn" style="position: absolute; top: 15px; right: 15px; background: #f3f4f6; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold;">✕</button>
+            <button id="close-premium-btn" aria-label="Close Premium Modal" style="position: absolute; top: 15px; right: 15px; background: #f3f4f6; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold;">✕</button>
             <div style="text-align: center; margin-bottom: 25px;"><h2>Choose Your Plan</h2></div>
             <div style="display: flex; gap: 15px; margin-bottom: 20px;">
                 <div style="flex: 1; border: 1px solid #e5e7eb; border-radius: 15px; padding: 20px;">
@@ -459,13 +461,13 @@
                     <button class="upgrade-pay-btn" style="width: 100%; padding: 12px; background: white; color: #8b5cf6; border: none; border-radius: 10px; margin-top: 20px;">Get VIP</button>
                 </div>
             </div>
-            <div style="text-align: center;"><button id="not-right-now-btn" style="background: none; border: none; color: #9ca3af; cursor: pointer;">Not right now</button></div>
+            <div style="text-align: center;"><button id="not-right-now-btn" aria-label="Not right now" style="background: none; border: none; color: #9ca3af; cursor: pointer;">Not right now</button></div>
         </div>
     </div>
     <!-- IN-CHAT MENU MODAL (ADD FRIEND / BLOCK) -->
     <div id="in-chat-menu-modal">
         <div class="chat-menu-card">
-            <button class="chat-menu-close" id="close-chat-menu-btn"><i class="fa-solid fa-xmark"></i></button>
+            <button class="chat-menu-close" id="close-chat-menu-btn" aria-label="Close Chat Menu"><i class="fa-solid fa-xmark"></i></button>
             <div class="chat-menu-header">
                 <div class="chat-menu-avatar" id="menu-avatar">S</div>
                 <div>
@@ -486,7 +488,7 @@
     <div id="video-call-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111827; z-index: 6000; flex-direction: column;">
         <div style="padding: 20px; color: white; display: flex; justify-content: space-between; align-items: center; position: absolute; width: 100%; z-index: 10;">
             <h3>Call with Stranger</h3>
-            <button id="end-call-btn" style="background: #ef4444; color: white; border: none; width: 45px; height: 45px; border-radius: 50%;"><i class="fa-solid fa-phone-slash"></i></button>
+            <button id="end-call-btn" aria-label="End Video Call" style="background: #ef4444; color: white; border: none; width: 45px; height: 45px; border-radius: 50%;"><i class="fa-solid fa-phone-slash"></i></button>
         </div>
         <div style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; background: #000;">
             <video id="remote-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
@@ -495,6 +497,7 @@
     </div>
 
     <script type="module" src="script.js"></script>
-    <script src="https://pl31556406.profitableratecpmnetwork.com/d1/f7/1d/d1f71df344ced2f1f48ef7b62efd3fbf.js"></script>
+    <!-- Adsterra Script added with defer -->
+    <script defer src="https://pl31556406.profitableratecpmnetwork.com/d1/f7/1d/d1f71df344ced2f1f48ef7b62efd3fbf.js"></script>
 </body>
 </html>
