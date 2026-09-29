@@ -428,7 +428,7 @@ document.getElementById('report-btn')?.addEventListener('click', () => {
 // ==========================================
 // EMAIL AUTHENTICATION & ADD FRIEND SYSTEM
 // ==========================================
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
 const authModal = document.getElementById('auth-modal');
 const authEmail = document.getElementById('auth-email');
@@ -437,57 +437,87 @@ const authSignupBtn = document.getElementById('auth-signup-btn');
 const authLoginBtn = document.getElementById('auth-login-btn');
 const authErrorMsg = document.getElementById('auth-error-msg');
 const addFriendBtn = document.getElementById('add-friend-btn');
+const friendsContainer = document.getElementById('friends-list-container');
+const friendCount = document.getElementById('friend-count');
 
-// 1. Add Friend Button Click Logic
+// 1. યુઝર લોગીન છે કે નહિ તે ચેક કરો અને Friends લિસ્ટ બતાવો
+onAuthStateChanged(auth, (user) => {
+    if (user && !user.isAnonymous) {
+        // જો પાક્કું એકાઉન્ટ હોય તો Login Prompt કાઢી નાખો
+        friendsContainer.innerHTML = '<p style="font-size: 13px; color: #6b7280; text-align: center; margin-top: 20px;">No friends yet. Start chatting and add someone!</p>';
+        friendCount.innerText = "0";
+    } else {
+        // ગેસ્ટ હોય તો Login Prompt બતાવો
+        friendsContainer.innerHTML = `
+            <div id="friends-login-prompt" style="background: #f5f3ff; border: 1px dashed #8b5cf6; padding: 15px; border-radius: 10px; text-align: center;">
+                <p style="font-size: 13px; color: #4b5563; margin: 0 0 10px 0;">Login to add and see your friends here.</p>
+                <button onclick="document.getElementById('auth-modal').style.display='flex'" style="background: #8b5cf6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px;">Login Now</button>
+            </div>
+        `;
+        friendCount.innerText = "0";
+    }
+});
+
+// 2. Add Friend બટન લોજીક
 if (addFriendBtn) {
     addFriendBtn.addEventListener('click', () => {
         const user = auth.currentUser;
         
         // જો યુઝર ગેસ્ટ (Anonymous) હોય, તો લોગીન પેજ બતાવો
         if (user && user.isAnonymous) {
-            document.getElementById('in-chat-menu-modal').style.display = 'none'; // જૂનું મેનુ બંધ કરો
-            authModal.style.display = 'flex'; // નવું લોગીન મોડલ ખોલો
+            document.getElementById('in-chat-menu-modal').style.display = 'none';
+            authModal.style.display = 'flex'; 
         } 
-        // જો યુઝરે ઈમેલથી એકાઉન્ટ બનાવેલું હોય, તો ફ્રેન્ડ રિક્વેસ્ટ મોકલો
+        // જો રજીસ્ટર યુઝર હોય, તો ફ્રેન્ડને લિસ્ટમાં એડ કરો
         else if (user && !user.isAnonymous) {
-            alert("Friend request sent successfully! 🎉");
+            const partnerName = document.getElementById('menu-partner-name').innerText;
+            
+            // "No friends yet" મેસેજ કાઢી નાખો
+            if(friendsContainer.innerHTML.includes('No friends yet')) {
+                friendsContainer.innerHTML = '';
+            }
+            
+            // ફ્રેન્ડને લિસ્ટમાં નવી ડિઝાઇન સાથે ઉમેરો
+            const newFriendHtml = `
+                <div style="display: flex; align-items: center; justify-content: space-between; background: white; padding: 10px; border-radius: 10px; border: 1px solid #e5e7eb; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 35px; height: 35px; background: linear-gradient(45deg, #8b5cf6, #e879f9); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">${partnerName.charAt(0)}</div>
+                        <strong style="font-size: 14px; color: #111827;">${partnerName}</strong>
+                    </div>
+                    <button style="background: #f3f4f6; color: #8b5cf6; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px;"><i class="fa-solid fa-message"></i> Chat</button>
+                </div>
+            `;
+            
+            friendsContainer.innerHTML += newFriendHtml;
+            
+            // કાઉન્ટ (નંબર) વધારો
+            let currentCount = parseInt(friendCount.innerText);
+            friendCount.innerText = currentCount + 1;
+            
+            alert(`Friend request sent! ${partnerName} is added to your list. 🎉`);
             document.getElementById('in-chat-menu-modal').style.display = 'none';
         }
     });
 }
 
-// 2. Sign Up (નવું એકાઉન્ટ બનાવવા માટે)
+// 3. Sign Up (નવું એકાઉન્ટ બનાવવા માટે)
 if (authSignupBtn) {
     authSignupBtn.addEventListener('click', () => {
         const email = authEmail.value;
         const password = authPassword.value;
-        
         createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                authModal.style.display = 'none';
-                alert("Account created successfully! You are now a registered user. 🚀");
-            })
-            .catch((error) => {
-                authErrorMsg.innerText = "Error: " + error.message;
-                authErrorMsg.style.display = 'block';
-            });
+            .then(() => { authModal.style.display = 'none'; alert("Account created successfully! 🚀"); })
+            .catch((error) => { authErrorMsg.innerText = "Error: " + error.message; authErrorMsg.style.display = 'block'; });
     });
 }
 
-// 3. Log In (જૂના એકાઉન્ટમાં જવા માટે)
+// 4. Log In (જૂના એકાઉન્ટમાં જવા માટે)
 if (authLoginBtn) {
     authLoginBtn.addEventListener('click', () => {
         const email = authEmail.value;
         const password = authPassword.value;
-        
         signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                authModal.style.display = 'none';
-                alert("Welcome back! Logged in successfully. ✅");
-            })
-            .catch((error) => {
-                authErrorMsg.innerText = "Error: " + error.message;
-                authErrorMsg.style.display = 'block';
-            });
+            .then(() => { authModal.style.display = 'none'; alert("Logged in successfully. ✅"); })
+            .catch((error) => { authErrorMsg.innerText = "Error: " + error.message; authErrorMsg.style.display = 'block'; });
     });
 }
