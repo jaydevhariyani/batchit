@@ -195,7 +195,7 @@
             #main-chat-screen { flex-direction: column !important; }
         }
     </style>
-<link rel="preconnect" href="https://batchit-6a771.firebaseapp.com" crossorigin>
+    <link rel="preconnect" href="https://batchit-6a771.firebaseapp.com" crossorigin>
     <link rel="preconnect" href="https://apis.google.com" crossorigin>
     <link rel="preconnect" href="https://www.googleapis.com" crossorigin>
 </head>
@@ -207,9 +207,9 @@
         <!-- Navbar -->
         <nav class="main-nav">
             <a href="index.html" class="logo">
-    <img src="icon.png.png" alt="Batchit Logo" style="height: 40px; margin-right: 10px; border-radius: 8px;">
-    Batchit
-</a>
+                <img src="icon.png.png" alt="Batchit Logo" style="height: 40px; margin-right: 10px; border-radius: 8px;">
+                Batchit
+            </a>
             <div class="desktop-menu">
                 <a href="#" class="nav-link">Home</a>
                 <a href="#" class="nav-link">Blog</a>
@@ -370,6 +370,7 @@
         </nav>
 
         <div class="dashboard-container">
+            
             <!-- Sidebar for Profile Setup -->
             <div class="dash-sidebar">
                 <h3 style="margin: 0; color: #111827;">Profile Setup</h3>
@@ -392,11 +393,12 @@
                     <label style="font-weight: 600; font-size: 14px;">Country</label>
                     <input type="text" id="guest-country-input" placeholder="e.g. India" value="India" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 5px; box-sizing: border-box;">
                 </div>
+                
                 <div style="font-size: 12px; color: #6b7280; margin-top: auto;">
                     <input type="checkbox" id="age-agree" checked> I agree to 18+ Terms of Service.
                 </div>
-                </div>
-                 <!-- MY FRIENDS SECTION -->
+                
+                <!-- MY FRIENDS SECTION -->
                 <div style="margin-top: 30px; border-top: 2px dashed #e5e7eb; padding-top: 20px;">
                     <h3 style="margin: 0 0 15px 0; color: #111827; display: flex; align-items: center; justify-content: space-between;">
                         <span><i class="fa-solid fa-user-group"></i> My Friends</span>
@@ -411,8 +413,7 @@
                         </div>
                     </div>
                 </div>
-                </div>
-            </div>
+            </div> <!-- સાચો બંધ થતો DIV અહીં છે -->
 
             <!-- Main Dashboard Area (Filters) -->
             <div class="dash-main">
@@ -444,8 +445,9 @@
                     Start New Chat <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
-        </div>
-    </div>
+
+        </div> <!-- CLOSES DASHBOARD CONTAINER -->
+    </div> <!-- CLOSES DASHBOARD SCREEN -->
 
     <!-- 3. RADAR SCREEN -->
     <div id="radar-screen" style="display: none; height: 100vh; flex-direction: column; align-items: center; justify-content: center; background: white;">
@@ -457,7 +459,7 @@
     <!-- 4. MAIN CHAT SCREEN -->
     <div id="main-chat-screen" style="display: none; height: 100vh; background: #f4f7fd; flex-direction: row;">
         
-        <!-- નવું: ડાબી બાજુનું Friends Sidebar -->
+        <!-- ડાબી બાજુનું Friends Sidebar -->
         <div class="chat-sidebar">
             <div style="padding: 20px; border-bottom: 1px solid #e5e7eb; background: white;">
                 <h3 style="margin: 0; color: #111827; display: flex; justify-content: space-between; align-items: center;">
@@ -467,14 +469,11 @@
             </div>
             
             <div id="sidebar-friends-list" style="flex: 1; overflow-y: auto;">
-                
                 <!-- ડેમો: ઓનલાઈન ફ્રેન્ડ (ગ્રીન ડોટ અને મેસેજ કાઉન્ટ સાથે) -->
                 <div class="friend-item">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="position: relative;">
-                            <!-- પ્રોફાઈલ ફોટો / અક્ષર -->
                             <div style="width: 45px; height: 45px; background: linear-gradient(135deg, #22c55e, #10b981); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold;">R</div>
-                            <!-- ગ્રીન ડોટ (Online Status) -->
                             <div class="online-dot"></div>
                         </div>
                         <div>
@@ -482,7 +481,6 @@
                             <span style="font-size: 13px; color: #22c55e; font-weight: 600;">Typing...</span>
                         </div>
                     </div>
-                    <!-- લાલ કલરનું મેસેજ કાઉન્ટ -->
                     <div class="msg-badge">2</div>
                 </div>
 
@@ -498,7 +496,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -551,6 +548,7 @@
             <div style="text-align: center;"><button id="not-right-now-btn" aria-label="Not right now" style="background: none; border: none; color: #9ca3af; cursor: pointer;">Not right now</button></div>
         </div>
     </div>
+    
     <!-- IN-CHAT MENU MODAL (ADD FRIEND / BLOCK) -->
     <div id="in-chat-menu-modal">
         <div class="chat-menu-card">
@@ -583,24 +581,25 @@
         </div>
     </div>
 
-    <script type="module" src="script.js"></script>
-<!-- Adsterra Script added with async -->
-<script async src="https://pl31556406.profitableratecpmnetwork.com/d1/f7/1d/d1f71df344ced2f1f48ef7b62efd3fbf.js"></script>
-<!-- AUTHENTICATION MODAL -->
-<div id="auth-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
-    <div style="background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 30px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
-        <button onclick="document.getElementById('auth-modal').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: #f3f4f6; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold;">✕</button>
-        <h2 style="margin-top: 0; color: #111827; text-align: center;">Create Free Account</h2>
-        <p style="color: #6b7280; text-align: center; font-size: 14px; margin-bottom: 20px;">Register to add friends and save your chat history!</p>
-        
-        <input type="email" id="auth-email" placeholder="Email Address" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
-        <input type="password" id="auth-password" placeholder="Password (min 6 chars)" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
-        
-        <button id="auth-signup-btn" style="width: 100%; background: #8b5cf6; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; margin-bottom: 10px;">Sign Up</button>
-        <button id="auth-login-btn" style="width: 100%; background: transparent; color: #8b5cf6; border: 2px solid #8b5cf6; padding: 14px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer;">Log In</button>
-        
-        <p id="auth-error-msg" style="color: red; font-size: 13px; text-align: center; margin-top: 15px; display: none;"></p>
+    <!-- AUTHENTICATION MODAL -->
+    <div id="auth-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div style="background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 30px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+            <button onclick="document.getElementById('auth-modal').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: #f3f4f6; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold;">✕</button>
+            <h2 style="margin-top: 0; color: #111827; text-align: center;">Create Free Account</h2>
+            <p style="color: #6b7280; text-align: center; font-size: 14px; margin-bottom: 20px;">Register to add friends and save your chat history!</p>
+            
+            <input type="email" id="auth-email" placeholder="Email Address" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+            <input type="password" id="auth-password" placeholder="Password (min 6 chars)" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+            
+            <button id="auth-signup-btn" style="width: 100%; background: #8b5cf6; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; margin-bottom: 10px;">Sign Up</button>
+            <button id="auth-login-btn" style="width: 100%; background: transparent; color: #8b5cf6; border: 2px solid #8b5cf6; padding: 14px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer;">Log In</button>
+            
+            <p id="auth-error-msg" style="color: red; font-size: 13px; text-align: center; margin-top: 15px; display: none;"></p>
+        </div>
     </div>
-</div>
+
+    <!-- Scripts -->
+    <script type="module" src="script.js"></script>
+    <script async src="https://pl31556406.profitableratecpmnetwork.com/d1/f7/1d/d1f71df344ced2f1f48ef7b62efd3fbf.js"></script>
 </body>
 </html>
