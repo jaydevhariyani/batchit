@@ -425,3 +425,69 @@ document.getElementById('report-btn')?.addEventListener('click', () => {
     alert("Report sent to moderators. Thank you for keeping the community safe!");
     inChatMenuModal.style.display = 'none';
 });
+// ==========================================
+// EMAIL AUTHENTICATION & ADD FRIEND SYSTEM
+// ==========================================
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+const authModal = document.getElementById('auth-modal');
+const authEmail = document.getElementById('auth-email');
+const authPassword = document.getElementById('auth-password');
+const authSignupBtn = document.getElementById('auth-signup-btn');
+const authLoginBtn = document.getElementById('auth-login-btn');
+const authErrorMsg = document.getElementById('auth-error-msg');
+const addFriendBtn = document.getElementById('add-friend-btn');
+
+// 1. Add Friend Button Click Logic
+if (addFriendBtn) {
+    addFriendBtn.addEventListener('click', () => {
+        const user = auth.currentUser;
+        
+        // જો યુઝર ગેસ્ટ (Anonymous) હોય, તો લોગીન પેજ બતાવો
+        if (user && user.isAnonymous) {
+            document.getElementById('in-chat-menu-modal').style.display = 'none'; // જૂનું મેનુ બંધ કરો
+            authModal.style.display = 'flex'; // નવું લોગીન મોડલ ખોલો
+        } 
+        // જો યુઝરે ઈમેલથી એકાઉન્ટ બનાવેલું હોય, તો ફ્રેન્ડ રિક્વેસ્ટ મોકલો
+        else if (user && !user.isAnonymous) {
+            alert("Friend request sent successfully! 🎉");
+            document.getElementById('in-chat-menu-modal').style.display = 'none';
+        }
+    });
+}
+
+// 2. Sign Up (નવું એકાઉન્ટ બનાવવા માટે)
+if (authSignupBtn) {
+    authSignupBtn.addEventListener('click', () => {
+        const email = authEmail.value;
+        const password = authPassword.value;
+        
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                authModal.style.display = 'none';
+                alert("Account created successfully! You are now a registered user. 🚀");
+            })
+            .catch((error) => {
+                authErrorMsg.innerText = "Error: " + error.message;
+                authErrorMsg.style.display = 'block';
+            });
+    });
+}
+
+// 3. Log In (જૂના એકાઉન્ટમાં જવા માટે)
+if (authLoginBtn) {
+    authLoginBtn.addEventListener('click', () => {
+        const email = authEmail.value;
+        const password = authPassword.value;
+        
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                authModal.style.display = 'none';
+                alert("Welcome back! Logged in successfully. ✅");
+            })
+            .catch((error) => {
+                authErrorMsg.innerText = "Error: " + error.message;
+                authErrorMsg.style.display = 'block';
+            });
+    });
+}
