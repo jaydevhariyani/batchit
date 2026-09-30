@@ -520,3 +520,17 @@ if (authLoginBtn) {
             .catch((error) => { authErrorMsg.innerText = "Error: " + error.message; authErrorMsg.style.display = 'block'; });
     });
 }
+// --- 6. BACK BUTTON LOGIC ---
+document.getElementById('back-to-home-btn')?.addEventListener('click', () => {
+    if(confirm("Do you want to leave this chat and go back?")) {
+        const mainChatScreen = document.getElementById('main-chat-screen');
+        const dashboardScreen = document.getElementById('dashboard-screen');
+        
+        if(mainChatScreen) mainChatScreen.style.display = 'none';
+        if(dashboardScreen) dashboardScreen.style.display = 'flex';
+        
+        // ચેટ બોક્સ ખાલી કરી નાખો
+        const chatBox = document.getElementById('chat-box');
+        if(chatBox) chatBox.innerHTML = "";
+    }
+});
