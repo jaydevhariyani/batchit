@@ -534,3 +534,12 @@ document.getElementById('back-to-home-btn')?.addEventListener('click', () => {
         if(chatBox) chatBox.innerHTML = "";
     }
 });
+// --- 7. MOBILE MENU LOGIC ---
+const mobileMenuBtn = document.getElementById('mobile-menu-toggle');
+const mobileMenu = document.getElementById('mobile-menu');
+
+if (mobileMenuBtn && mobileMenu) {
+    mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('active');
+    });
+}
